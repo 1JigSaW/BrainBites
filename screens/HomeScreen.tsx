@@ -1,11 +1,13 @@
 import React, {useContext, useEffect, useState} from 'react';
 import {
+    Image,
     SafeAreaView,
     StyleSheet, Text, View,
 } from 'react-native';
 import {HomeStackParamList} from "../navigation/HomeStack";
 import {StackScreenProps} from "@react-navigation/stack";
 import {BACKGROUND} from "../colors";
+import {Regular} from "../fonts";
 
 type Props = StackScreenProps<HomeStackParamList, 'HomeScreen'>;
 
@@ -15,10 +17,15 @@ const HomeScreen = ({navigation}: Props) => {
         <SafeAreaView style={styles.safeContainer}>
             <View style={styles.headerContainer}>
                 <View style={styles.iconContainer}>
-                    <Text style={styles.iconText}>jigsaw</Text>
+                    <View style={styles.avatarIcon}></View>
+                    <Text style={styles.iconText}>My topics</Text>
                 </View>
                 <View style={styles.iconContainer}>
-                    <Text style={styles.iconText}>Текст</Text>
+                    <Image source={{ uri: 'https://cdn.pixabay.com/photo/2018/02/08/22/27/flower-3140492_1280.jpg' }} style={styles.avatar} />
+                    <Text style={styles.nameText}>jigsaw</Text>
+                </View>
+                <View style={styles.iconContainer}>
+                    <Text style={styles.iconText}>My cards</Text>
                 </View>
             </View>
             <View style={styles.container}>
@@ -38,7 +45,7 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
         alignItems: 'center',
         paddingHorizontal: 20,
-        paddingVertical: 10,
+        paddingVertical: 20,
     },
     container: {
         flex: 1,
@@ -60,8 +67,20 @@ const styles = StyleSheet.create({
         marginBottom: 5,
     },
     iconText: {
+        fontFamily: Regular,
         fontSize: 16,
         color: '#000',
+    },
+    nameText: {
+        fontFamily: Regular,
+        fontSize: 24,
+        color: '#000',
+    },
+    avatar: {
+        width: 70,
+        height: 70,
+        borderRadius: 35,
+        marginBottom: 5,
     },
 });
 
