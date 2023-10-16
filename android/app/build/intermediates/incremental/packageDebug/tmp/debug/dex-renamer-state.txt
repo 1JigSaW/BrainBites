@@ -1,12 +1,12 @@
-#Sun Oct 15 22:55:40 EEST 2023
+#Mon Oct 16 01:12:55 EEST 2023
 path.3=14/classes.dex
 path.2=1/classes.dex
 path.1=0/classes.dex
 path.0=classes.dex
-base.3=/home/jigsaw/BrainBites/android/app/build/intermediates/dex/debug/mergeProjectDexDebug/14/classes.dex
-base.2=/home/jigsaw/BrainBites/android/app/build/intermediates/dex/debug/mergeProjectDexDebug/1/classes.dex
-base.1=/home/jigsaw/BrainBites/android/app/build/intermediates/dex/debug/mergeProjectDexDebug/0/classes.dex
-base.0=/home/jigsaw/BrainBites/android/app/build/intermediates/dex/debug/mergeExtDexDebug/classes.dex
+base.3=/home/jigsaw/WebstormProjects/BrainBites/android/app/build/intermediates/dex/debug/mergeProjectDexDebug/14/classes.dex
+base.2=/home/jigsaw/WebstormProjects/BrainBites/android/app/build/intermediates/dex/debug/mergeProjectDexDebug/1/classes.dex
+base.1=/home/jigsaw/WebstormProjects/BrainBites/android/app/build/intermediates/dex/debug/mergeProjectDexDebug/0/classes.dex
+base.0=/home/jigsaw/WebstormProjects/BrainBites/android/app/build/intermediates/dex/debug/mergeExtDexDebug/classes.dex
 renamed.3=classes4.dex
 renamed.2=classes3.dex
 renamed.1=classes2.dex

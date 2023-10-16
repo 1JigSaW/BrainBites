@@ -1,17 +1,17 @@
 import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
+import MainNavigator from "./navigation/MainNavigator";
 
-const Tab = createBottomTabNavigator();
+const queryClient = new QueryClient();
 
 function App(): JSX.Element {
   return (
-      <NavigationContainer>
-        <Tab.Navigator>
-          {/*<Tab.Screen name="Home" />*/}
-          {/*<Tab.Screen name="Settings" />*/}
-        </Tab.Navigator>
-      </NavigationContainer>
+      <QueryClientProvider client={queryClient}>
+          <NavigationContainer>
+              <MainNavigator />
+          </NavigationContainer>
+      </QueryClientProvider>
   );
 }
 
