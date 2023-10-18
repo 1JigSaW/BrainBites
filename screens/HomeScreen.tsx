@@ -6,7 +6,7 @@ import {
 } from 'react-native';
 import {HomeStackParamList} from "../navigation/HomeStack";
 import {StackScreenProps} from "@react-navigation/stack";
-import {BACKGROUND, BLACK} from "../colors";
+import {BACKGROUND, BLACK, BLUE} from "../colors";
 import {Regular} from "../fonts";
 import TopicsIcon from "../components/icons/TopicsIcon";
 import MyCardsIcon from "../components/icons/MyCardsIcon";
@@ -14,10 +14,14 @@ import CountCardsIcon from "../components/icons/CountCardsIcon";
 import BrainXPIcon from "../components/icons/BrainXPIcon";
 import BadgesIcon from "../components/icons/BadgesIcon";
 import ArrowRightIcon from "../components/icons/ArrowRight";
+import {getButtonStyle, getButtonTextStyle} from "../components/functions/buttonHelpers";
+
 
 type Props = StackScreenProps<HomeStackParamList, 'HomeScreen'>;
 
 const HomeScreen = ({navigation}: Props) => {
+    const [activeButton, setActiveButton] = useState('Cards');
+
 
     return (
         <ScrollView style={{ flex: 1, backgroundColor: BACKGROUND }}>
@@ -116,14 +120,23 @@ const HomeScreen = ({navigation}: Props) => {
                 <View style={styles.separator} />
 
                 <View style={styles.buttonContainer}>
-                    <TouchableOpacity style={styles.roundedButton}>
-                        <Text style={styles.buttonText}>Cards</Text>
+                    <TouchableOpacity
+                        style={getButtonStyle('Cards')}
+                        onPress={() => setActiveButton('Cards')}
+                    >
+                        <Text style={getButtonTextStyle('Cards')}>Cards</Text>
                     </TouchableOpacity>
-                    <TouchableOpacity style={styles.roundedButton}>
-                        <Text style={styles.buttonText}>XP</Text>
+                    <TouchableOpacity
+                        style={getButtonStyle('XP')}
+                        onPress={() => setActiveButton('XP')}
+                    >
+                        <Text style={getButtonTextStyle('XP')}>XP</Text>
                     </TouchableOpacity>
-                    <TouchableOpacity style={styles.roundedButton}>
-                        <Text style={styles.buttonText}>Badges</Text>
+                    <TouchableOpacity
+                        style={getButtonStyle('Badges')}
+                        onPress={() => setActiveButton('Badges')}
+                    >
+                        <Text style={getButtonTextStyle('Badges')}>Badges</Text>
                     </TouchableOpacity>
                 </View>
                 <View style={styles.blockNum}>
@@ -348,7 +361,13 @@ const styles = StyleSheet.create({
     },
     blockNum: {
         marginBottom: 30,
-    }
+    },
+    activeButton: {
+        backgroundColor: BLUE,
+    },
+    activeButtonText: {
+        color: BACKGROUND,
+    },
 });
 
 export default HomeScreen;
