@@ -20,7 +20,7 @@ type Props = StackScreenProps<HomeStackParamList, 'HomeScreen'>;
 const HomeScreen = ({navigation}: Props) => {
 
     return (
-        <ScrollView style={{ flex: 1 }}>
+        <ScrollView style={{ flex: 1, backgroundColor: BACKGROUND }}>
             <SafeAreaView style={styles.safeContainer}>
                 <View style={styles.headerContainer}>
                     <View style={styles.iconContainer}>
@@ -106,7 +106,9 @@ const HomeScreen = ({navigation}: Props) => {
 
                 <View style={styles.lineContainer}>
                     <Text style={styles.subtitle}>Leaderboard</Text>
-                    <ArrowRightIcon size={25} color={BLACK} />
+                    <TouchableOpacity onPress={() => navigation.navigate('LeaderBoardScreen')}>
+                        <ArrowRightIcon size={25} color={BLACK} />
+                    </TouchableOpacity>
                 </View>
 
                 <View style={styles.separator} />
