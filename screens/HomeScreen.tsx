@@ -58,7 +58,9 @@ const HomeScreen = ({navigation}: Props) => {
 
                 <View style={styles.lineContainer}>
                     <Text style={styles.subtitle}>Upcoming Achievements</Text>
-                    <ArrowRightIcon size={25} color={BLACK} />
+                    <TouchableOpacity onPress={() => navigation.navigate('AchievementsScreen')}>
+                        <ArrowRightIcon size={25} color={BLACK} />
+                    </TouchableOpacity>
                 </View>
 
                 <View style={styles.separator} />
