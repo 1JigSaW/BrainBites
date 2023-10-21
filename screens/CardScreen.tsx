@@ -4,7 +4,7 @@ import {
     StyleSheet, Text, View,
 } from 'react-native';
 import {StackScreenProps} from "@react-navigation/stack";
-import {BACKGROUND} from "../colors";
+import {BACKGROUND, BLACK, BLUE} from "../colors";
 import {CardsStackParamList} from "../navigation/CardsStack";
 import Swiper from 'react-native-deck-swiper';
 
@@ -29,11 +29,10 @@ const CardsScreen = () => {
         { text: 'Card 1' },
         { text: 'Card 2' },
         { text: 'Card 3' },
-        // ... добавьте столько карточек, сколько вам нужно
     ];
 
     return (
-        <View style={styles.container}>
+        <View style={styles.containerBlock}>
             <Swiper
                 cards={cards}
                 renderCard={(card) => (
@@ -41,35 +40,40 @@ const CardsScreen = () => {
                         <Text>{card.text}</Text>
                     </View>
                 )}
+                backgroundColor={BLUE}
+                cardVerticalMargin={50}
+                cardHorizontalMargin={10}
                 onSwiped={(cardIndex) => { console.log(cardIndex); }}
                 onSwipedAll={() => { console.log('All cards have been swiped!'); }}
-                stackSize={3}
-                stackScale={10} // Это свойство создаст эффект масштабирования для задних карточек
-                stackSeparation={15}
+                stackSize={5}
+                // stackSeparation={-5}
+                stackScale={0}
             />
         </View>
     );
 };
 
 const styles = StyleSheet.create({
-    container: {
+    containerBlock: {
         flex: 1,
-        backgroundColor: BACKGROUND,
+        backgroundColor: BLACK,
         justifyContent: 'center',
         alignItems: 'center',
     },
     card: {
-        width: screenWidth - 40,
-        height: screenHeight - 150,
-        backgroundColor: '#FFFFFF',
+        width: '100%', // Увеличили отступы по бокам
+        height: '100%', // Увеличили отступ сверху и снизу
+        backgroundColor: BACKGROUND,
         alignItems: 'center',
         justifyContent: 'center',
-        borderRadius: 5,
+        borderRadius: 20,
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 3 },
         shadowOpacity: 0.5,
         shadowRadius: 5,
         elevation: 5,
+        marginTop: -40,
+        borderWidth: 1,
     },
 });
 
