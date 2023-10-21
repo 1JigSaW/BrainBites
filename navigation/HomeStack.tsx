@@ -4,11 +4,15 @@ import HomeScreen from "../screens/HomeScreen";
 import LeaderBoardScreen from "../screens/LeaderBoardScreen";
 import ArrowBackIcon from "../components/icons/ArrowBackIcon";
 import AchievementsScreen from "../screens/AchievementsScreen";
+import MyCardsScreen from "./MyCardsScreen";
+import MyTopicsScreen from "../screens/MyTopicsScreen";
 
 export type HomeStackParamList = {
     HomeScreen: undefined;
     LeaderBoardScreen: undefined;
     AchievementsScreen: undefined;
+    MyCardsScreen: undefined;
+    MyTopicsScreen: undefined;
 };
 
 const Stack = createStackNavigator<HomeStackParamList>();
@@ -40,6 +44,40 @@ const HomeStack = () => {
                 options={{
                     headerBackTitleVisible: false,
                     headerTitle: 'Achievements',
+                    headerTitleAlign: 'center',
+                    headerBackImage: ({ tintColor }) => (
+                        <ArrowBackIcon color={tintColor} size={25} style={{marginLeft: 10, marginTop: 5}} />
+                    ),
+                    headerTitleStyle: {
+                        fontFamily: 'Abel',
+                        fontSize: 28,
+                    },
+                }}
+
+            />
+            <Stack.Screen
+                name="MyCardsScreen"
+                component={MyCardsScreen}
+                options={{
+                    headerBackTitleVisible: false,
+                    headerTitle: 'My Cards',
+                    headerTitleAlign: 'center',
+                    headerBackImage: ({ tintColor }) => (
+                        <ArrowBackIcon color={tintColor} size={25} style={{marginLeft: 10, marginTop: 5}} />
+                    ),
+                    headerTitleStyle: {
+                        fontFamily: 'Abel',
+                        fontSize: 28,
+                    },
+                }}
+
+            />
+            <Stack.Screen
+                name="MyTopicsScreen"
+                component={MyTopicsScreen}
+                options={{
+                    headerBackTitleVisible: false,
+                    headerTitle: 'My Topics',
                     headerTitleAlign: 'center',
                     headerBackImage: ({ tintColor }) => (
                         <ArrowBackIcon color={tintColor} size={25} style={{marginLeft: 10, marginTop: 5}} />

@@ -2,6 +2,7 @@ import React from 'react';
 import { createStackNavigator } from '@react-navigation/stack';
 import CardsScreen from "../screens/CardScreen";
 
+
 export type CardsStackParamList = {
     CardsScreen: undefined;
 };

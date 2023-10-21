@@ -27,19 +27,19 @@ const HomeScreen = ({navigation}: Props) => {
         <ScrollView style={{ flex: 1, backgroundColor: BACKGROUND }}>
             <SafeAreaView style={styles.safeContainer}>
                 <View style={styles.headerContainer}>
-                    <View style={styles.iconContainer}>
+                    <TouchableOpacity style={styles.iconContainer} onPress={() => navigation.navigate('MyTopicsScreen')}>
                         <TopicsIcon size={35} color={BLACK} />
                         <Text style={styles.iconText}>My topics</Text>
-                    </View>
+                    </TouchableOpacity>
                     <View style={styles.iconContainer}>
                         <Image source={{ uri: 'https://cdn.pixabay.com/photo/2018/02/08/22/27/flower-3140492_1280.jpg' }}
                                style={styles.avatar} />
                         <Text style={styles.nameText}>jigsaw</Text>
                     </View>
-                    <View style={styles.iconContainer}>
+                    <TouchableOpacity style={styles.iconContainer} onPress={() => navigation.navigate('MyCardsScreen')}>
                         <MyCardsIcon size={30} color={BLACK} />
                         <Text style={styles.iconText}>My cards</Text>
-                    </View>
+                    </TouchableOpacity>
                 </View>
 
                 <View style={styles.headerContainer}>
@@ -121,22 +121,22 @@ const HomeScreen = ({navigation}: Props) => {
 
                 <View style={styles.buttonContainer}>
                     <TouchableOpacity
-                        style={getButtonStyle('Cards')}
+                        style={getButtonStyle('Cards', activeButton, styles)}
                         onPress={() => setActiveButton('Cards')}
                     >
-                        <Text style={getButtonTextStyle('Cards')}>Cards</Text>
+                        <Text style={getButtonTextStyle('Cards', activeButton, styles)}>Cards</Text>
                     </TouchableOpacity>
                     <TouchableOpacity
-                        style={getButtonStyle('XP')}
+                        style={getButtonStyle('XP', activeButton, styles)}
                         onPress={() => setActiveButton('XP')}
                     >
-                        <Text style={getButtonTextStyle('XP')}>XP</Text>
+                        <Text style={getButtonTextStyle('XP', activeButton, styles)}>XP</Text>
                     </TouchableOpacity>
                     <TouchableOpacity
-                        style={getButtonStyle('Badges')}
+                        style={getButtonStyle('Badges', activeButton, styles)}
                         onPress={() => setActiveButton('Badges')}
                     >
-                        <Text style={getButtonTextStyle('Badges')}>Badges</Text>
+                        <Text style={getButtonTextStyle('Badges', activeButton, styles)}>Badges</Text>
                     </TouchableOpacity>
                 </View>
                 <View style={styles.blockNum}>
