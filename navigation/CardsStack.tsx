@@ -5,6 +5,7 @@ import CardsScreen from "../screens/CardScreen";
 
 export type CardsStackParamList = {
     CardsScreen: undefined;
+    QuizScreen: undefined;
 };
 
 const Stack = createStackNavigator<CardsStackParamList>();
