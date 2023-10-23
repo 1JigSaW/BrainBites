@@ -5,7 +5,7 @@ import {
     ScrollView,
     StyleSheet, Text, TouchableOpacity, View,
 } from 'react-native';
-import {HomeStackParamList} from "./HomeStack";
+import {HomeStackParamList} from "../navigation/HomeStack";
 import {StackScreenProps} from "@react-navigation/stack";
 import {BACKGROUND, BLACK} from "../colors";
 import DeleteIcon from "../components/icons/DeleteIcon";

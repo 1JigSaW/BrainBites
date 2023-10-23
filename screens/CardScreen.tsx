@@ -13,7 +13,7 @@ import QuizScreen from "./QuizScreen";
 
 type Props = StackScreenProps<CardsStackParamList, 'CardsScreen'>;
 
-const CardsScreen = () => {
+const CardsScreen = ({navigation}: Props) => {
     const [showTestScreen, setShowTestScreen] = useState(true);
 
 
@@ -61,7 +61,7 @@ const CardsScreen = () => {
                     />
                 </View>
             ) : (
-                <QuizScreen />
+                <QuizScreen setShowTestScreen={setShowTestScreen} />
             )}
         </>
     );

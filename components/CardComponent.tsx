@@ -85,7 +85,7 @@ const styles = StyleSheet.create({
     },
     source: {
         position: 'absolute',
-        bottom: 30,
+        bottom: 40,
         left: 20,
         color: BLACK,
         fontFamily: 'Abel',
@@ -100,6 +100,16 @@ const styles = StyleSheet.create({
         fontFamily: 'Abel',
         fontSize: 15,
         fontWeight: '400',
+        borderWidth: 1,
+        paddingVertical: 2,
+        paddingHorizontal: 5,
+        textAlign: "center",
+        borderRadius: 20,
+    },
+    tagBlock: {
+        borderWidth: 1,
+        borderRadius: 20,
+        padding: 5,
     }
 });
 

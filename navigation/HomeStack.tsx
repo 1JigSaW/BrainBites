@@ -4,7 +4,7 @@ import HomeScreen from "../screens/HomeScreen";
 import LeaderBoardScreen from "../screens/LeaderBoardScreen";
 import ArrowBackIcon from "../components/icons/ArrowBackIcon";
 import AchievementsScreen from "../screens/AchievementsScreen";
-import MyCardsScreen from "./MyCardsScreen";
+import MyCardsScreen from "../screens/MyCardsScreen";
 import MyTopicsScreen from "../screens/MyTopicsScreen";
 
 export type HomeStackParamList = {
