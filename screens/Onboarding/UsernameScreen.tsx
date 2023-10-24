@@ -11,12 +11,45 @@ import {
 } from 'react-native';
 import { StackScreenProps } from "@react-navigation/stack";
 import { OnboardingStackParamList } from "../../navigation/OnboardingNavigator";
-import {BACKGROUND, BLACK, BLUE} from "../../colors";
+import {BACKGROUND, BLACK, BLUE, RED} from "../../colors";
+import {useCheckUsernameUnique} from "../../queries/user";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import {onboardingUsername} from "../../constants";
 
 type Props = StackScreenProps<OnboardingStackParamList, 'UsernameScreen'>;
 
 const UsernameScreen = ({ navigation }: Props) => {
     const [username, setUsername] = useState('');
+    const [isUsernameTaken, setIsUsernameTaken] = useState(false);
+
+    const usernameCheck = useCheckUsernameUnique();
+
+    const handleContinuePress = async () => {
+        if (!username) {
+            return;
+        }
+
+        usernameCheck.mutate(username, {
+            onSuccess: (data) => {
+                if (data.isUnique) {
+                    AsyncStorage.setItem(onboardingUsername, username);
+                    navigation.navigate('TopicSelectionScreen');
+                } else {
+                    setIsUsernameTaken(true);
+                }
+            },
+            onError: (error) => {
+
+            }
+        });
+    };
+
+    const handleTextChange = (text: string) => {
+        setUsername(text);
+        if (isUsernameTaken) {
+            setIsUsernameTaken(false);  // reset the error if user starts typing
+        }
+    };
 
     return (
         <ScrollView style={{ flex: 1, backgroundColor: BACKGROUND }} contentContainerStyle={{ flexGrow: 1 }}>
@@ -26,17 +59,18 @@ const UsernameScreen = ({ navigation }: Props) => {
                         style={styles.input}
                         placeholder="Enter unique username"
                         value={username}
-                        onChangeText={setUsername}
+                        onChangeText={handleTextChange} // Updated handler
                     />
+                    {isUsernameTaken && <Text style={{ color: RED, textAlign: 'center', width: '100%' }}>Username is already taken</Text>}
                 </View>
-                <TouchableOpacity style={styles.continueButton} onPress={() => {
-                }}>
-                    <Text style={styles.textButton}>Continue</Text>
+                <TouchableOpacity style={styles.continueButton} onPress={handleContinuePress}>
+                    <Text style={[styles.textButton, (isUsernameTaken || username === '') && {opacity: 0.5}]} disabled={isUsernameTaken || username === ''}>Continue</Text>
                 </TouchableOpacity>
             </SafeAreaView>
         </ScrollView>
     );
 };
+
 
 const styles = StyleSheet.create({
     safeContainer: {
