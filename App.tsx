@@ -10,21 +10,26 @@ import MainContext from './navigation/MainContext';
 const queryClient = new QueryClient();
 
 function App(): JSX.Element | null {
-
+    const [userId, setUserId] = useState<number | null>(null);
     const [isFirstLaunch, setIsFirstLaunch] = useState<boolean | null>(null);
 
     useEffect(() => {
         AsyncStorage.getItem(firstLaunchTest).then(value => {
             if (value == null) {
-                // AsyncStorage.setItem(firstLaunchTest, 'true');
                 setIsFirstLaunch(true);
             } else {
                 setIsFirstLaunch(false);
             }
         });
+        AsyncStorage.getItem(user).then(value => {
+            if (value !== null) {
+                setUserId(JSON.parse(value).id);
+            }
+        });
     }, []);
 
-    const completeOnboarding = async () => {
+    const completeOnboarding = async (newUserId: number) => {
+        setUserId(newUserId);
         await AsyncStorage.setItem(firstLaunchTest, 'true');
         setIsFirstLaunch(false);
     };
@@ -33,16 +38,9 @@ function App(): JSX.Element | null {
         return null;
     }
 
-    AsyncStorage.getItem(user)
-        .then(value => {
-            console.log('AsyncStorage value:', value);
-        })
-        .catch(error => {
-            console.error('Error reading AsyncStorage:', error);
-        });
-
+    console.log('userId', userId);
   return (
-      <MainContext.Provider value={{ completeOnboarding }}>
+      <MainContext.Provider value={{ userId, completeOnboarding }}>
           <QueryClientProvider client={queryClient}>
               <NavigationContainer>
                   {isFirstLaunch ? <OnboardingNavigator /> : <MainNavigator />}

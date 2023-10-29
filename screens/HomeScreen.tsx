@@ -19,10 +19,34 @@ import {getButtonStyle, getButtonTextStyle} from "../components/functions/button
 
 type Props = StackScreenProps<HomeStackParamList, 'HomeScreen'>;
 
-const HomeScreen = ({navigation}: Props) => {
+import MainContext from "../navigation/MainContext";
+import {useGetUserStats} from "../queries/user";
+
+const getFontSizeForName = (name: string) => {
+    if (name.length <= 5) {
+        return 20; // Large font size for short names
+    } else if (name.length <= 20) {
+        return 16; // Medium font size for medium-length names
+    } else {
+        return 12; // Small font size for long names
+    }
+};
+
+const HomeScreen = ({ navigation, route }: Props) => {
     const [activeButton, setActiveButton] = useState('Cards');
+    const { userId } = useContext(MainContext);
 
+    const { data: userStats, isLoading, isError } = useGetUserStats(userId);
 
+    // if (isLoading) {
+    //     // Show some loading indicator
+    //     return <LoadingIndicator />;
+    // }
+    //
+    // if (isError) {
+    //     // Handle error state
+    //     return <ErrorMessage message="Could not load user stats." />;
+    // }
     return (
         <ScrollView style={{ flex: 1, backgroundColor: BACKGROUND }}>
             <SafeAreaView style={styles.safeContainer}>
@@ -32,9 +56,18 @@ const HomeScreen = ({navigation}: Props) => {
                         <Text style={styles.iconText}>My topics</Text>
                     </TouchableOpacity>
                     <View style={styles.iconContainer}>
-                        <Image source={{ uri: 'https://cdn.pixabay.com/photo/2018/02/08/22/27/flower-3140492_1280.jpg' }}
-                               style={styles.avatar} />
-                        <Text style={styles.nameText}>jigsaw</Text>
+                        <Image
+                            source={{ uri: 'https://cdn.pixabay.com/photo/2018/02/08/22/27/flower-3140492_1280.jpg' }}
+                            style={styles.avatar}
+                        />
+                        <Text
+                            style={[
+                                styles.nameText,
+                                { fontSize: getFontSizeForName(userStats?.username || '') }
+                            ]}
+                        >
+                            {userStats?.username}
+                        </Text>
                     </View>
                     <TouchableOpacity style={styles.iconContainer} onPress={() => navigation.navigate('MyCardsScreen')}>
                         <MyCardsIcon size={30} color={BLACK} />

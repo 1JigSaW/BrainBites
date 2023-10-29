@@ -4,8 +4,22 @@ export interface UsernameCheckResponse {
     isUnique: boolean;
 }
 export interface CreateUserResponse {
+    id: number;
     username: string;
     topics: string[];
+}
+export interface UserStatsResponse {
+    xp: number;
+    saved_cards_count: number;
+    topics_count: number;
+    earned_badges_count: number;
+    earned_badges: Badge[];
+    username: string;
+}
+
+export interface Badge {
+    name: string;
+    description: string;
 }
 
 
@@ -27,6 +41,15 @@ export class UserApi {
                 username: username,
                 topic_ids: topicIds
             });
+            return data;
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    static async getUserStats(userId: number): Promise<UserStatsResponse> {
+        try {
+            const { data } = await API.get(`/api/user-stats/${userId}/`);
             return data;
         } catch (error) {
             throw error;

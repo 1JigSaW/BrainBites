@@ -46,7 +46,7 @@ const TopicSelectionScreen = ({ navigation, route }: Props) => {
                     console.log('User created successfully:', data);
                     try {
                         await AsyncStorage.setItem(user, JSON.stringify(data));
-                        await completeOnboarding();
+                        await completeOnboarding(data.id);
                     } catch (error) {
                         console.error('Ошибка при сохранении данных пользователя:', error);
                     }

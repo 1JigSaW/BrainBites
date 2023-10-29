@@ -1,5 +1,5 @@
 import {useMutation, useQuery} from '@tanstack/react-query';
-import {CreateUserResponse, UserApi, UsernameCheckResponse} from "../api/user.api";
+import {CreateUserResponse, UserApi, UsernameCheckResponse, UserStatsResponse} from "../api/user.api";
 import {AxiosError} from "axios";
 
 export const USERNAME_UNIQUE_QUERY_KEY = 'username_check_unique';
@@ -31,6 +31,22 @@ export const useCreateUser = () => {
             },
             onSuccess: (data) => {
                 console.log('User created successfully:', data);
+            }
+        },
+    );
+};
+
+export const useGetUserStats = (userId: number | null) => {
+    return useQuery<UserStatsResponse, AxiosError>(
+        ['user_stats', userId],
+        () => UserApi.getUserStats(userId),
+        {
+            enabled: !!userId, // The query will not execute until the userId is truthy
+            onError: (error) => {
+                console.error('Error fetching user stats:', error);
+            },
+            onSuccess: (data) => {
+                console.log('User stats fetched successfully:', data);
             }
         },
     );
