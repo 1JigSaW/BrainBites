@@ -1,29 +1,61 @@
-import React, { useState } from 'react';
+import React, {useContext, useState} from 'react';
 import { Button, SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { StackScreenProps } from '@react-navigation/stack';
 import { OnboardingStackParamList } from '../../navigation/OnboardingNavigator';
 import { BACKGROUND, BLACK, BLUE } from '../../colors';
 import { useGetAllTopics } from '../../queries/topic';
+import {useMutation} from "@tanstack/react-query";
+import {UserApi} from "../../api/user.api";
+import {useCreateUser} from "../../queries/user";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import {user} from "../../constants";
+import MainContext from "../../navigation/MainContext";
 
 type Props = StackScreenProps<OnboardingStackParamList, 'TopicSelectionScreen'>;
 
 const TopicSelectionScreen = ({ navigation, route }: Props) => {
+    const { completeOnboarding } = useContext(MainContext);
     const { username } = route.params;
     const [selectedTopics, setSelectedTopics] = useState<string[]>([]);
     const { data: topics, isLoading, isError } = useGetAllTopics();
 
+    const createUserMutation = useCreateUser();
+
     const toggleTopic = (topicTitle: string) => {
-        setSelectedTopics((prevSelectedTopics) =>
+        setSelectedTopics(prevSelectedTopics =>
             prevSelectedTopics.includes(topicTitle)
                 ? prevSelectedTopics.filter(t => t !== topicTitle)
                 : [...prevSelectedTopics, topicTitle]
         );
     };
 
-    const handleContinue = async () => {
-        console.log('Selected topics:', selectedTopics);
-        // Replace 'NextScreenName' with the actual next screen's name
-        // navigation.navigate('NextScreenName');
+    const handleContinue = () => {
+        if (!topics) {
+            console.error('Topics data is not available.');
+            return;
+        }
+
+        const topicIds = topics
+            .filter(topic => selectedTopics.includes(topic.title))
+            .map(topic => topic.id);
+
+        createUserMutation.mutate(
+            { username, topicIds },
+            {
+                onSuccess: async (data) => {
+                    console.log('User created successfully:', data);
+                    try {
+                        await AsyncStorage.setItem(user, JSON.stringify(data));
+                        await completeOnboarding();
+                    } catch (error) {
+                        console.error('Ошибка при сохранении данных пользователя:', error);
+                    }
+                },
+                onError: (error) => {
+                    console.error('Ошибка при создании пользователя:', error);
+                },
+            }
+        );
     };
 
     if (isLoading) return <Text>Loading...</Text>;

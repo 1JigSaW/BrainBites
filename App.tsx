@@ -4,7 +4,8 @@ import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
 import MainNavigator from "./navigation/MainNavigator";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import OnboardingNavigator from "./navigation/OnboardingNavigator";
-import {firstLaunchTest} from "./constants";
+import {firstLaunchTest, user} from "./constants";
+import MainContext from './navigation/MainContext';
 
 const queryClient = new QueryClient();
 
@@ -23,16 +24,31 @@ function App(): JSX.Element | null {
         });
     }, []);
 
+    const completeOnboarding = async () => {
+        await AsyncStorage.setItem(firstLaunchTest, 'true');
+        setIsFirstLaunch(false);
+    };
+
     if (isFirstLaunch === null) {
         return null;
     }
 
+    AsyncStorage.getItem(user)
+        .then(value => {
+            console.log('AsyncStorage value:', value);
+        })
+        .catch(error => {
+            console.error('Error reading AsyncStorage:', error);
+        });
+
   return (
-      <QueryClientProvider client={queryClient}>
-          <NavigationContainer>
-              {isFirstLaunch ? <OnboardingNavigator /> : <MainNavigator />}
-          </NavigationContainer>
-      </QueryClientProvider>
+      <MainContext.Provider value={{ completeOnboarding }}>
+          <QueryClientProvider client={queryClient}>
+              <NavigationContainer>
+                  {isFirstLaunch ? <OnboardingNavigator /> : <MainNavigator />}
+              </NavigationContainer>
+          </QueryClientProvider>
+      </MainContext.Provider>
   );
 }
 
