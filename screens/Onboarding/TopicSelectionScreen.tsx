@@ -1,48 +1,66 @@
-import {Button, SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View} from "react-native";
-import {StackScreenProps} from "@react-navigation/stack";
-import {OnboardingStackParamList} from "../../navigation/OnboardingNavigator";
-import {BACKGROUND} from "../../colors";
-import {useState} from "react";
-import {useGetAllTopics} from "../../queries/topic";
+import React, { useState } from 'react';
+import { Button, SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { StackScreenProps } from '@react-navigation/stack';
+import { OnboardingStackParamList } from '../../navigation/OnboardingNavigator';
+import { BACKGROUND, BLACK, BLUE } from '../../colors';
+import { useGetAllTopics } from '../../queries/topic';
 
 type Props = StackScreenProps<OnboardingStackParamList, 'TopicSelectionScreen'>;
 
-const TopicSelectionScreen = ({ navigation }: Props) => {
-    const [selectedTopics, setSelectedTopics] = useState([]);
+const TopicSelectionScreen = ({ navigation, route }: Props) => {
+    const { username } = route.params;
+    const [selectedTopics, setSelectedTopics] = useState<string[]>([]);
     const { data: topics, isLoading, isError } = useGetAllTopics();
 
-    const toggleTopic = (topic: string) => {
-        if (selectedTopics.includes(topic)) {
-            setSelectedTopics(selectedTopics.filter(t => t !== topic));
-        } else {
-            setSelectedTopics([...selectedTopics, topic]);
-        }
+    const toggleTopic = (topicTitle: string) => {
+        setSelectedTopics((prevSelectedTopics) =>
+            prevSelectedTopics.includes(topicTitle)
+                ? prevSelectedTopics.filter(t => t !== topicTitle)
+                : [...prevSelectedTopics, topicTitle]
+        );
+    };
+
+    const handleContinue = async () => {
+        console.log('Selected topics:', selectedTopics);
+        // Replace 'NextScreenName' with the actual next screen's name
+        // navigation.navigate('NextScreenName');
     };
 
     if (isLoading) return <Text>Loading...</Text>;
     if (isError) return <Text>Error fetching topics.</Text>;
 
     return (
-        <ScrollView style={{ flex: 1, backgroundColor: BACKGROUND }}>
+        <ScrollView
+            style={{ flex: 1, backgroundColor: BACKGROUND }}
+            contentContainerStyle={{ flexGrow: 1, justifyContent: 'center', alignItems: 'center' }}
+        >
             <SafeAreaView style={styles.safeContainer}>
                 <Text style={styles.instructions}>Choose your topics:</Text>
                 <View style={styles.topicsContainer}>
-                    {topics.map((topic, index) => (
+                    {topics.map((topic) => (
                         <TouchableOpacity
-                            key={index}
-                            style={[styles.topic, selectedTopics.includes(topic) && styles.selectedTopic]}
-                            onPress={() => toggleTopic(topic.title)}>
-                            <Text>{topic.title}</Text>
+                            key={topic.id}
+                            style={[
+                                styles.topic,
+                                selectedTopics.includes(topic.title) && styles.selectedTopic
+                            ]}
+                            onPress={() => toggleTopic(topic.title)}
+                        >
+                            <Text style={[
+                                styles.topicTitle,
+                                selectedTopics.includes(topic.title) && styles.selectedTopicTitle
+                            ]}>
+                                {topic.title}
+                            </Text>
                         </TouchableOpacity>
                     ))}
                 </View>
                 <TouchableOpacity
                     disabled={selectedTopics.length === 0}
-                    onPress={() => {
-                        // Отправьте selectedTopics на сервер и выполните навигацию
-                    }}
+                    style={[styles.button, selectedTopics.length === 0 ? styles.disabledButton : styles.activeButton]}
+                    onPress={handleContinue}
                 >
-                    <Text>Continue</Text>
+                    <Text style={styles.buttonText}>Continue</Text>
                 </TouchableOpacity>
             </SafeAreaView>
         </ScrollView>
@@ -51,30 +69,61 @@ const TopicSelectionScreen = ({ navigation }: Props) => {
 
 const styles = StyleSheet.create({
     safeContainer: {
-        flex: 1,
-        backgroundColor: BACKGROUND,
-        paddingHorizontal: 23,
-        paddingVertical: 5,
+        width: '100%', // Added to ensure the SafeAreaView takes the full width
+        maxWidth: 600, // You can adjust this for tablet or large screen sizes
+        alignItems: 'center', // Center content horizontally
+        justifyContent: 'center', // Center content vertically
+        padding: 10, // Added padding for spacing
     },
     instructions: {
-        fontSize: 16,
         marginBottom: 20,
+        fontFamily: 'Abel',
+        fontSize: 20,
+        color: BLACK,
     },
     topicsContainer: {
         flexDirection: 'row',
         flexWrap: 'wrap',
+        justifyContent: 'center', // Added to center the topic buttons
     },
     topic: {
-        padding: 5,
+        padding: 10,
         borderWidth: 1,
-        borderColor: '#aaa',
         borderRadius: 15,
         margin: 4,
         alignItems: 'center',
+        borderColor: BLACK,
+    },
+    topicTitle: {
+        fontFamily: 'Abel',
+        color: BLACK, // Default color
     },
     selectedTopic: {
-        backgroundColor: '#ddd',
+        backgroundColor: BLUE,
+        borderColor: BLUE,
+    },
+    selectedTopicTitle: {
+        color: BACKGROUND, // Text color for selected topics
+    },
+    buttonText: {
+        color: 'white',
+    },
+    button: {
+        padding: 10,
+        borderRadius: 20,
+        alignItems: 'center',
+        width: '80%', // Set a fixed width for the buttons
+        marginBottom: 10,
+    },
+    activeButton: {
+        backgroundColor: BLUE,
+        marginTop: 10,
+    },
+    disabledButton: {
+        backgroundColor: '#ccc',
+        marginTop: 10,
     },
 });
 
 export default TopicSelectionScreen;
+

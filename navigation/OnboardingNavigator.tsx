@@ -5,7 +5,9 @@ import TopicSelectionScreen from "../screens/Onboarding/TopicSelectionScreen";
 
 export type OnboardingStackParamList = {
     UsernameScreen: undefined;
-    TopicSelectionScreen: undefined;
+    TopicSelectionScreen: {
+        username: string;
+    };
 };
 
 const Stack = createStackNavigator<OnboardingStackParamList>();

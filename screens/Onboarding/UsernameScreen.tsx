@@ -32,8 +32,7 @@ const UsernameScreen = ({ navigation }: Props) => {
         usernameCheck.mutate(username, {
             onSuccess: (data) => {
                 if (data.isUnique) {
-                    AsyncStorage.setItem(onboardingUsername, username);
-                    navigation.navigate('TopicSelectionScreen');
+                    navigation.navigate('TopicSelectionScreen', { username });
                 } else {
                     setIsUsernameTaken(true);
                 }
@@ -63,7 +62,7 @@ const UsernameScreen = ({ navigation }: Props) => {
                     />
                     {isUsernameTaken && <Text style={{ color: RED, textAlign: 'center', width: '100%' }}>Username is already taken</Text>}
                 </View>
-                <TouchableOpacity style={styles.continueButton} onPress={handleContinuePress}>
+                <TouchableOpacity style={[styles.continueButton, (isUsernameTaken || username === '') && {backgroundColor: '#ccc'}]} onPress={handleContinuePress}>
                     <Text style={[styles.textButton, (isUsernameTaken || username === '') && {opacity: 0.5}]} disabled={isUsernameTaken || username === ''}>Continue</Text>
                 </TouchableOpacity>
             </SafeAreaView>
@@ -83,7 +82,7 @@ const styles = StyleSheet.create({
     },
     inputContainer: {
         width: '100%',
-        marginBottom: 20,
+        marginBottom: 10,
     },
     input: {
         width: '100%',
@@ -98,12 +97,14 @@ const styles = StyleSheet.create({
         padding: 15,
         backgroundColor: BLUE,
         borderRadius: 20,
-        color: BACKGROUND
+        color: BACKGROUND,
+        width: '100%'
     },
     textButton: {
         color: BACKGROUND,
         fontSize: 15,
         fontFamily: 'Abel',
+        textAlign: 'center',
     }
 });
 
