@@ -6,6 +6,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import OnboardingNavigator from "./navigation/OnboardingNavigator";
 import {firstLaunchTest, user} from "./constants";
 import MainContext from './navigation/MainContext';
+import Toast from "react-native-toast-message";
 
 const queryClient = new QueryClient();
 
@@ -45,6 +46,7 @@ function App(): JSX.Element | null {
               <NavigationContainer>
                   {isFirstLaunch ? <OnboardingNavigator /> : <MainNavigator />}
               </NavigationContainer>
+              <Toast />
           </QueryClientProvider>
       </MainContext.Provider>
   );

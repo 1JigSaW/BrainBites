@@ -12,7 +12,12 @@ export type HomeStackParamList = {
     LeaderBoardScreen: undefined;
     AchievementsScreen: undefined;
     MyCardsScreen: undefined;
-    MyTopicsScreen: undefined;
+    MyTopicsScreen: {
+        topics: {
+            id: number;
+            title: string;
+        }[];
+    };
 };
 
 const Stack = createStackNavigator<HomeStackParamList>();

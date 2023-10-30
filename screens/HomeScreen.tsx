@@ -21,6 +21,7 @@ type Props = StackScreenProps<HomeStackParamList, 'HomeScreen'>;
 
 import MainContext from "../navigation/MainContext";
 import {useGetUserStats} from "../queries/user";
+import {useIsFocused} from "@react-navigation/native";
 
 const getFontSizeForName = (name: string) => {
     if (name.length <= 5) {
@@ -34,9 +35,21 @@ const getFontSizeForName = (name: string) => {
 
 const HomeScreen = ({ navigation, route }: Props) => {
     const [activeButton, setActiveButton] = useState('Cards');
+    const isFocused = useIsFocused(); // Этот хук возвращает true, когда экран в фокусе
     const { userId } = useContext(MainContext);
+    const {
+        data: userStats,
+        isLoading,
+        isError,
+        refetch,
+    } = useGetUserStats(userId);
 
-    const { data: userStats, isLoading, isError } = useGetUserStats(userId);
+    useEffect(() => {
+        if (isFocused && userId) {
+            refetch();
+        }
+    }, [isFocused, userId, refetch]);
+
 
     // if (isLoading) {
     //     // Show some loading indicator
@@ -51,7 +64,17 @@ const HomeScreen = ({ navigation, route }: Props) => {
         <ScrollView style={{ flex: 1, backgroundColor: BACKGROUND }}>
             <SafeAreaView style={styles.safeContainer}>
                 <View style={styles.headerContainer}>
-                    <TouchableOpacity style={styles.iconContainer} onPress={() => navigation.navigate('MyTopicsScreen')}>
+                    <TouchableOpacity
+                        style={styles.iconContainer}
+                        onPress={() => {
+                            // Make sure userStats is defined and has a 'topics' property before navigating
+                            if (userStats?.topics) {
+                                navigation.navigate('MyTopicsScreen', { topics: userStats.topics });
+                            } else {
+                                console.error('User stats or topics are undefined');
+                            }
+                        }}
+                    >
                         <TopicsIcon size={35} color={BLACK} />
                         <Text style={styles.iconText}>My topics</Text>
                     </TouchableOpacity>
@@ -78,17 +101,17 @@ const HomeScreen = ({ navigation, route }: Props) => {
                 <View style={styles.headerContainer}>
                     <View style={styles.iconContainer}>
                         <CountCardsIcon size={35} color={BLACK} />
-                        <Text style={styles.textBold}>100</Text>
+                        <Text style={styles.textBold}>{userStats?.read_cards_count}</Text>
                         <Text style={styles.textDefault}>Cards</Text>
                     </View>
                     <View style={styles.iconContainer}>
                         <BrainXPIcon size={35} color={BLACK} />
-                        <Text style={styles.textBold}>100</Text>
+                        <Text style={styles.textBold}>{userStats?.xp}</Text>
                         <Text style={styles.textDefault}>XP</Text>
                     </View>
                     <View style={styles.iconContainer}>
                         <BadgesIcon size={35} color={BLACK} />
-                        <Text style={styles.textBold}>100</Text>
+                        <Text style={styles.textBold}>{userStats?.earned_badges_count}</Text>
                         <Text style={styles.textDefault}>Badges</Text>
                     </View>
                 </View>

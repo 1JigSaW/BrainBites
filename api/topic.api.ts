@@ -14,4 +14,13 @@ export class TopicsApi {
             throw error;
         }
     }
+
+    static async updateUserTopics(user_id: number, topic_ids: number[]): Promise<void> {
+        try {
+            const endpoint = `/api/update_topics/${user_id}/`;
+            await API.put(endpoint, { topic_ids });
+        } catch (error) {
+            throw error;
+        }
+    }
 }

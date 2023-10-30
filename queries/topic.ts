@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query';
+import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
 import { TopicsApi, TopicResponse } from "../api/topic.api";
 import { AxiosError } from "axios";
 
@@ -12,6 +12,25 @@ export const useGetAllTopics = () => {
             onError: error => {
                 console.error(error);
             }
+        }
+    );
+};
+
+
+export const useUpdateUserTopics = () => {
+    const queryClient = useQueryClient();
+
+    return useMutation<void, AxiosError, { user_id: number; topic_ids: number[] }>(
+        ({ user_id, topic_ids }) => TopicsApi.updateUserTopics(user_id, topic_ids),
+        {
+            onError: (error) => {
+                // Handle the error here if needed
+                console.error(error);
+            },
+            onSuccess: () => {
+                // Invalidate and refetch
+                queryClient.invalidateQueries(TOPICS_QUERY_KEY);
+            },
         }
     );
 };

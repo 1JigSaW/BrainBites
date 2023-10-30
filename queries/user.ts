@@ -36,19 +36,22 @@ export const useCreateUser = () => {
     );
 };
 
+
 export const useGetUserStats = (userId: number | null) => {
     return useQuery<UserStatsResponse, AxiosError>(
         ['user_stats', userId],
         () => UserApi.getUserStats(userId),
         {
-            enabled: !!userId, // The query will not execute until the userId is truthy
+            enabled: !!userId, // Запрос не будет выполнен, пока userId не станет истинным
+            refetchOnWindowFocus: true, // Автоматически повторяет запрос при фокусировке окна
             onError: (error) => {
                 console.error('Error fetching user stats:', error);
             },
             onSuccess: (data) => {
                 console.log('User stats fetched successfully:', data);
-            }
+            },
         },
     );
 };
+
 

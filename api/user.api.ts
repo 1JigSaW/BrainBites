@@ -15,11 +15,18 @@ export interface UserStatsResponse {
     earned_badges_count: number;
     earned_badges: Badge[];
     username: string;
+    read_cards_count: number;
+    topics: Topic[];
 }
 
 export interface Badge {
     name: string;
     description: string;
+}
+
+export interface Topic {
+    id: number;
+    title: string;
 }
 
 
@@ -47,7 +54,7 @@ export class UserApi {
         }
     }
 
-    static async getUserStats(userId: number): Promise<UserStatsResponse> {
+    static async getUserStats(userId: number | null): Promise<UserStatsResponse> {
         try {
             const { data } = await API.get(`/api/user-stats/${userId}/`);
             return data;
