@@ -9,7 +9,7 @@ const CardComponent = ({ card, handlePress }: any) => {
     const [localIconSelected, setLocalIconSelected] = useState(false);
     const localIconColor = localIconSelected ? BLUE : BACKGROUND;
     const localIconBorderColor = localIconSelected ? BACKGROUND : BACKGROUND;
-    console.log('localIconSelected', localIconSelected);
+    console.log(card)
     return (
         <View style={styles.card}>
             <View style={styles.titleContainer}>
@@ -29,9 +29,9 @@ const CardComponent = ({ card, handlePress }: any) => {
                 style={styles.image}
                 source={{uri: 'https://via.placeholder.com/150'}}
             />
-            <Text style={styles.text}>{card.text}</Text>
+            <Text style={styles.text}>{card.content}</Text>
             <Text style={styles.source}>{card.source}</Text>
-            <Text style={styles.tag}>{card.tag}</Text>
+            <Text style={styles.tag}>{card.topic}</Text>
         </View>
     );
 }
