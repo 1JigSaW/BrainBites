@@ -1,75 +1,127 @@
-import {useContext, useEffect} from "react";
+import { useContext, useEffect, useState } from "react";
 import MainContext from "../navigation/MainContext";
-import {StackScreenProps} from "@react-navigation/stack";
-import {HomeStackParamList} from "../navigation/HomeStack";
-import {CardsStackParamList} from "../navigation/CardsStack";
+import { StackScreenProps } from "@react-navigation/stack";
+import { CardsStackParamList } from "../navigation/CardsStack";
 import Swiper from 'react-native-deck-swiper';
-import SaveIcon from "../components/icons/SaveIcon";
 import CardComponent from "../components/CardComponent";
-import {useGetUnseenCards} from "../queries/card";
-import {ActivityIndicator, StyleSheet, Text, View} from "react-native";
+import { useGetUnseenCards } from "../queries/card";
+import {ActivityIndicator, Alert, StyleSheet, Text, View} from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import {RemainingCards, SwipedCardIds} from "../constants";
 
 type Props = StackScreenProps<CardsStackParamList, 'CardsScreen'>;
 
-const CardsScreen = ({ navigation }: Props) => {
+const CARDS_KEY = '@CardsScreen/cards';
+
+const CardsScreen = ({ navigation }) => {
     const { userId } = useContext(MainContext);
-    const pageSize = 20;
+    const pageSize = 5;
+    const [cards, setCards] = useState( []);
+    const [fetchEnabled, setFetchEnabled] = useState(false);
 
     const {
         data: cardsData,
-        isLoading,
         isError,
         error,
         refetch
-    } = useGetUnseenCards(userId, pageSize);
+    } = useGetUnseenCards(userId, pageSize, fetchEnabled);
 
-    // Handle navigation to the test if required
-    useEffect(() => {
-        if (!cardsData) {
+    // При свайпе карточки сохраняем её ID
+    const handleSwiped = async (cardIndex: number) => {
+        const swipedCardId = cards[cardIndex].id;
+        // Обновляем список свайпнутых ID в локальном хранилище
+        try {
+            const swipedCardIdsJson = await AsyncStorage.getItem(SwipedCardIds);
+            const swipedCardIds = swipedCardIdsJson ? JSON.parse(swipedCardIdsJson) : [];
+            swipedCardIds.push(swipedCardId);
+            await AsyncStorage.setItem(SwipedCardIds, JSON.stringify(swipedCardIds));
 
+            // Также обновляем оставшиеся карточки в локальном хранилище
+            const updatedRemainingCards = cards.filter(card => card.id !== swipedCardId);
+            await AsyncStorage.setItem(RemainingCards, JSON.stringify(updatedRemainingCards));
+        } catch (error) {
+            // Обработка ошибок записи в AsyncStorage
+            console.log('Error saving swiped card:', error);
         }
-    }, [cardsData, navigation]);
-    console.log('cardsData', cardsData);
+    };
+
+    const handleTest = async () => {
+        console.log('All cards have been swiped, resetting...');
+
+        try {
+            // Удаляем сохраненные ID свайпнутых и оставшихся карточек из AsyncStorage
+            await AsyncStorage.removeItem('swipedCardIds');
+            await AsyncStorage.removeItem('remainingCards');
+
+            // Обновляем состояние, чтобы убедиться, что карточек нет
+            setCards([]);
+
+            // Включаем флаг для повторной загрузки карточек при следующем открытии приложения
+            setFetchEnabled(true);
+        } catch (error) {
+            console.error('Error resetting cards:', error);
+        }
+    };
 
 
     useEffect(() => {
-        refetch();
-    }, [refetch]);
+        const loadCards = async () => {
+            try {
+                // Пытаемся загрузить список свайпнутых ID из локального хранилища
+                const swipedCardIdsJson = await AsyncStorage.getItem(SwipedCardIds);
+                const swipedCardIds = swipedCardIdsJson ? JSON.parse(swipedCardIdsJson) : [];
 
-    if (isLoading) {
-        return (
-            <View style={styles.container}>
-                <ActivityIndicator size="large" />
-            </View>
-        );
-    }
+                // Пытаемся загрузить карточки, которые остались, из локального хранилища
+                const remainingCardsJson = await AsyncStorage.getItem(RemainingCards);
+                const remainingCards = remainingCardsJson ? JSON.parse(remainingCardsJson) : [];
 
-    if (isError) {
-        return (
-            <View style={styles.container}>
-                <Text>Could not load cards: {error?.message}</Text>
-            </View>
-        );
-    }
+                if (remainingCards.length > 0) {
+                    console.log(RemainingCards, remainingCards)
+                    const filteredCards = remainingCards.filter((card: { id: any; }) => !swipedCardIds.includes(card.id));
+                    setCards(filteredCards);
+                    console.log(cards)
+                } else {
+                    // Если в локальном хранилище нет карточек, делаем запрос к API
+                    setFetchEnabled(true);
+                }
+            } catch (error) {
+                // Обработка ошибок чтения из AsyncStorage
+                console.log('Error loading cards:', error);
+            }
+        };
+
+        loadCards();
+    }, [userId, fetchEnabled]);
+
+    useEffect(() => {
+        if (fetchEnabled && !isError && cardsData && cards.length === 0) {
+            setCards(cardsData);
+            // Сохраняем подгруженные карточки в локальное хранилище
+            AsyncStorage.setItem(RemainingCards, JSON.stringify(cardsData));
+            setFetchEnabled(false);
+        }
+    }, [fetchEnabled, isError, cardsData, cards]);
 
     return (
         <View style={styles.container}>
-            <Swiper
-                cards={cardsData} // Assume your API response contains a 'cards' array
-                renderCard={(card) => <CardComponent card={card} />}
-                onSwipedAll={() => {console.log(111)}} // Refetch when all cards are swiped
-                backgroundColor="#f0f0f0"
-                stackSize={pageSize}
-                stackScale={10}
-                stackSeparation={15}
-                disableBottomSwipe
-                disableTopSwipe
-                // Other props for Swiper...
-            />
+
+            {cards?.length > 0 ? (
+                <Swiper
+                    cards={cards}
+                    renderCard={(card) => <CardComponent card={card} />}
+                    onSwiped={(cardIndex) => handleSwiped(cardIndex)}
+                    onSwipedAll={handleTest}
+                    backgroundColor="#f0f0f0"
+                    stackSize={pageSize}
+                    stackScale={10}
+                    stackSeparation={15}
+                />
+            ) : (
+                <Text>No cards left</Text>
+            )}
         </View>
     );
 };
-
 const styles = StyleSheet.create({
     container: {
         flex: 1,
@@ -77,9 +129,6 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
     },
-    // ...rest of your styles
 });
 
 export default CardsScreen;
-
-

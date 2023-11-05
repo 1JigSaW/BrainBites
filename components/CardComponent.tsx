@@ -9,7 +9,12 @@ const CardComponent = ({ card, handlePress }: any) => {
     const [localIconSelected, setLocalIconSelected] = useState(false);
     const localIconColor = localIconSelected ? BLUE : BACKGROUND;
     const localIconBorderColor = localIconSelected ? BACKGROUND : BACKGROUND;
-    console.log(card)
+
+    if (!card) {
+        console.error('CardComponent was given undefined data');
+        return <Text>Error: Card data is not available.</Text>;
+    }
+
     return (
         <View style={styles.card}>
             <View style={styles.titleContainer}>

@@ -1,7 +1,7 @@
 import { API } from "./API";
 
 export interface Card {
-    id: number;
+    id: number | null;
     title: string;
     content: string;
     source: string;
@@ -9,20 +9,18 @@ export interface Card {
     topic: string;
 }
 
-// Обновите этот класс для соответствия новому API
 export class CardApi {
     static async getUnseenCards(userId: number | null, limit: number = 20): Promise<Card[] | { test_required: boolean }> {
         try {
-            // Параметр 'page' убран, так как он не используется в API
-            const response = await API.get(`api/cards/${userId}/`, {
+            // Запрос к эндпоинту, который должен соответствовать ожидаемому пути в Django (например, api/users/{userId}/cards/)
+            // Убедитесь, что у вас правильно настроен URL и что вы используете шаблоны пути, как в вашем Django View.
+            const response = await API.get(`api/cards/${userId}`, {
                 params: { limit }
             });
+            console.log('response.data', response.data);
+            return response.data;
             if (response.status === 200) {
-                // Обработка случая, когда нужно показать тест
-                if (response.data.test_required) {
-                    return { test_required: true };
-                }
-                // В противном случае возвращаем массив карточек
+                // В случае успеха возвращаем полученные данные
                 return response.data;
             }
             throw new Error(`Error: ${response.statusText}`);
