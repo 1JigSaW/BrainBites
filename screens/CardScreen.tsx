@@ -7,100 +7,127 @@ import CardComponent from "../components/CardComponent";
 import { useGetUnseenCards } from "../queries/card";
 import {ActivityIndicator, Alert, StyleSheet, Text, View} from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import {RemainingCards, SwipedCardIds} from "../constants";
+import {QuizVisible, QuizzesData, RemainingCards, SwipedCardIds} from "../constants";
+import {useGetAvailableQuizzes} from "../queries/quiz";
+import QuizModal from "../components/QuizModal";
 
 type Props = StackScreenProps<CardsStackParamList, 'CardsScreen'>;
 
-const CARDS_KEY = '@CardsScreen/cards';
-
-const CardsScreen = ({ navigation }) => {
+const CardsScreen = ({ navigation }: Props) => {
     const { userId } = useContext(MainContext);
     const pageSize = 5;
     const [cards, setCards] = useState( []);
     const [fetchEnabled, setFetchEnabled] = useState(false);
+    const [fetchEnabledQuiz, setFetchEnabledQuiz] = useState(false);
+    const [quizzes, setQuizzes] = useState([]);
+    const [isQuizVisible, setIsQuizVisible] = useState(false);
 
     const {
         data: cardsData,
-        isError,
-        error,
-        refetch
-    } = useGetUnseenCards(userId, pageSize, fetchEnabled);
+        isError: isCardsError,
+        refetch: refetchCards
+    } = useGetUnseenCards(userId, pageSize, cards.length === 0 && !isQuizVisible);
 
-    // При свайпе карточки сохраняем её ID
-    const handleSwiped = async (cardIndex: number) => {
+
+    const {
+        data: quizzesData,
+        isError: isQuizzesError,
+        refetch: refetchQuizzes
+    } = useGetAvailableQuizzes(userId, isQuizVisible);
+
+    const handleSwiped = async (cardIndex) => {
         const swipedCardId = cards[cardIndex].id;
-        // Обновляем список свайпнутых ID в локальном хранилище
         try {
-            const swipedCardIdsJson = await AsyncStorage.getItem(SwipedCardIds);
-            const swipedCardIds = swipedCardIdsJson ? JSON.parse(swipedCardIdsJson) : [];
+            const swipedCardIds = await getSwipedCardIds();
             swipedCardIds.push(swipedCardId);
             await AsyncStorage.setItem(SwipedCardIds, JSON.stringify(swipedCardIds));
 
-            // Также обновляем оставшиеся карточки в локальном хранилище
-            const updatedRemainingCards = cards.filter(card => card.id !== swipedCardId);
-            await AsyncStorage.setItem(RemainingCards, JSON.stringify(updatedRemainingCards));
+            const updatedCards = cards.filter(card => card.id !== swipedCardId);
+            setCards(updatedCards);
+            await AsyncStorage.setItem(RemainingCards, JSON.stringify(updatedCards));
         } catch (error) {
-            // Обработка ошибок записи в AsyncStorage
             console.log('Error saving swiped card:', error);
         }
     };
 
     const handleTest = async () => {
         console.log('All cards have been swiped, resetting...');
-
         try {
-            // Удаляем сохраненные ID свайпнутых и оставшихся карточек из AsyncStorage
-            await AsyncStorage.removeItem('swipedCardIds');
-            await AsyncStorage.removeItem('remainingCards');
-
-            // Обновляем состояние, чтобы убедиться, что карточек нет
             setCards([]);
-
-            // Включаем флаг для повторной загрузки карточек при следующем открытии приложения
-            setFetchEnabled(true);
+            setIsQuizVisible(true);
+            await AsyncStorage.setItem(QuizVisible, 'true');
+            await clearSwipedCardIds();
         } catch (error) {
             console.error('Error resetting cards:', error);
         }
     };
 
-
     useEffect(() => {
-        const loadCards = async () => {
-            try {
-                // Пытаемся загрузить список свайпнутых ID из локального хранилища
-                const swipedCardIdsJson = await AsyncStorage.getItem(SwipedCardIds);
-                const swipedCardIds = swipedCardIdsJson ? JSON.parse(swipedCardIdsJson) : [];
-
-                // Пытаемся загрузить карточки, которые остались, из локального хранилища
-                const remainingCardsJson = await AsyncStorage.getItem(RemainingCards);
-                const remainingCards = remainingCardsJson ? JSON.parse(remainingCardsJson) : [];
-
-                if (remainingCards.length > 0) {
-                    console.log(RemainingCards, remainingCards)
-                    const filteredCards = remainingCards.filter((card: { id: any; }) => !swipedCardIds.includes(card.id));
-                    setCards(filteredCards);
-                    console.log(cards)
-                } else {
-                    // Если в локальном хранилище нет карточек, делаем запрос к API
-                    setFetchEnabled(true);
-                }
-            } catch (error) {
-                // Обработка ошибок чтения из AsyncStorage
-                console.log('Error loading cards:', error);
-            }
-        };
-
-        loadCards();
-    }, [userId, fetchEnabled]);
-
-    useEffect(() => {
-        if (fetchEnabled && !isError && cardsData && cards.length === 0) {
-            setCards(cardsData);
-            // Сохраняем подгруженные карточки в локальное хранилище
-            AsyncStorage.setItem(RemainingCards, JSON.stringify(cardsData));
-            setFetchEnabled(false);
+        if (isQuizVisible) {
+            refetchQuizzes();
         }
-    }, [fetchEnabled, isError, cardsData, cards]);
+    }, [isQuizVisible]);
+
+// Изменён handleContinueFromQuiz для загрузки новых карточек
+    const handleContinueFromQuiz = () => {
+        setIsQuizVisible(false);
+        refetchCards(); // Загружаем новые карточки после закрытия викторины
+    };
+
+    // Load quiz visibility and data
+    useEffect(() => {
+        loadQuizVisibility();
+    }, []);
+
+    // Load cards and manage state accordingly
+    useEffect(() => {
+        if (!isCardsError && cardsData && cards.length === 0) {
+            setCards(cardsData);
+            AsyncStorage.setItem(RemainingCards, JSON.stringify(cardsData));
+        }
+    }, [isCardsError, cardsData]);
+
+    // Manage quizzes state and storage
+    useEffect(() => {
+        if (!isQuizzesError && quizzesData && isQuizVisible) {
+            setQuizzes(quizzesData);
+            AsyncStorage.setItem(QuizzesData, JSON.stringify(quizzesData));
+        }
+    }, [isQuizzesError, quizzesData, isQuizVisible]);
+
+    // Helper functions
+    async function getSwipedCardIds() {
+        const swipedCardIdsJson = await AsyncStorage.getItem(SwipedCardIds);
+        return swipedCardIdsJson ? JSON.parse(swipedCardIdsJson) : [];
+    }
+
+    async function clearSwipedCardIds() {
+        await AsyncStorage.removeItem(SwipedCardIds);
+        await AsyncStorage.removeItem(RemainingCards);
+    }
+
+    async function loadQuizVisibility() {
+        try {
+            const isQuizVisible = await getIsQuizVisible();
+            if (isQuizVisible) {
+                const storedQuizzes = await getStoredQuizzes();
+                setQuizzes(storedQuizzes);
+            }
+            setIsQuizVisible(isQuizVisible);
+        } catch (error) {
+            console.log('Error loading quiz visibility and data:', error);
+        }
+    }
+
+    async function getIsQuizVisible() {
+        const isQuizVisibleJson = await AsyncStorage.getItem(QuizVisible);
+        return isQuizVisibleJson ? JSON.parse(isQuizVisibleJson) : false;
+    }
+
+    async function getStoredQuizzes() {
+        const quizzesDataJson = await AsyncStorage.getItem(QuizzesData);
+        return quizzesDataJson ? JSON.parse(quizzesDataJson) : [];
+    }
 
     return (
         <View style={styles.container}>
@@ -118,6 +145,14 @@ const CardsScreen = ({ navigation }) => {
                 />
             ) : (
                 <Text>No cards left</Text>
+            )}
+
+            {quizzes && quizzes.length > 0 && (
+                <QuizModal
+                    isVisible={isQuizVisible}
+                    onContinue={handleContinueFromQuiz}
+                    quizzes={quizzes}
+                />
             )}
         </View>
     );

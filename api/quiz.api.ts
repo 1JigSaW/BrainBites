@@ -1,0 +1,27 @@
+import { API } from "./API";
+
+export interface Quiz {
+    id: number;
+    card: number;
+    question: string;
+    correct_answer: string;
+    answers: string[];
+}
+
+export class QuizApi {
+    static async getAvailableQuizzes(userId: number | null): Promise<Quiz[]> {
+        try {
+            // Запрос к эндпоинту, который должен соответствовать ожидаемому пути в Django (например, api/users/{userId}/quizzes/)
+            const response = await API.get(`api/quizzes/${userId}/`);
+            console.log('response.data', response.data);
+            if (response.status === 200) {
+                // В случае успеха возвращаем полученные данные
+                return response.data;
+            }
+            throw new Error(`Error: ${response.statusText}`);
+        } catch (error) {
+            console.error('Error fetching available quizzes:', error);
+            throw error;
+        }
+    }
+}
