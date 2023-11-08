@@ -10,7 +10,7 @@ export interface Card {
 }
 
 export class CardApi {
-    static async getUnseenCards(userId: number | null, limit: number = 20): Promise<Card[] | { test_required: boolean }> {
+    static async getUnseenCards(userId: number | null, limit: number = 20): Promise<Card[]> {
         try {
             // Запрос к эндпоинту, который должен соответствовать ожидаемому пути в Django (например, api/users/{userId}/cards/)
             // Убедитесь, что у вас правильно настроен URL и что вы используете шаблоны пути, как в вашем Django View.

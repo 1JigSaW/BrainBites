@@ -2,8 +2,15 @@ import React, { useState, useEffect } from 'react';
 import {View, Text, Modal, StyleSheet, Button, Animated} from 'react-native';
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import {QuizState} from "../constants";
+import {Quiz} from "../api/quiz.api";
 
-const QuizOverlay = ({ isVisible, onContinue, quizzes }) => {
+interface QuizOverlayProps {
+    isVisible: boolean;
+    onContinue: () => void;
+    quizzes: Quiz[]; // Replace 'Quiz[]' with the appropriate type for your quizzes
+}
+
+const QuizOverlay = ({ isVisible, onContinue, quizzes }: QuizOverlayProps) => {
     const [slideAnim] = useState(new Animated.Value(0));
     const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
     const [correctAnswersCount, setCorrectAnswersCount] = useState(0);
@@ -72,7 +79,7 @@ const QuizOverlay = ({ isVisible, onContinue, quizzes }) => {
                         <Text style={styles.questionText}>
                             {quizzes[currentQuestionIndex].question}
                         </Text>
-                        {quizzes[currentQuestionIndex].answers.map((answer, index) => (
+                        {quizzes[currentQuestionIndex].answers.map((answer: any, index: number) => (
                             <Button
                                 key={index}
                                 title={typeof answer.text === 'string' ? answer.text : 'Default Answer'}

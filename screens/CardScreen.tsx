@@ -7,23 +7,21 @@ import CardComponent from "../components/CardComponent";
 import {useGetUnseenCards, useMarkCardsAsTestPassed} from "../queries/card";
 import {ActivityIndicator, Alert, AppState, StyleSheet, Text, View} from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import {CARDSNOVIEWED, QuizVisible, QuizzesData, RemainingCards, SwipedCardIds} from "../constants";
 import {useGetAvailableQuizzes} from "../queries/quiz";
 import QuizModal from "../components/QuizModal";
+import {CARDS_INDEX_KEY, CARDS_KEY, QUIZ_KEY} from "../constants";
+import {Quiz} from "../api/quiz.api";
+import {Card} from "../api/card.api";
 
 type Props = StackScreenProps<CardsStackParamList, 'CardsScreen'>;
 
-const CARDS_KEY = '@currentCards18';
-const CARDS_INDEX_KEY = '@currentCardIndex18';
-const QUIZ_KEY = '@quiz18';
-
-const CardsScreen = ({ navigation }) => {
+const CardsScreen = ({ navigation }: Props) => {
     const { userId } = useContext(MainContext);
     const pageSize = 5;
-    const [cards, setCards] = useState([]);
+    const [cards, setCards] = useState<Card[] | undefined>([]);
     const [fetchEnabled, setFetchEnabled] = useState(false);
     const [fetchEnabledQuiz, setFetchEnabledQuiz] = useState(false);
-    const [quizzes, setQuizzes] = useState([]);
+    const [quizzes, setQuizzes] = useState<Quiz[]>([]);
     const [isQuizVisible, setIsQuizVisible] = useState(false);
     const [swipeKey, setSwipeKey] = useState(0);
 
@@ -112,7 +110,7 @@ const CardsScreen = ({ navigation }) => {
     const handleContinueFromQuiz = () => {
         setIsQuizVisible(false); // Скрыть викторину
         saveTestState(false); // Обнуляем состояние теста
-        markAsPassedMutation.mutate(null, {
+        markAsPassedMutation.mutate(undefined, {
             onSuccess: async () => {
                 // Может быть, здесь не нужно вызывать refetchCards, так как изменение fetchEnabled вызовет запрос
                 console.log('All cards have been marked as passed.');
@@ -172,7 +170,7 @@ const CardsScreen = ({ navigation }) => {
 
     return (
         <View style={styles.container}>
-            {cards?.length > 0 ? (
+            {cards && cards?.length > 0 ? (
                 <Swiper
                     key={swipeKey} // Обновление ключа при каждом изменении количества карточек
                     cards={cards}

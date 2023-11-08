@@ -3,11 +3,15 @@ import React, { createContext } from 'react';
 interface MainContextProps {
     userId: number | null;
     completeOnboarding: (newUserId: number) => Promise<void>;
+    cardCount: number;
+    setCardCount: (count: number) => void;
 }
 
 const MainContext = React.createContext<MainContextProps>({
     userId: null,
-    completeOnboarding: async () => {}
+    completeOnboarding: async () => {},
+    cardCount: 0,
+    setCardCount: () => {}
 });
 
 export default MainContext;

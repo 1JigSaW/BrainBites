@@ -7,7 +7,7 @@ interface MarkCardsAsTestPassedResult {
 }
 
 export const useGetUnseenCards = (userId: number | null, limit = 20, isEnabled = false) => {
-    return useQuery<Card[] | { test_required: boolean }, Error>(
+    return useQuery<Card[], Error>(
         ['unseen_cards', userId, limit],
         () => CardApi.getUnseenCards(userId, limit),
         {
@@ -18,8 +18,8 @@ export const useGetUnseenCards = (userId: number | null, limit = 20, isEnabled =
 };
 
 export const useMarkCardsAsTestPassed = (
-    userId: number,
-    options?: UseMutationOptions<MarkCardsAsTestPassedResult, AxiosError, void>
+    userId: number | null,
+    options?: UseMutationOptions<MarkCardsAsTestPassedResult, axios.AxiosError, void>
 ) => {
     return useMutation<MarkCardsAsTestPassedResult, AxiosError, void>(
         () => CardApi.markCardsAsTestPassed(userId),

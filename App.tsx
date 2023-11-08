@@ -13,6 +13,7 @@ const queryClient = new QueryClient();
 function App(): JSX.Element | null {
     const [userId, setUserId] = useState<number | null>(null);
     const [isFirstLaunch, setIsFirstLaunch] = useState<boolean | null>(null);
+    const [cardCount, setCardCount] = useState<number>(0);
 
     useEffect(() => {
         AsyncStorage.getItem(firstLaunchTest).then(value => {
@@ -41,7 +42,7 @@ function App(): JSX.Element | null {
 
     console.log('userId', userId);
   return (
-      <MainContext.Provider value={{ userId, completeOnboarding }}>
+      <MainContext.Provider value={{ userId, completeOnboarding, cardCount, setCardCount }}>
           <QueryClientProvider client={queryClient}>
               <NavigationContainer>
                   {isFirstLaunch ? <OnboardingNavigator /> : <MainNavigator />}
