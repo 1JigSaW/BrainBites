@@ -19,13 +19,25 @@ export class CardApi {
             });
             console.log('response.data', response.data);
             return response.data;
+            throw new Error(`Error: ${response.statusText}`);
+        } catch (error) {
+            console.error('Error fetching unseen cards:', error);
+            throw error;
+        }
+    }
+
+    static async markCardsAsTestPassed(userId: number): Promise<{ message: string }> {
+        try {
+            // Отправляем POST запрос на маркировку карт
+            const response = await API.post(`api/mark-cards-passed/${userId}/`);
             if (response.status === 200) {
-                // В случае успеха возвращаем полученные данные
+                // В случае успеха возвращаем сообщение из ответа
+                console.log('response.data', response.data);
                 return response.data;
             }
             throw new Error(`Error: ${response.statusText}`);
         } catch (error) {
-            console.error('Error fetching unseen cards:', error);
+            console.error('Error marking cards as test passed:', error);
             throw error;
         }
     }

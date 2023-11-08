@@ -4,7 +4,7 @@ import { StackScreenProps } from "@react-navigation/stack";
 import { CardsStackParamList } from "../navigation/CardsStack";
 import Swiper from 'react-native-deck-swiper';
 import CardComponent from "../components/CardComponent";
-import { useGetUnseenCards } from "../queries/card";
+import {useGetUnseenCards, useMarkCardsAsTestPassed} from "../queries/card";
 import {ActivityIndicator, Alert, AppState, StyleSheet, Text, View} from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import {CARDSNOVIEWED, QuizVisible, QuizzesData, RemainingCards, SwipedCardIds} from "../constants";
@@ -13,8 +13,9 @@ import QuizModal from "../components/QuizModal";
 
 type Props = StackScreenProps<CardsStackParamList, 'CardsScreen'>;
 
-const CARDS_KEY = '@currentCards4';
-const CARDS_INDEX_KEY = '@currentCardIndex4';
+const CARDS_KEY = '@currentCards18';
+const CARDS_INDEX_KEY = '@currentCardIndex18';
+const QUIZ_KEY = '@quiz18';
 
 const CardsScreen = ({ navigation }) => {
     const { userId } = useContext(MainContext);
@@ -24,6 +25,9 @@ const CardsScreen = ({ navigation }) => {
     const [fetchEnabledQuiz, setFetchEnabledQuiz] = useState(false);
     const [quizzes, setQuizzes] = useState([]);
     const [isQuizVisible, setIsQuizVisible] = useState(false);
+    const [swipeKey, setSwipeKey] = useState(0);
+
+    const markAsPassedMutation = useMarkCardsAsTestPassed(userId);
 
     const {
         data: cardsData,
@@ -42,7 +46,14 @@ const CardsScreen = ({ navigation }) => {
             try {
                 const savedCards = await AsyncStorage.getItem(CARDS_KEY);
                 const savedIndex = await AsyncStorage.getItem(CARDS_INDEX_KEY);
-                if (savedCards && savedIndex) {
+                const savedTestState = await AsyncStorage.getItem(QUIZ_KEY);
+                const isTestActive = savedTestState ? JSON.parse(savedTestState) : false;
+
+                if (isTestActive) {
+                    // Если состояние теста активно, показываем тест.
+                    setIsQuizVisible(true);
+                    setFetchEnabledQuiz(true);
+                } else if (savedCards && savedIndex) {
                     const parsedCards = JSON.parse(savedCards);
                     const index = parseInt(savedIndex, 10);
                     // Если в сохраненных карточках есть еще не просмотренные,
@@ -74,18 +85,51 @@ const CardsScreen = ({ navigation }) => {
 
     // Функция для вызова, когда все карточки просмотрены
     const handleTest = async () => {
-        // Показываем викторину только если все карточки были просмотрены.
-        if (cards && cards.length === 0) {
-            setIsQuizVisible(true); // Показываем викторину
-            setFetchEnabledQuiz(true); // Включаем флаг для загрузки вопросов квиза
-            await saveProgress(0);
+        console.log('test')
+        console.log('cards', cards)
+        // Убеждаемся, что все карточки были просмотрены.
+
+        console.log('test2')
+        setIsQuizVisible(true); // Показываем викторину
+        setFetchEnabledQuiz(true);
+        await saveTestState(true);
+
+        // Сохраняем прогресс, что все карточки были просмотрены.
+        await saveProgress(0);
+
+    };
+
+    const saveTestState = async (isTestActive: boolean) => {
+        try {
+            await AsyncStorage.setItem(QUIZ_KEY, JSON.stringify(isTestActive));
+        } catch (error) {
+            Alert.alert('Ошибка', 'Не удалось сохранить состояние теста');
         }
     };
 
+
     // Функция для обработки продолжения после викторины
     const handleContinueFromQuiz = () => {
-        setIsQuizVisible(false);
-        setFetchEnabled(true); // Включаем флаг для загрузки новых карточек
+        setIsQuizVisible(false); // Скрыть викторину
+        saveTestState(false); // Обнуляем состояние теста
+        markAsPassedMutation.mutate(null, {
+            onSuccess: async () => {
+                // Может быть, здесь не нужно вызывать refetchCards, так как изменение fetchEnabled вызовет запрос
+                console.log('All cards have been marked as passed.');
+                setFetchEnabled(true);
+                if (cardsData) {
+                    await refetchCards();
+                    setCards(cardsData);
+                    setSwipeKey(swipeKey + 1);
+                }
+            },
+            onError: (error) => {
+                setFetchEnabled(false); // Выключить флаг, если произошла ошибка
+                Alert.alert('Ошибка', 'Не удалось отметить карточки как пройденные');
+                console.error('Error marking cards as passed:', error);
+            }
+        });
+
     };
 
     const saveProgress = async (index: number) => {
@@ -109,11 +153,11 @@ const CardsScreen = ({ navigation }) => {
     }, [isCardsError, isQuizzesError, isQuizVisible]);
 
     useEffect(() => {
-        // Загрузка новых карточек при установленном флаге fetchEnabled
-        if (fetchEnabled && cardsData) {
+        console.log(fetchEnabled, cardsData)
+            console.log(222)
+            console.log('New cards data received:', cardsData);
             setCards(cardsData);
             setFetchEnabled(false);
-        }
     }, [fetchEnabled, cardsData]);
 
     useEffect(() => {
@@ -123,11 +167,14 @@ const CardsScreen = ({ navigation }) => {
         }
     }, [fetchEnabledQuiz, quizzesData]);
 
+    console.log('cards', cards);
+
 
     return (
         <View style={styles.container}>
             {cards?.length > 0 ? (
                 <Swiper
+                    key={swipeKey} // Обновление ключа при каждом изменении количества карточек
                     cards={cards}
                     renderCard={(card) => <CardComponent card={card} />}
                     onSwiped={handleSwiped}
@@ -137,6 +184,7 @@ const CardsScreen = ({ navigation }) => {
                     stackScale={10}
                     stackSeparation={15}
                 />
+
             ) : (
                 <Text>No cards left</Text>
             )}
