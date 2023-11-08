@@ -13,8 +13,8 @@ import QuizModal from "../components/QuizModal";
 
 type Props = StackScreenProps<CardsStackParamList, 'CardsScreen'>;
 
-const CARDS_KEY = '@currentCards1';
-const CARDS_INDEX_KEY = '@currentCardIndex1';
+const CARDS_KEY = '@currentCards4';
+const CARDS_INDEX_KEY = '@currentCardIndex4';
 
 const CardsScreen = ({ navigation }) => {
     const { userId } = useContext(MainContext);
@@ -40,18 +40,22 @@ const CardsScreen = ({ navigation }) => {
     useEffect(() => {
         const loadSavedState = async () => {
             try {
-                // Получаем сохраненные карточки и индекс
                 const savedCards = await AsyncStorage.getItem(CARDS_KEY);
                 const savedIndex = await AsyncStorage.getItem(CARDS_INDEX_KEY);
                 if (savedCards && savedIndex) {
-                    console.log(1)
-                    setCards(JSON.parse(savedCards).slice(parseInt(savedIndex)));
+                    const parsedCards = JSON.parse(savedCards);
+                    const index = parseInt(savedIndex, 10);
+                    // Если в сохраненных карточках есть еще не просмотренные,
+                    // устанавливаем их в состояние.
+                    if (index < parsedCards.length) {
+                        setCards(parsedCards.slice(index));
+                    } else {
+                        // Если все карточки были просмотрены, переходим к тесту.
+                        handleTest();
+                    }
                 } else {
-                    console.log(2)
-                    // Если сохраненного состояния нет, то загружаем карточки
+                    // Если сохраненного состояния нет, загружаем новые карточки.
                     setFetchEnabled(true);
-                    setCards(cardsData);
-                    setFetchEnabled(false);
                 }
             } catch (error) {
                 Alert.alert('Ошибка', 'Не удалось восстановить сохраненные данные');
@@ -61,6 +65,7 @@ const CardsScreen = ({ navigation }) => {
         loadSavedState();
     }, []);
 
+
     // Функция для обработки свайпа карточки
     const handleSwiped = (cardIndex: number) => {
         saveProgress(cardIndex + 1);
@@ -69,11 +74,12 @@ const CardsScreen = ({ navigation }) => {
 
     // Функция для вызова, когда все карточки просмотрены
     const handleTest = async () => {
-        setIsQuizVisible(true); // Показываем викторину
-        setFetchEnabledQuiz(true); // Включаем флаг для загрузки вопросов квиза
-
-        // Сохраняем прогресс
-        await saveProgress(0);
+        // Показываем викторину только если все карточки были просмотрены.
+        if (cards && cards.length === 0) {
+            setIsQuizVisible(true); // Показываем викторину
+            setFetchEnabledQuiz(true); // Включаем флаг для загрузки вопросов квиза
+            await saveProgress(0);
+        }
     };
 
     // Функция для обработки продолжения после викторины
@@ -101,6 +107,22 @@ const CardsScreen = ({ navigation }) => {
             Alert.alert('Ошибка', 'Не удалось загрузить вопросы для викторины');
         }
     }, [isCardsError, isQuizzesError, isQuizVisible]);
+
+    useEffect(() => {
+        // Загрузка новых карточек при установленном флаге fetchEnabled
+        if (fetchEnabled && cardsData) {
+            setCards(cardsData);
+            setFetchEnabled(false);
+        }
+    }, [fetchEnabled, cardsData]);
+
+    useEffect(() => {
+        if (fetchEnabledQuiz && quizzesData) {
+            setQuizzes(quizzesData);
+            setFetchEnabledQuiz(false);
+        }
+    }, [fetchEnabledQuiz, quizzesData]);
+
 
     return (
         <View style={styles.container}>
