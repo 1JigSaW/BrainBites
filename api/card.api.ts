@@ -41,4 +41,22 @@ export class CardApi {
             throw error;
         }
     }
+
+    static async updateReadCardsCount(userId: number, readCardsCount: number): Promise<{ message: string }> {
+        try {
+            const response = await API.put(`api/update-read-cards-count/${userId}/`, {
+                read_cards: readCardsCount
+            });
+
+            if (response.status === 200) {
+                console.log('response.data', response.data);
+                return response.data;
+            }
+
+            throw new Error(`Error: ${response.statusText}`);
+        } catch (error) {
+            console.error('Error updating read cards count:', error);
+            throw error;
+        }
+    }
 }

@@ -22,6 +22,7 @@ type Props = StackScreenProps<HomeStackParamList, 'HomeScreen'>;
 import MainContext from "../navigation/MainContext";
 import {useGetUserStats} from "../queries/user";
 import {useIsFocused} from "@react-navigation/native";
+import {useUpdateReadCardsCount} from "../queries/card";
 
 const getFontSizeForName = (name: string) => {
     if (name.length <= 5) {
@@ -36,7 +37,7 @@ const getFontSizeForName = (name: string) => {
 const HomeScreen = ({ navigation, route }: Props) => {
     const [activeButton, setActiveButton] = useState('Cards');
     const isFocused = useIsFocused(); // Этот хук возвращает true, когда экран в фокусе
-    const { userId } = useContext(MainContext);
+    const { userId, cardCount } = useContext(MainContext);
     const {
         data: userStats,
         isLoading,
@@ -44,11 +45,20 @@ const HomeScreen = ({ navigation, route }: Props) => {
         refetch,
     } = useGetUserStats(userId);
 
+
+    const { mutate: updateReadCardsCount } = useUpdateReadCardsCount();
+
     useEffect(() => {
         if (isFocused && userId) {
-            refetch();
+            refetch(); // Refetch user stats when the screen is in focus
+
+            // Now, call the mutation to update the read cards count
+            updateReadCardsCount({
+                userId,
+                readCardsCount: cardCount,
+            });
         }
-    }, [isFocused, userId, refetch]);
+    }, [isFocused, userId, refetch, cardCount, updateReadCardsCount]);
 
 
     // if (isLoading) {
@@ -101,7 +111,7 @@ const HomeScreen = ({ navigation, route }: Props) => {
                 <View style={styles.headerContainer}>
                     <View style={styles.iconContainer}>
                         <CountCardsIcon size={35} color={BLACK} />
-                        <Text style={styles.textBold}>{userStats?.read_cards_count}</Text>
+                        <Text style={styles.textBold}>{cardCount}</Text>
                         <Text style={styles.textDefault}>Cards</Text>
                     </View>
                     <View style={styles.iconContainer}>

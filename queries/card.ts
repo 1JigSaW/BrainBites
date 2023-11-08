@@ -1,8 +1,12 @@
 import {useMutation, UseMutationOptions, useQuery, UseQueryOptions} from '@tanstack/react-query';
-import { AxiosError } from 'axios';
+import axios, { AxiosError } from 'axios';
 import { Card, CardApi } from '../api/card.api';
 
 interface MarkCardsAsTestPassedResult {
+    message: string;
+}
+
+interface UpdateReadCardsCountData {
     message: string;
 }
 
@@ -32,6 +36,26 @@ export const useMarkCardsAsTestPassed = (
             onError: (error) => {
                 // Здесь можно добавить обработку ошибок
                 console.error('Error marking cards as passed:', error.message);
+            }
+        }
+    );
+};
+
+export const useUpdateReadCardsCount = (
+    options?: UseMutationOptions<UpdateReadCardsCountData, AxiosError, { userId: number; readCardsCount: number }>
+) => {
+    return useMutation<UpdateReadCardsCountData, AxiosError, { userId: number; readCardsCount: number }>(
+        ({ userId, readCardsCount }) => CardApi.updateReadCardsCount(userId, readCardsCount),
+        {
+            // Spread additional options if they were passed to the hook
+            ...options,
+            onSuccess: (data) => {
+                // This is where you can add additional logic on success
+                console.log('Read cards count updated:', data.message);
+            },
+            onError: (error) => {
+                // This is where you handle errors
+                console.error('Error updating read cards count:', error.message);
             }
         }
     );

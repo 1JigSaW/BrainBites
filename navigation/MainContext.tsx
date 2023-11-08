@@ -4,7 +4,7 @@ interface MainContextProps {
     userId: number | null;
     completeOnboarding: (newUserId: number) => Promise<void>;
     cardCount: number;
-    setCardCount: (count: number) => void;
+    setCardCount: (count: (prevCardCount) => any) => void;
 }
 
 const MainContext = React.createContext<MainContextProps>({

@@ -9,14 +9,14 @@ import {ActivityIndicator, Alert, AppState, StyleSheet, Text, View} from "react-
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import {useGetAvailableQuizzes} from "../queries/quiz";
 import QuizModal from "../components/QuizModal";
-import {CARDS_INDEX_KEY, CARDS_KEY, QUIZ_KEY} from "../constants";
+import {CARDS_COUNT, CARDS_INDEX_KEY, CARDS_KEY, QUIZ_KEY} from "../constants";
 import {Quiz} from "../api/quiz.api";
 import {Card} from "../api/card.api";
 
 type Props = StackScreenProps<CardsStackParamList, 'CardsScreen'>;
 
 const CardsScreen = ({ navigation }: Props) => {
-    const { userId } = useContext(MainContext);
+    const { userId, setCardCount, cardCount } = useContext(MainContext);
     const pageSize = 5;
     const [cards, setCards] = useState<Card[] | undefined>([]);
     const [fetchEnabled, setFetchEnabled] = useState(false);
@@ -77,17 +77,22 @@ const CardsScreen = ({ navigation }: Props) => {
 
     // Функция для обработки свайпа карточки
     const handleSwiped = (cardIndex: number) => {
+        // Save the new card index to local storage
         saveProgress(cardIndex + 1);
+
+        // Update the card count state and AsyncStorage simultaneously
+        setCardCount(prevCardCount => {
+            const newCardCount = prevCardCount + 1;
+            AsyncStorage.setItem(CARDS_COUNT, String(newCardCount)).catch((error) => {
+                console.error('AsyncStorage error:', error);
+            });
+            return newCardCount;
+        });
     };
 
 
     // Функция для вызова, когда все карточки просмотрены
     const handleTest = async () => {
-        console.log('test')
-        console.log('cards', cards)
-        // Убеждаемся, что все карточки были просмотрены.
-
-        console.log('test2')
         setIsQuizVisible(true); // Показываем викторину
         setFetchEnabledQuiz(true);
         await saveTestState(true);
@@ -151,11 +156,8 @@ const CardsScreen = ({ navigation }: Props) => {
     }, [isCardsError, isQuizzesError, isQuizVisible]);
 
     useEffect(() => {
-        console.log(fetchEnabled, cardsData)
-            console.log(222)
-            console.log('New cards data received:', cardsData);
-            setCards(cardsData);
-            setFetchEnabled(false);
+        setCards(cardsData);
+        setFetchEnabled(false);
     }, [fetchEnabled, cardsData]);
 
     useEffect(() => {
@@ -164,8 +166,6 @@ const CardsScreen = ({ navigation }: Props) => {
             setFetchEnabledQuiz(false);
         }
     }, [fetchEnabledQuiz, quizzesData]);
-
-    console.log('cards', cards);
 
 
     return (

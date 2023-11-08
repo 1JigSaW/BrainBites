@@ -4,7 +4,7 @@ import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
 import MainNavigator from "./navigation/MainNavigator";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import OnboardingNavigator from "./navigation/OnboardingNavigator";
-import {firstLaunchTest, user} from "./constants";
+import {CARDS_COUNT, firstLaunchTest, user} from "./constants";
 import MainContext from './navigation/MainContext';
 import Toast from "react-native-toast-message";
 
@@ -26,6 +26,12 @@ function App(): JSX.Element | null {
         AsyncStorage.getItem(user).then(value => {
             if (value !== null) {
                 setUserId(JSON.parse(value).id);
+            }
+        });
+
+        AsyncStorage.getItem(CARDS_COUNT).then(value => {
+            if (value !== null) {
+                setCardCount(Number(value));
             }
         });
     }, []);
