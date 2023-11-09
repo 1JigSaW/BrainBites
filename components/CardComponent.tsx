@@ -1,19 +1,50 @@
-import React, {useState} from "react";
+import React, {useContext, useState} from "react";
 import {BACKGROUND, BLACK, BLUE} from "../colors";
 import {Image, StyleSheet, Text, TouchableOpacity, View} from "react-native";
 import SaveIcon from "./icons/SaveIcon";
-import SaveEmptyIcon from "./icons/SaveIcon";
+import SaveEmptyIcon from "./icons/SaveEmptyIcon";
+import {useSaveCard} from "../queries/card";
+import MainContext from "../navigation/MainContext";
 
 
-const CardComponent = ({ card, handlePress }: any) => {
-    const [localIconSelected, setLocalIconSelected] = useState(false);
-    const localIconColor = localIconSelected ? BLUE : BACKGROUND;
-    const localIconBorderColor = localIconSelected ? BACKGROUND : BACKGROUND;
+const CardComponent = ({ card }: any) => {
+    const { userId } = useContext(MainContext);
+    const [savedCards, setSavedCards] = useState(new Set()); // Use a Set to track saved card IDs
+    const { mutate: toggleSaveCard } = useSaveCard();
+
+    const localIconSelected = savedCards.has(card.id); // Determine if the card is selected based on its ID
+    const localIconColor = localIconSelected ? BLUE : BACKGROUND; // Assuming BLUE and BACKGROUND are color constants
+
+    const handleSavePress = () => {
+        if (!userId) {
+            console.error('No user ID provided');
+            return;
+        }
+        if (!card || !card.id) {
+            console.error('No card or card ID provided');
+            return;
+        }
+
+        setSavedCards(prevSavedCards => {
+            const newSavedCards = new Set(prevSavedCards);
+            if (newSavedCards.has(card.id)) {
+                newSavedCards.delete(card.id);
+                toggleSaveCard({ userId, cardId: card.id });
+            } else {
+                newSavedCards.add(card.id);
+                // Call the mutation function when a card is being saved (not unsaved)
+                toggleSaveCard({ userId, cardId: card.id });
+            }
+            return newSavedCards;
+        });
+    };
 
     if (!card) {
         console.error('CardComponent was given undefined data');
         return <Text>Error: Card data is not available.</Text>;
     }
+
+    console.log('Card ID:', card.id, 'Saved:', localIconSelected);
 
     return (
         <View style={styles.card}>
@@ -21,25 +52,25 @@ const CardComponent = ({ card, handlePress }: any) => {
                 <Text style={styles.title}>{card.title}</Text>
                 <TouchableOpacity
                     style={styles.saveIcon}
-                    onPress={() => setLocalIconSelected(prev => !prev)}
+                    onPress={handleSavePress} // Use the handleSavePress function here
                 >
                     {!localIconSelected ? (
-                        <SaveIcon size={20} color={BLUE} />
+                        <SaveIcon size={20} color={localIconColor} />
                     ) : (
-                        <SaveEmptyIcon size={20} color={BLACK} />
+                        <SaveEmptyIcon size={20} color={localIconColor} />
                     )}
                 </TouchableOpacity>
             </View>
             <Image
                 style={styles.image}
-                source={{uri: 'https://via.placeholder.com/150'}}
+                source={{ uri: 'https://via.placeholder.com/150' }}
             />
             <Text style={styles.text}>{card.content}</Text>
             <Text style={styles.source}>{card.source}</Text>
             <Text style={styles.tag}>{card.topic}</Text>
         </View>
     );
-}
+};
 
 const styles = StyleSheet.create({
     card: {

@@ -26,7 +26,7 @@ export class CardApi {
         }
     }
 
-    static async markCardsAsTestPassed(userId: number): Promise<{ message: string }> {
+    static async markCardsAsTestPassed(userId: number | null): Promise<{ message: string }> {
         try {
             // Отправляем POST запрос на маркировку карт
             const response = await API.post(`api/mark-cards-passed/${userId}/`);
@@ -59,4 +59,25 @@ export class CardApi {
             throw error;
         }
     }
+
+    static async saveCardForUser(userId: number, cardId: number): Promise<{ message: string }> {
+        try {
+            // Send a PUT request to the SaveCard endpoint. Make sure to replace 'api/save-card/' with the actual path to your endpoint.
+            const response = await API.put(`api/save_card/${userId}/`, {
+                card_id: cardId
+            });
+
+            if (response.status === 200) {
+                // If the request is successful, return the response message.
+                console.log('response.data', response.data);
+                return response.data;
+            }
+
+            throw new Error(`Error: ${response.statusText}`);
+        } catch (error) {
+            console.error('Error saving card:', error);
+            throw error;
+        }
+    }
+
 }

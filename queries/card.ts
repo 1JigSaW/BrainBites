@@ -10,6 +10,10 @@ interface UpdateReadCardsCountData {
     message: string;
 }
 
+interface SaveCardResult {
+    message: string;
+}
+
 export const useGetUnseenCards = (userId: number | null, limit = 20, isEnabled = false) => {
     return useQuery<Card[], Error>(
         ['unseen_cards', userId, limit],
@@ -23,7 +27,7 @@ export const useGetUnseenCards = (userId: number | null, limit = 20, isEnabled =
 
 export const useMarkCardsAsTestPassed = (
     userId: number | null,
-    options?: UseMutationOptions<MarkCardsAsTestPassedResult, axios.AxiosError, void>
+    options?: UseMutationOptions<MarkCardsAsTestPassedResult, AxiosError, void>
 ) => {
     return useMutation<MarkCardsAsTestPassedResult, AxiosError, void>(
         () => CardApi.markCardsAsTestPassed(userId),
@@ -56,6 +60,26 @@ export const useUpdateReadCardsCount = (
             onError: (error) => {
                 // This is where you handle errors
                 console.error('Error updating read cards count:', error.message);
+            }
+        }
+    );
+};
+
+export const useSaveCard = (
+    options?: UseMutationOptions<SaveCardResult, AxiosError, { userId: number; cardId: number }>
+) => {
+    return useMutation<SaveCardResult, AxiosError, { userId: number; cardId: number }>(
+        ({ userId, cardId }) => CardApi.saveCardForUser(userId, cardId),
+        {
+            // Spread additional options if they were passed to the hook
+            ...options,
+            onSuccess: (data) => {
+                // This is where you can add additional logic on success
+                console.log('Card saved:', data.message);
+            },
+            onError: (error) => {
+                // This is where you handle errors
+                console.error('Error saving card:', error.message);
             }
         }
     );

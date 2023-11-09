@@ -8,7 +8,7 @@ interface Props {
     color?: string;
 }
 
-const SaveEmptyIcon = ({ size, style, color }: Props) => {
+const SaveIcon = ({ size, style, color }: Props) => {
     const fillColor = color ? color : '#000';
 
     return (
@@ -32,5 +32,5 @@ const SaveEmptyIcon = ({ size, style, color }: Props) => {
     );
 };
 
-export default SaveEmptyIcon;
+export default SaveIcon;
 
