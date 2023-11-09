@@ -80,4 +80,15 @@ export class CardApi {
         }
     }
 
+    static async getSavedCards(userId: number): Promise<Card[]> {
+        try {
+            const response = await API.get(`api/saved-cards/${userId}/`);
+            console.log('response.data', response.data);
+            return response.data;
+        } catch (error) {
+            console.error('Error fetching saved cards:', error);
+            throw error;
+        }
+    }
+
 }

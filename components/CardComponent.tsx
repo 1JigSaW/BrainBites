@@ -7,7 +7,7 @@ import {useSaveCard} from "../queries/card";
 import MainContext from "../navigation/MainContext";
 
 
-const CardComponent = ({ card }: any) => {
+const CardComponent = ({ card, myCards, handleRemoveCard }: any) => {
     const { userId } = useContext(MainContext);
     const [savedCards, setSavedCards] = useState(new Set()); // Use a Set to track saved card IDs
     const { mutate: toggleSaveCard } = useSaveCard();
@@ -16,6 +16,9 @@ const CardComponent = ({ card }: any) => {
     const localIconColor = localIconSelected ? BLUE : BACKGROUND; // Assuming BLUE and BACKGROUND are color constants
 
     const handleSavePress = () => {
+        if (myCards) {
+            handleRemoveCard(card.id);
+        }
         if (!userId) {
             console.error('No user ID provided');
             return;
@@ -47,7 +50,7 @@ const CardComponent = ({ card }: any) => {
     console.log('Card ID:', card.id, 'Saved:', localIconSelected);
 
     return (
-        <View style={styles.card}>
+        <View style={[styles.card, myCards && {height: '90%'}]}>
             <View style={styles.titleContainer}>
                 <Text style={styles.title}>{card.title}</Text>
                 <TouchableOpacity

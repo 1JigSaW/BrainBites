@@ -84,3 +84,13 @@ export const useSaveCard = (
         }
     );
 };
+
+export const useGetSavedCards = (userId: number | null, options?: UseQueryOptions<Card[], Error>) => {
+    return useQuery<Card[], Error>(
+        ['saved_cards', userId],
+        () => CardApi.getSavedCards(userId),
+        {
+            ...options, // Allow users to pass additional options
+        }
+    );
+};
