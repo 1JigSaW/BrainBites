@@ -17,6 +17,7 @@ const CardComponent = ({ card, myCards, handleRemoveCard }: any) => {
 
     const handleSavePress = () => {
         if (myCards) {
+            toggleSaveCard({ userId, cardId: card.id });
             handleRemoveCard(card.id);
         }
         if (!userId) {

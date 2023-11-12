@@ -60,7 +60,7 @@ export class CardApi {
         }
     }
 
-    static async saveCardForUser(userId: number, cardId: number): Promise<{ message: string }> {
+    static async saveCardForUser(userId: number | null, cardId: number): Promise<{ message: string }> {
         try {
             // Send a PUT request to the SaveCard endpoint. Make sure to replace 'api/save-card/' with the actual path to your endpoint.
             const response = await API.put(`api/save_card/${userId}/`, {
@@ -80,7 +80,7 @@ export class CardApi {
         }
     }
 
-    static async getSavedCards(userId: number): Promise<Card[]> {
+    static async getSavedCards(userId: number | null): Promise<Card[]> {
         try {
             const response = await API.get(`api/saved-cards/${userId}/`);
             console.log('response.data', response.data);

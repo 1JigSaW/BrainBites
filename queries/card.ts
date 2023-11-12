@@ -66,9 +66,9 @@ export const useUpdateReadCardsCount = (
 };
 
 export const useSaveCard = (
-    options?: UseMutationOptions<SaveCardResult, AxiosError, { userId: number; cardId: number }>
+    options?: UseMutationOptions<SaveCardResult, AxiosError, { userId: number | null; cardId: number }>
 ) => {
-    return useMutation<SaveCardResult, AxiosError, { userId: number; cardId: number }>(
+    return useMutation<SaveCardResult, AxiosError, { userId: number | null; cardId: number }>(
         ({ userId, cardId }) => CardApi.saveCardForUser(userId, cardId),
         {
             // Spread additional options if they were passed to the hook

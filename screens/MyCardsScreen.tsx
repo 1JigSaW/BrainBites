@@ -14,24 +14,24 @@ import Swiper from 'react-native-deck-swiper';
 import {useGetSavedCards} from "../queries/card";
 import MainContext from "../navigation/MainContext";
 import {Card} from "../api/card.api";
+import {useIsFocused} from "@react-navigation/native";
 
 type Props = StackScreenProps<HomeStackParamList, 'MyCardsScreen'>;
 
 const MyCardsScreen = ({ navigation }: Props) => {
     const { userId } = useContext(MainContext);
-    const { data: cards, isLoading, isError } = useGetSavedCards(userId);
-
+    const { data: cardsGet, isLoading, isError } = useGetSavedCards(userId);
     const [currentIndex, setCurrentIndex] = useState(0);
+    const swiperRef = useRef<Swiper<Card>>(null);
+    const [cards, setCards] = useState<Card[] | undefined>([]);
+    const isFocused = useIsFocused();
 
-    if (isLoading) {
-        // Add your loading indicator
-        return <Text>Loading...</Text>;
-    }
-
-    if (isError || !cards) {
-        // Handle error state
-        return <Text>Error fetching cards.</Text>;
-    }
+    const handleRemoveCard = (cardId: number | null) => {
+        // Фильтрация списка cards для удаления карточки с указанным ID
+        const updatedCards = cards?.filter(card => card.id !== cardId);
+        // Обновление списка карточек
+        setCards(updatedCards); // Предполагаем, что у вас есть состояние cards, которое можно обновить
+    };
 
     const handleSwiped = (index: number) => {
         setCurrentIndex(index + 1); // Increment the current index
@@ -47,11 +47,23 @@ const MyCardsScreen = ({ navigation }: Props) => {
         }
     };
 
-    // Reference to the Swiper component
-    const swiperRef = useRef<Swiper<Card>>(null);
 
+    useEffect(() => {
+        if (isFocused) {
+            setCards(cardsGet);
+        }
+    }, [isFocused]);
 
-    console.log('cards', cards);
+    if (isLoading) {
+        // Add your loading indicator
+        return <Text>Loading...</Text>;
+    }
+
+    if (isError || !cards) {
+        // Handle error state
+        return <Text>Error fetching cards.</Text>;
+    }
+
     return (
         <SafeAreaView style={styles.safeContainer}>
             <TouchableOpacity onPress={handleSwipeBack}>
@@ -59,7 +71,7 @@ const MyCardsScreen = ({ navigation }: Props) => {
             </TouchableOpacity>
             <Swiper
                 cards={cards}
-                renderCard={(card) => <CardComponent card={card} myCards={1} />}
+                renderCard={(card) => <CardComponent card={card} myCards={1} handleRemoveCard={handleRemoveCard} />}
                 onSwiped={handleSwiped}
                 onSwipedAll={handleSwipedAll}
                 backgroundColor="#f0f0f0"
@@ -67,10 +79,12 @@ const MyCardsScreen = ({ navigation }: Props) => {
                 stackScale={10}
                 stackSeparation={15}
                 infinite // Set to true if you want an infinite loop
+                ref={swiperRef}
             />
         </SafeAreaView>
     );
 };
+
 
 const styles = StyleSheet.create({
     container: {
