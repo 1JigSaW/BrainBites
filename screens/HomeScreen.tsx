@@ -20,7 +20,7 @@ import {getButtonStyle, getButtonTextStyle} from "../components/functions/button
 type Props = StackScreenProps<HomeStackParamList, 'HomeScreen'>;
 
 import MainContext from "../navigation/MainContext";
-import {useGetUserStats} from "../queries/user";
+import {useGetUsers, useGetUserStats} from "../queries/user";
 import {useIsFocused} from "@react-navigation/native";
 import {useUpdateReadCardsCount} from "../queries/card";
 
@@ -35,7 +35,7 @@ const getFontSizeForName = (name: string) => {
 };
 
 const HomeScreen = ({ navigation, route }: Props) => {
-    const [activeButton, setActiveButton] = useState('Cards');
+    const [activeButton, setActiveButton] = useState<string>('read_cards');
     const isFocused = useIsFocused(); // Этот хук возвращает true, когда экран в фокусе
     const { userId, cardCount } = useContext(MainContext);
     const {
@@ -44,6 +44,15 @@ const HomeScreen = ({ navigation, route }: Props) => {
         isError,
         refetch,
     } = useGetUserStats(userId);
+
+    const sortBy = activeButton;
+    const returnAll = false;
+
+    const {
+        data: users,
+        isLoading: isLoadingUsers,
+        isError: isErrorUsers
+    } = useGetUsers({ sortBy, returnAll, userId });
 
 
     const { mutate: updateReadCardsCount } = useUpdateReadCardsCount();
@@ -187,33 +196,46 @@ const HomeScreen = ({ navigation, route }: Props) => {
 
                 <View style={styles.buttonContainer}>
                     <TouchableOpacity
-                        style={getButtonStyle('Cards', activeButton, styles)}
-                        onPress={() => setActiveButton('Cards')}
+                        style={getButtonStyle('read_cards', activeButton, styles)}
+                        onPress={() => setActiveButton('read_cards')}
                     >
-                        <Text style={getButtonTextStyle('Cards', activeButton, styles)}>Cards</Text>
+                        <Text style={getButtonTextStyle('read_cards', activeButton, styles)}>Cards</Text>
                     </TouchableOpacity>
                     <TouchableOpacity
-                        style={getButtonStyle('XP', activeButton, styles)}
-                        onPress={() => setActiveButton('XP')}
+                        style={getButtonStyle('xp', activeButton, styles)}
+                        onPress={() => setActiveButton('xp')}
                     >
-                        <Text style={getButtonTextStyle('XP', activeButton, styles)}>XP</Text>
+                        <Text style={getButtonTextStyle('xp', activeButton, styles)}>XP</Text>
                     </TouchableOpacity>
                     <TouchableOpacity
-                        style={getButtonStyle('Badges', activeButton, styles)}
-                        onPress={() => setActiveButton('Badges')}
+                        style={getButtonStyle('badges', activeButton, styles)}
+                        onPress={() => setActiveButton('badges')}
                     >
-                        <Text style={getButtonTextStyle('Badges', activeButton, styles)}>Badges</Text>
+                        <Text style={getButtonTextStyle('badges', activeButton, styles)}>Badges</Text>
                     </TouchableOpacity>
                 </View>
                 <View style={styles.blockNum}>
-                    <View style={styles.listItemContainer}>
-                        <Text style={styles.listNumber}>#1</Text>
-                        <Image source={{ uri: 'https://cdn.pixabay.com/photo/2018/02/08/22/27/flower-3140492_1280.jpg' }} style={styles.listImage} />
-                        <Text style={styles.listText}>Item 1</Text>
-                        <Text style={styles.listEndNumber}>100</Text>
-                    </View>
-                    <View style={styles.listSeparator} />
+                    {users && users.map(user => (
+                        <React.Fragment key={user.id}>
+                            <View style={styles.listItemContainer}>
+                                <Text style={styles.listNumber}>#{user.user_rank}</Text>
+                                <Image
+                                    source={{ uri: 'https://cdn.pixabay.com/photo/2018/02/08/22/27/flower-3140492_1280.jpg' }}
+                                    style={styles.listImage}
+                                />
+                                <Text style={styles.listText}>{user.username}</Text>
+                                <Text style={styles.listEndNumber}>
+                                    {sortBy === 'xp' ? user.xp :
+                                        sortBy === 'read_cards' ? user.read_cards :
+                                            sortBy === 'badges' ? user.badges_count : ''}
+                                </Text>
+                            </View>
+                            {users.indexOf(user) < users.length - 1 && <View style={styles.listSeparator} />}
+                        </React.Fragment>
+                    ))}
                 </View>
+
+
 
             </SafeAreaView>
         </ScrollView>

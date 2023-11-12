@@ -9,6 +9,14 @@ interface UseCheckUsernameUniqueOptions {
     enabled: boolean;
 }
 
+const USERS_QUERY_KEY = 'users';
+
+interface UseGetUsersOptions {
+    sortBy?: string;
+    returnAll?: boolean;
+    userId?: number | null;
+}
+
 export const useCheckUsernameUnique = () => {
     return useMutation<UsernameCheckResponse, AxiosError, string>(
         (username: string) => UserApi.checkUsernameUnique(username),
@@ -49,6 +57,24 @@ export const useGetUserStats = (userId: number | null) => {
             },
             onSuccess: (data) => {
                 console.log('User stats fetched successfully:', data);
+            },
+        },
+    );
+};
+
+
+export const useGetUsers = ({ sortBy, returnAll, userId }: UseGetUsersOptions) => {
+    return useQuery<UserStatsResponse[], AxiosError>(
+        [USERS_QUERY_KEY, sortBy, returnAll, userId],
+        () => UserApi.getUsers(sortBy, returnAll, userId),
+        {
+            enabled: returnAll !== undefined,
+            refetchOnWindowFocus: false,
+            onError: (error) => {
+                console.error('Error fetching users:', error);
+            },
+            onSuccess: (data) => {
+                console.log('Users fetched successfully:', data);
             },
         },
     );

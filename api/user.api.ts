@@ -9,6 +9,8 @@ export interface CreateUserResponse {
     topics: string[];
 }
 export interface UserStatsResponse {
+    read_cards: number;
+    id:  null | undefined;
     xp: number;
     saved_cards_count: number;
     topics_count: number;
@@ -17,6 +19,8 @@ export interface UserStatsResponse {
     username: string;
     read_cards_count: number;
     topics: Topic[];
+    user_rank: number;
+    badges_count: number;
 }
 
 export interface Badge {
@@ -62,4 +66,20 @@ export class UserApi {
             throw error;
         }
     }
+
+    static async getUsers(sortBy: string = '', returnAll: boolean = false, userId: number | null = null): Promise<UserStatsResponse[]> {
+        try {
+            const params = new URLSearchParams();
+            if (sortBy) params.append('sort_by', sortBy);
+            if (returnAll) params.append('return_all', 'True');
+            if (userId !== null) params.append('user_id', userId.toString());
+
+            const { data } = await API.get(`/api/users_filter/?${params.toString()}`);
+            console.log('data', data);
+            return data;
+        } catch (error) {
+            throw error;
+        }
+    }
+
 }

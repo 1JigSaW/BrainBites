@@ -7,41 +7,68 @@ import {
 } from 'react-native';
 import {HomeStackParamList} from "../navigation/HomeStack";
 import {StackScreenProps} from "@react-navigation/stack";
-import {BACKGROUND} from "../colors";
+import {BACKGROUND, BLUE} from "../colors";
+import {getButtonStyle, getButtonTextStyle} from "../components/functions/buttonHelpers";
+import {useGetUsers} from "../queries/user";
 
 type Props = StackScreenProps<HomeStackParamList, 'LeaderBoardScreen'>;
 
 const LeaderBoardScreen = ({navigation}: Props) => {
+    const [activeButton, setActiveButton] = useState<string>('read_cards');
+    const sortBy = activeButton;
+    const returnAll = true
+
+
+    const {
+        data: users,
+        isLoading: isLoadingUsers,
+        isError: isErrorUsers
+    } = useGetUsers({ sortBy, returnAll });;
 
     return (
         <ScrollView style={{ flex: 1, backgroundColor: BACKGROUND }}>
             <SafeAreaView style={styles.safeContainer}>
                 <View>
                     <View style={styles.buttonContainer}>
-                        <TouchableOpacity style={styles.roundedButton}>
-                            <Text style={styles.buttonText}>Cards</Text>
+                        <TouchableOpacity
+                            style={getButtonStyle('read_cards', activeButton, styles)}
+                            onPress={() => setActiveButton('read_cards')}
+                        >
+                            <Text style={getButtonTextStyle('read_cards', activeButton, styles)}>Cards</Text>
                         </TouchableOpacity>
-                        <TouchableOpacity style={styles.roundedButton}>
-                            <Text style={styles.buttonText}>XP</Text>
+                        <TouchableOpacity
+                            style={getButtonStyle('xp', activeButton, styles)}
+                            onPress={() => setActiveButton('xp')}
+                        >
+                            <Text style={getButtonTextStyle('xp', activeButton, styles)}>XP</Text>
                         </TouchableOpacity>
-                        <TouchableOpacity style={styles.roundedButton}>
-                            <Text style={styles.buttonText}>Badges</Text>
+                        <TouchableOpacity
+                            style={getButtonStyle('badges', activeButton, styles)}
+                            onPress={() => setActiveButton('badges')}
+                        >
+                            <Text style={getButtonTextStyle('badges', activeButton, styles)}>Badges</Text>
                         </TouchableOpacity>
                     </View>
-                    <View style={styles.listItemContainer}>
-                        <Text style={styles.listNumber}>#1</Text>
-                        <Image source={{ uri: 'https://cdn.pixabay.com/photo/2018/02/08/22/27/flower-3140492_1280.jpg' }} style={styles.listImage} />
-                        <Text style={styles.listText}>Item 1</Text>
-                        <Text style={styles.listEndNumber}>100</Text>
+                    <View>
+                        {users && users.map((user, index) => (
+                            <React.Fragment key={user.id}>
+                                <View style={styles.listItemContainer}>
+                                    <Text style={styles.listNumber}>#{index+1}</Text>
+                                    <Image
+                                        source={{ uri: 'https://cdn.pixabay.com/photo/2018/02/08/22/27/flower-3140492_1280.jpg' }}
+                                        style={styles.listImage}
+                                    />
+                                    <Text style={styles.listText}>{user.username}</Text>
+                                    <Text style={styles.listEndNumber}>
+                                        {sortBy === 'xp' ? user.xp :
+                                            sortBy === 'read_cards' ? user.read_cards :
+                                                sortBy === 'badges' ? user.badges_count : ''}
+                                    </Text>
+                                </View>
+                                {users.indexOf(user) < users.length - 1 && <View style={styles.listSeparator} />}
+                            </React.Fragment>
+                        ))}
                     </View>
-                    <View style={styles.listSeparator} />
-                    <View style={styles.listItemContainer}>
-                        <Text style={styles.listNumber}>#1</Text>
-                        <Image source={{ uri: 'https://cdn.pixabay.com/photo/2018/02/08/22/27/flower-3140492_1280.jpg' }} style={styles.listImage} />
-                        <Text style={styles.listText}>Item 1</Text>
-                        <Text style={styles.listEndNumber}>100</Text>
-                    </View>
-                    <View style={styles.listSeparator} />
                 </View>
             </SafeAreaView>
         </ScrollView>
@@ -124,6 +151,12 @@ const styles = StyleSheet.create({
         backgroundColor: 'black',
         marginLeft: 10,
         marginRight: 10,
+    },
+    activeButton: {
+        backgroundColor: BLUE,
+    },
+    activeButtonText: {
+        color: BACKGROUND,
     },
 });
 
