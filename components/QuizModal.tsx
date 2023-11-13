@@ -1,8 +1,10 @@
-import React, { useState, useEffect } from 'react';
-import {View, Text, Modal, StyleSheet, Button, Animated} from 'react-native';
+import React, {useState, useEffect, useContext} from 'react';
+import {View, Text, Modal, StyleSheet, Button, Animated, TouchableOpacity} from 'react-native';
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import {QuizState} from "../constants";
 import {Quiz} from "../api/quiz.api";
+import {useUpdateUserXp} from "../queries/card";
+import MainContext from "../navigation/MainContext";
 
 interface QuizOverlayProps {
     isVisible: boolean;
@@ -15,6 +17,8 @@ const QuizOverlay = ({ isVisible, onContinue, quizzes }: QuizOverlayProps) => {
     const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
     const [correctAnswersCount, setCorrectAnswersCount] = useState(0);
     const [quizCompleted, setQuizCompleted] = useState(false);
+    const { userId } = useContext(MainContext);
+    const { mutate: updateUserXp } = useUpdateUserXp();
 
     useEffect(() => {
         Animated.timing(slideAnim, {
@@ -39,7 +43,7 @@ const QuizOverlay = ({ isVisible, onContinue, quizzes }: QuizOverlayProps) => {
     useEffect(() => {
         const saveQuizState = async () => {
             const state = JSON.stringify({ index: currentQuestionIndex, correctCount: correctAnswersCount });
-            await AsyncStorage.setItem('quizState', state);
+            await AsyncStorage.setItem(QuizState, state);
         };
 
         saveQuizState();
@@ -62,8 +66,10 @@ const QuizOverlay = ({ isVisible, onContinue, quizzes }: QuizOverlayProps) => {
         setQuizCompleted(true);
         setCurrentQuestionIndex(0);
         setCorrectAnswersCount(0);
+        if (quizCompleted) {
+            updateUserXp({ userId, correctAnswersCount });
+        }
     };
-
     return (
         <Animated.View
             style={[
@@ -79,12 +85,10 @@ const QuizOverlay = ({ isVisible, onContinue, quizzes }: QuizOverlayProps) => {
                         <Text style={styles.questionText}>
                             {quizzes[currentQuestionIndex].question}
                         </Text>
-                        {quizzes[currentQuestionIndex].answers.map((answer: any, index: number) => (
-                            <Button
-                                key={index}
-                                title={typeof answer.text === 'string' ? answer.text : 'Default Answer'}
-                                onPress={() => handleAnswer(answer.isCorrect)}
-                            />
+                        {quizzes[currentQuestionIndex].answers.map((answer, index) => (
+                            <TouchableOpacity key={index} onPress={() => handleAnswer(quizzes[currentQuestionIndex].correct_answer.toString() === answer.toString())}>
+                                <Text>{answer}</Text>
+                            </TouchableOpacity>
                         ))}
                     </>
                 ) : quizCompleted ? (

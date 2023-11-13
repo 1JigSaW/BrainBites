@@ -7,28 +7,65 @@ import {
 import {HomeStackParamList} from "../navigation/HomeStack";
 import {StackScreenProps} from "@react-navigation/stack";
 import {BACKGROUND, BLACK} from "../colors";
+import {useGetUserBadgeProgress} from "../queries/badge";
+import MainContext from "../navigation/MainContext";
 import ArrowRightIcon from "../components/icons/ArrowRight";
+import {Criteria} from "../api/badge.api";
 
 type Props = StackScreenProps<HomeStackParamList, 'AchievementsScreen'>;
 
-const AchievementsScreen = ({navigation}: Props) => {
+const AchievementsScreen = ({ navigation }: Props) => {
+    const { userId } = useContext(MainContext);
+    const { data: badgeProgress, isLoading, error } = useGetUserBadgeProgress(userId, true);
+
+    if (isLoading) {
+        return <Text>Loading...</Text>;
+    }
+
+    if (error) {
+        return <Text>Error: {error.message}</Text>;
+    }
+
+    const calculateTotalCriteria = (criteria: Criteria): number | unknown => {
+        return Object.values(criteria).reduce((total, value) => {
+            // Проверяем, является ли значение числом
+            if (typeof value === 'number') {
+                return total + value;
+            }
+            // Проверяем, является ли значение объектом с нужной структурой
+            else if (typeof value === 'object' && value !== null && 'count' in value) {
+                const obj = value as { count: number; topic_id: number };
+                return total + obj.count;
+            }
+            return total;
+        }, 0);
+    };
+
+    const calculateProgressBarWidth = (current: number, criteria: Criteria): string => {
+        const target = calculateTotalCriteria(criteria);
+        const percentage = (current / target) * 100;
+        return `${Math.min(Math.max(percentage, 0), 100)}%`; // Возвращает строку с символом '%'
+    };
+
 
     return (
         <ScrollView style={{ flex: 1, backgroundColor: BACKGROUND }}>
             <SafeAreaView style={styles.safeContainer}>
-                <View style={styles.roundedContainer}>
-                    <View style={styles.infoContainer}>
-                        <View>
-                            <Text style={styles.mainText}>Card Master</Text>
-                            <Text style={styles.subText}>Collect 50 cards</Text>
+                {badgeProgress?.map((badge, index) => (
+                    <View key={index} style={styles.roundedContainer}>
+                        <View style={styles.infoContainer}>
+                            <View>
+                                <Text style={styles.mainText}>{badge.name}</Text>
+                                <Text style={styles.subText}>{badge.description}</Text>
+                            </View>
+                            <ArrowRightIcon size={40} color={BLACK} />
                         </View>
-                        <ArrowRightIcon size={40} color={BLACK} />
-                    </View>
 
-                    <View style={styles.progressBarBackground}>
-                        <View style={styles.progressBarFill} />
+                        <View style={styles.progressBarBackground}>
+                            <View style={[styles.progressBarFill, { width: calculateProgressBarWidth(badge.progress_number, badge.criteria) as any }]} />
+                        </View>
                     </View>
-                </View>
+                ))}
             </SafeAreaView>
         </ScrollView>
     );

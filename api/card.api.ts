@@ -91,4 +91,23 @@ export class CardApi {
         }
     }
 
+    static async updateUserXp(userId: number | null, correctAnswersCount: number): Promise<{ message: string, new_xp: number }> {
+        try {
+            const response = await API.post(`api/update-user-xp/`, {
+                user_id: userId,
+                correct_answers_count: correctAnswersCount
+            });
+
+            if (response.status === 200) {
+                console.log('response.data', response.data);
+                return response.data;
+            }
+
+            throw new Error(`Error: ${response.statusText}`);
+        } catch (error) {
+            console.error('Error updating user XP:', error);
+            throw error;
+        }
+    }
+
 }

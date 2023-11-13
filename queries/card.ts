@@ -94,3 +94,21 @@ export const useGetSavedCards = (userId: number | null, options?: UseQueryOption
         }
     );
 };
+
+
+export const useUpdateUserXp = (
+    options?: UseMutationOptions<{ message: string, new_xp: number }, AxiosError, { userId: number | null, correctAnswersCount: number }>
+) => {
+    return useMutation<{ message: string, new_xp: number }, AxiosError, { userId: number | null, correctAnswersCount: number }>(
+        ({ userId, correctAnswersCount }) => CardApi.updateUserXp(userId, correctAnswersCount),
+        {
+            ...options,
+            onSuccess: (data) => {
+                console.log('XP updated:', data.message, 'New XP:', data.new_xp);
+            },
+            onError: (error) => {
+                console.error('Error updating user XP:', error.message);
+            }
+        }
+    );
+};
