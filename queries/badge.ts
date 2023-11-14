@@ -12,3 +12,15 @@ export const useGetUserBadgeProgress = (userId: number | null, isEnabled = false
         }
     );
 };
+
+export const useCheckUserAchievements = (userId: any, options = {}) => {
+    return useQuery(
+        ['check_user_achievements', userId],
+        () => UserBadgeProgressApi.checkUserAchievements(userId),
+        {
+            retry: false, // Отключение повторных попыток
+            enabled: !!userId, // Запуск запроса только если userId предоставлен
+            ...options
+        }
+    );
+};

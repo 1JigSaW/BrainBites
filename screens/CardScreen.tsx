@@ -12,6 +12,8 @@ import QuizModal from "../components/QuizModal";
 import {CARDS_COUNT, CARDS_INDEX_KEY, CARDS_KEY, QUIZ_KEY} from "../constants";
 import {Quiz} from "../api/quiz.api";
 import {Card} from "../api/card.api";
+import {useCheckUserAchievements} from "../queries/badge";
+import Toast from "react-native-toast-message";
 
 type Props = StackScreenProps<CardsStackParamList, 'CardsScreen'>;
 
@@ -24,6 +26,9 @@ const CardsScreen = ({ navigation }: Props) => {
     const [quizzes, setQuizzes] = useState<Quiz[]>([]);
     const [isQuizVisible, setIsQuizVisible] = useState(false);
     const [swipeKey, setSwipeKey] = useState(0);
+    const [earnedBadges, setEarnedBadges] = useState([]);
+
+    const checkAchievements = useCheckUserAchievements(userId);
 
     const markAsPassedMutation = useMarkCardsAsTestPassed(userId);
 
@@ -73,6 +78,21 @@ const CardsScreen = ({ navigation }: Props) => {
 
         loadSavedState();
     }, []);
+
+    const handleCheckAchievements = async () => {
+        try {
+            const badges = await checkAchievements.refetch();
+            setEarnedBadges(badges.data);
+            if (badges.data?.length > 0) {
+                Toast.show({
+                    type: 'success',
+                    text1: 'You get a new badge',
+                });
+            }
+        } catch (error) {
+            console.error('Error checking achievements:', error);
+        }
+    };
 
 
     // Функция для обработки свайпа карточки
@@ -164,6 +184,7 @@ const CardsScreen = ({ navigation }: Props) => {
         if (fetchEnabledQuiz && quizzesData) {
             setQuizzes(quizzesData);
             setFetchEnabledQuiz(false);
+            handleCheckAchievements();
         }
     }, [fetchEnabledQuiz, quizzesData]);
 

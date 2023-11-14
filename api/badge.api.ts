@@ -9,7 +9,7 @@ export interface BadgeProgress {
     criteria: Criteria;
 }
 
-interface Criteria {
+export interface Criteria {
     [key: string]: number | { count: number; topic_id: number } | unknown;
 }
 
@@ -26,6 +26,22 @@ export class UserBadgeProgressApi {
             throw new Error(`Error: ${response.statusText}`);
         } catch (error) {
             console.error('Error fetching user badge progress:', error);
+            throw error;
+        }
+    }
+
+    static async checkUserAchievements(userId: any) {
+        try {
+            const response = await API.get(`api/check-achievements/`, {
+                params: { user_id: userId }
+            });
+            console.log('Achievements Response:', response.data);
+            if (response.status === 200) {
+                return response.data.earned_badges;
+            }
+            throw new Error(`Error: ${response.statusText}`);
+        } catch (error) {
+            console.error('Error fetching user achievements:', error);
             throw error;
         }
     }
