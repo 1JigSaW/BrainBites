@@ -2,16 +2,17 @@ import { useQuery, UseQueryOptions } from '@tanstack/react-query';
 import { AxiosError } from 'axios';
 import {BadgeProgress, UserBadgeProgressApi} from "../api/badge.api";
 
-export const useGetUserBadgeProgress = (userId: number | null, isEnabled = false) => {
+export const useGetUserBadgeProgress = (userId: number | null, isEnabled = false, topThree = false) => {
     return useQuery<BadgeProgress[], AxiosError>(
-        ['user_badge_progress', userId],
-        () => UserBadgeProgressApi.getUserBadgeProgress(userId),
+        ['user_badge_progress', userId, topThree],
+        () => UserBadgeProgressApi.getUserBadgeProgress(userId, topThree),
         {
             retry: false, // Отключаем повторные попытки
             enabled: isEnabled // Хук будет активирован только если isEnabled true
         }
     );
 };
+
 
 export const useCheckUserAchievements = (userId: any, options = {}) => {
     return useQuery(

@@ -11,12 +11,13 @@ import {useGetUserBadgeProgress} from "../queries/badge";
 import MainContext from "../navigation/MainContext";
 import ArrowRightIcon from "../components/icons/ArrowRight";
 import {Criteria} from "../api/badge.api";
+import {calculateProgressBarWidth} from "../utils";
 
 type Props = StackScreenProps<HomeStackParamList, 'AchievementsScreen'>;
 
 const AchievementsScreen = ({ navigation }: Props) => {
     const { userId } = useContext(MainContext);
-    const { data: badgeProgress, isLoading, error } = useGetUserBadgeProgress(userId, true);
+    const { data: badgeProgress, isLoading, error } = useGetUserBadgeProgress(userId, true, false);
     console.log('badgeProgress', badgeProgress);
     if (isLoading) {
         return <Text>Loading...</Text>;
@@ -25,27 +26,6 @@ const AchievementsScreen = ({ navigation }: Props) => {
     if (error) {
         return <Text>Error: {error.message}</Text>;
     }
-
-    const calculateTotalCriteria = (criteria: Criteria): number | unknown => {
-        return Object.values(criteria).reduce((total, value) => {
-            // Проверяем, является ли значение числом
-            if (typeof value === 'number') {
-                return total + value;
-            }
-            // Проверяем, является ли значение объектом с нужной структурой
-            else if (typeof value === 'object' && value !== null && 'count' in value) {
-                const obj = value as { count: number; topic_id: number };
-                return total + obj.count;
-            }
-            return total;
-        }, 0);
-    };
-
-    const calculateProgressBarWidth = (current: number, criteria: Criteria): string => {
-        const target = calculateTotalCriteria(criteria);
-        const percentage = (current / target) * 100;
-        return `${Math.min(Math.max(percentage, 0), 100)}%`; // Возвращает строку с символом '%'
-    };
 
 
     return (

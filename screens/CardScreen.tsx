@@ -178,6 +178,7 @@ const CardsScreen = ({ navigation }: Props) => {
     useEffect(() => {
         setCards(cardsData);
         setFetchEnabled(false);
+        handleCheckAchievements();
     }, [fetchEnabled, cardsData]);
 
     useEffect(() => {

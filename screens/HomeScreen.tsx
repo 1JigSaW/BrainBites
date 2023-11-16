@@ -23,6 +23,8 @@ import MainContext from "../navigation/MainContext";
 import {useGetUsers, useGetUserStats} from "../queries/user";
 import {useIsFocused} from "@react-navigation/native";
 import {useUpdateReadCardsCount} from "../queries/card";
+import {useGetUserBadgeProgress} from "../queries/badge";
+import {calculateProgressBarWidth} from "../utils";
 
 const getFontSizeForName = (name: string) => {
     if (name.length <= 5) {
@@ -38,9 +40,10 @@ const HomeScreen = ({ navigation, route }: Props) => {
     const [activeButton, setActiveButton] = useState<string>('read_cards');
     const isFocused = useIsFocused(); // Этот хук возвращает true, когда экран в фокусе
     const { userId, cardCount } = useContext(MainContext);
+    const { data: badgeProgress, isLoading, error, refetch: refetchBadge } = useGetUserBadgeProgress(userId, true, true);
     const {
         data: userStats,
-        isLoading,
+        isLoading: isLoadingStats,
         isError,
         refetch,
     } = useGetUserStats(userId);
@@ -60,7 +63,7 @@ const HomeScreen = ({ navigation, route }: Props) => {
     useEffect(() => {
         if (isFocused && userId) {
             refetch(); // Refetch user stats when the screen is in focus
-
+            refetchBadge();
             // Now, call the mutation to update the read cards count
             updateReadCardsCount({
                 userId,
@@ -144,46 +147,21 @@ const HomeScreen = ({ navigation, route }: Props) => {
 
                 <View style={styles.separator} />
 
-                <View style={styles.roundedContainer}>
-                    <View style={styles.infoContainer}>
-                        <View>
-                            <Text style={styles.mainText}>Card Master</Text>
-                            <Text style={styles.subText}>Collect 50 cards</Text>
+                {badgeProgress?.map((badge, index) => (
+                    <View key={index} style={styles.roundedContainer}>
+                        <View style={styles.infoContainer}>
+                            <View>
+                                <Text style={styles.mainText}>{badge.name}</Text>
+                                <Text style={styles.subText}>{badge.description}</Text>
+                            </View>
+                            <ArrowRightIcon size={40} color={BLACK} />
                         </View>
-                        <ArrowRightIcon size={40} color={BLACK} />
-                    </View>
 
-                    <View style={styles.progressBarBackground}>
-                        <View style={styles.progressBarFill} />
-                    </View>
-                </View>
-                <View style={styles.roundedContainer}>
-                    <View style={styles.infoContainer}>
-                        <View>
-                            <Text style={styles.mainText}>Card Master</Text>
-                            <Text style={styles.subText}>Collect 50 cards</Text>
+                        <View style={styles.progressBarBackground}>
+                            <View style={[styles.progressBarFill, { width: calculateProgressBarWidth(badge.progress_number, badge.criteria) as any }]} />
                         </View>
-                        <ArrowRightIcon size={40} color={BLACK} />
                     </View>
-
-                    <View style={styles.progressBarBackground}>
-                        <View style={styles.progressBarFill} />
-                    </View>
-                </View>
-
-                <View style={styles.roundedContainer}>
-                    <View style={styles.infoContainer}>
-                        <View>
-                            <Text style={styles.mainText}>Card Master</Text>
-                            <Text style={styles.subText}>Collect 50 cards</Text>
-                        </View>
-                        <ArrowRightIcon size={40} color={BLACK} />
-                    </View>
-
-                    <View style={styles.progressBarBackground}>
-                        <View style={styles.progressBarFill} />
-                    </View>
-                </View>
+                ))}
 
                 <View style={styles.lineContainer}>
                     <Text style={styles.subtitle}>Leaderboard</Text>

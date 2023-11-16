@@ -14,10 +14,10 @@ export interface Criteria {
 }
 
 export class UserBadgeProgressApi {
-    static async getUserBadgeProgress(userId: number | null): Promise<BadgeProgress[]> {
+    static async getUserBadgeProgress(userId: number | null, topThree: boolean = false): Promise<BadgeProgress[]> {
         try {
             const response = await API.get(`api/user-badge-progress/`, {
-                params: { user_id: userId }
+                params: { user_id: userId, top_three: topThree }
             });
             console.log('response.data', response.data);
             if (response.status === 200) {
@@ -29,6 +29,7 @@ export class UserBadgeProgressApi {
             throw error;
         }
     }
+
 
     static async checkUserAchievements(userId: any) {
         try {

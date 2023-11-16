@@ -1,8 +1,8 @@
-export const firstLaunchTest = 'firstLaunchTest1b';
-export const onboardingUsername = 'onboardingUsername1b';
-export const user = 'user_data_test1b'
-export const CARDS_KEY = '@currentCards1b';
-export const CARDS_INDEX_KEY = '@currentCardIndex1b';
-export const QUIZ_KEY = '@quiz1b';
-export const QuizState = 'quizState1b';
-export const CARDS_COUNT = 'cards_count1b';
+export const firstLaunchTest = 'firstLaunchTest1f';
+export const onboardingUsername = 'onboardingUsername1f';
+export const user = 'user_data_test1f'
+export const CARDS_KEY = '@currentCards1f';
+export const CARDS_INDEX_KEY = '@currentCardIndex1f';
+export const QUIZ_KEY = '@quiz1f';
+export const QuizState = 'quizState1f';
+export const CARDS_COUNT = 'cards_count1f';
