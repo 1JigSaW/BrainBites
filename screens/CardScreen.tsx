@@ -9,7 +9,7 @@ import {ActivityIndicator, Alert, AppState, StyleSheet, Text, View} from "react-
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import {useGetAvailableQuizzes} from "../queries/quiz";
 import QuizModal from "../components/QuizModal";
-import {CARDS_COUNT, CARDS_INDEX_KEY, CARDS_KEY, QUIZ_KEY} from "../constants";
+import {CARDS_COUNT, CARDS_INDEX_KEY, CARDS_KEY, QUIZ_KEY, QuizState} from "../constants";
 import {Quiz} from "../api/quiz.api";
 import {Card} from "../api/card.api";
 import {useCheckUserAchievements} from "../queries/badge";
@@ -34,6 +34,7 @@ const CardsScreen = ({ navigation }: Props) => {
 
     const {
         data: cardsData,
+        isLoading: isLoadingCards,
         isError: isCardsError,
         refetch: refetchCards
     } = useGetUnseenCards(userId, pageSize, fetchEnabled);
@@ -132,7 +133,9 @@ const CardsScreen = ({ navigation }: Props) => {
 
 
     // Функция для обработки продолжения после викторины
-    const handleContinueFromQuiz = () => {
+    const handleContinueFromQuiz = async () => {
+        handleCheckAchievements();
+        await AsyncStorage.removeItem(QuizState)
         setIsQuizVisible(false); // Скрыть викторину
         saveTestState(false); // Обнуляем состояние теста
         markAsPassedMutation.mutate(undefined, {
@@ -178,23 +181,24 @@ const CardsScreen = ({ navigation }: Props) => {
     useEffect(() => {
         setCards(cardsData);
         setFetchEnabled(false);
-        handleCheckAchievements();
     }, [fetchEnabled, cardsData]);
 
     useEffect(() => {
         if (fetchEnabledQuiz && quizzesData) {
             setQuizzes(quizzesData);
+            console.log('quizes', quizzesData)
             setFetchEnabledQuiz(false);
-            handleCheckAchievements();
         }
     }, [fetchEnabledQuiz, quizzesData]);
 
 
     return (
         <View style={styles.container}>
-            {cards && cards?.length > 0 ? (
+            {isLoadingCards ? (
+                <ActivityIndicator size="large" color="#0000ff" />
+            ) : cards && cards.length > 0 ? (
                 <Swiper
-                    key={swipeKey} // Обновление ключа при каждом изменении количества карточек
+                    key={swipeKey}
                     cards={cards}
                     renderCard={(card) => <CardComponent card={card} />}
                     onSwiped={handleSwiped}
@@ -204,7 +208,6 @@ const CardsScreen = ({ navigation }: Props) => {
                     stackScale={10}
                     stackSeparation={15}
                 />
-
             ) : (
                 <Text>No cards left</Text>
             )}

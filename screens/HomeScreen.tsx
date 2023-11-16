@@ -40,7 +40,8 @@ const HomeScreen = ({ navigation, route }: Props) => {
     const [activeButton, setActiveButton] = useState<string>('read_cards');
     const isFocused = useIsFocused(); // Этот хук возвращает true, когда экран в фокусе
     const { userId, cardCount } = useContext(MainContext);
-    const { data: badgeProgress, isLoading, error, refetch: refetchBadge } = useGetUserBadgeProgress(userId, true, true);
+    const shouldFetchBadgeProgress = userId != null;
+    const { data: badgeProgress, isLoading, error, refetch: refetchBadge } = useGetUserBadgeProgress(userId, shouldFetchBadgeProgress, true);
     const {
         data: userStats,
         isLoading: isLoadingStats,
