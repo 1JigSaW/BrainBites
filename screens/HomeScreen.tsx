@@ -1,5 +1,6 @@
 import React, {useContext, useEffect, useState} from 'react';
 import {
+    ActivityIndicator,
     Image,
     SafeAreaView, ScrollView,
     StyleSheet, Text, TouchableOpacity, View,
@@ -148,21 +149,25 @@ const HomeScreen = ({ navigation, route }: Props) => {
 
                 <View style={styles.separator} />
 
-                {badgeProgress?.map((badge, index) => (
-                    <View key={index} style={styles.roundedContainer}>
-                        <View style={styles.infoContainer}>
-                            <View>
-                                <Text style={styles.mainText}>{badge.name}</Text>
-                                <Text style={styles.subText}>{badge.description}</Text>
+                {isLoading ? (
+                    <ActivityIndicator size="large" color={BLUE} />
+                ) : (
+                    badgeProgress?.map((badge, index) => (
+                        <View key={index} style={styles.roundedContainer}>
+                            <View style={styles.infoContainer}>
+                                <View>
+                                    <Text style={styles.mainText}>{badge.name}</Text>
+                                    <Text style={styles.subText}>{badge.description}</Text>
+                                </View>
+                                <ArrowRightIcon size={40} color={BLACK} />
                             </View>
-                            <ArrowRightIcon size={40} color={BLACK} />
-                        </View>
 
-                        <View style={styles.progressBarBackground}>
-                            <View style={[styles.progressBarFill, { width: calculateProgressBarWidth(badge.progress_number, badge.criteria) as any }]} />
+                            <View style={styles.progressBarBackground}>
+                                <View style={[styles.progressBarFill, { width: calculateProgressBarWidth(badge.progress_number, badge.criteria) as any }]} />
+                            </View>
                         </View>
-                    </View>
-                ))}
+                    ))
+                )}
 
                 <View style={styles.lineContainer}>
                     <Text style={styles.subtitle}>Leaderboard</Text>
@@ -194,24 +199,28 @@ const HomeScreen = ({ navigation, route }: Props) => {
                     </TouchableOpacity>
                 </View>
                 <View style={styles.blockNum}>
-                    {users && users.map(user => (
-                        <React.Fragment key={user.id}>
-                            <View style={styles.listItemContainer}>
-                                <Text style={styles.listNumber}>#{user.user_rank}</Text>
-                                <Image
-                                    source={{ uri: 'https://cdn.pixabay.com/photo/2018/02/08/22/27/flower-3140492_1280.jpg' }}
-                                    style={styles.listImage}
-                                />
-                                <Text style={styles.listText}>{user.username}</Text>
-                                <Text style={styles.listEndNumber}>
-                                    {sortBy === 'xp' ? user.xp :
-                                        sortBy === 'read_cards' ? user.read_cards :
-                                            sortBy === 'badges' ? user.badges_count : ''}
-                                </Text>
-                            </View>
-                            {users.indexOf(user) < users.length - 1 && <View style={styles.listSeparator} />}
-                        </React.Fragment>
-                    ))}
+                    {isLoadingUsers ? (
+                        <ActivityIndicator size="large" color={BLUE} />
+                    ) : (
+                        users && users.map(user => (
+                            <React.Fragment key={user.id}>
+                                <View style={styles.listItemContainer}>
+                                    <Text style={styles.listNumber}>#{user.user_rank}</Text>
+                                    <Image
+                                        source={{ uri: 'https://cdn.pixabay.com/photo/2018/02/08/22/27/flower-3140492_1280.jpg' }}
+                                        style={styles.listImage}
+                                    />
+                                    <Text style={styles.listText}>{user.username}</Text>
+                                    <Text style={styles.listEndNumber}>
+                                        {sortBy === 'xp' ? user.xp :
+                                            sortBy === 'read_cards' ? user.read_cards :
+                                                sortBy === 'badges' ? user.badges_count : ''}
+                                    </Text>
+                                </View>
+                                {users.indexOf(user) < users.length - 1 && <View style={styles.listSeparator} />}
+                            </React.Fragment>
+                        ))
+                    )}
                 </View>
 
 

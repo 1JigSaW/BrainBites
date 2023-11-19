@@ -1,5 +1,14 @@
 import React, {useContext, useState} from 'react';
-import { Button, SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import {
+    ActivityIndicator,
+    Button,
+    SafeAreaView,
+    ScrollView,
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    View
+} from 'react-native';
 import { StackScreenProps } from '@react-navigation/stack';
 import { OnboardingStackParamList } from '../../navigation/OnboardingNavigator';
 import { BACKGROUND, BLACK, BLUE } from '../../colors';
@@ -18,6 +27,7 @@ const TopicSelectionScreen = ({ navigation, route }: Props) => {
     const { username } = route.params;
     const [selectedTopics, setSelectedTopics] = useState<string[]>([]);
     const { data: topics, isLoading, isError } = useGetAllTopics();
+    const [isCreatingUser, setIsCreatingUser] = useState(false);
 
     const createUserMutation = useCreateUser();
 
@@ -35,6 +45,8 @@ const TopicSelectionScreen = ({ navigation, route }: Props) => {
             return;
         }
 
+        setIsCreatingUser(true); // Включить индикатор загрузки
+
         const topicIds = topics
             .filter(topic => selectedTopics.includes(topic.title))
             .map(topic => topic.id);
@@ -43,22 +55,27 @@ const TopicSelectionScreen = ({ navigation, route }: Props) => {
             { username, topicIds },
             {
                 onSuccess: async (data) => {
-                    console.log('User created successfully:', data);
                     try {
                         await AsyncStorage.setItem(user, JSON.stringify(data));
                         await completeOnboarding(data.id);
                     } catch (error) {
                         console.error('Ошибка при сохранении данных пользователя:', error);
                     }
+                    setIsCreatingUser(false); // Выключить индикатор загрузки
                 },
                 onError: (error) => {
                     console.error('Ошибка при создании пользователя:', error);
+                    setIsCreatingUser(false); // Выключить индикатор загрузки в случае ошибки
                 },
             }
         );
     };
 
-    if (isLoading) return <Text>Loading...</Text>;
+    if (isLoading) return (
+        <SafeAreaView style={styles.safeContainer}>
+            <ActivityIndicator size="large" color={BLUE} />
+        </SafeAreaView>
+    );
     if (isError) return <Text>Error fetching topics.</Text>;
 
     return (
@@ -88,11 +105,15 @@ const TopicSelectionScreen = ({ navigation, route }: Props) => {
                     ))}
                 </View>
                 <TouchableOpacity
-                    disabled={selectedTopics.length === 0}
-                    style={[styles.button, selectedTopics.length === 0 ? styles.disabledButton : styles.activeButton]}
+                    disabled={selectedTopics.length === 0 || isCreatingUser}
+                    style={[styles.button, (selectedTopics.length === 0 || isCreatingUser) ? styles.disabledButton : styles.activeButton]}
                     onPress={handleContinue}
                 >
-                    <Text style={styles.buttonText}>Continue</Text>
+                    {isCreatingUser ? (
+                        <ActivityIndicator size="large" color={BACKGROUND} />
+                    ) : (
+                        <Text style={styles.buttonText}>Continue</Text>
+                    )}
                 </TouchableOpacity>
             </SafeAreaView>
         </ScrollView>

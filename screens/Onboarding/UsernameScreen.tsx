@@ -7,7 +7,7 @@ import {
     Text,
     TouchableOpacity,
     View,
-    TextInput,
+    TextInput, ActivityIndicator,
 } from 'react-native';
 import { StackScreenProps } from "@react-navigation/stack";
 import { OnboardingStackParamList } from "../../navigation/OnboardingNavigator";
@@ -24,13 +24,18 @@ const UsernameScreen = ({ navigation }: Props) => {
 
     const usernameCheck = useCheckUsernameUnique();
 
+    const [isCheckingUsername, setIsCheckingUsername] = useState(false);
+
     const handleContinuePress = async () => {
         if (!username) {
             return;
         }
 
+        setIsCheckingUsername(true);  // Включить индикатор загрузки
+
         usernameCheck.mutate(username, {
             onSuccess: (data) => {
+                setIsCheckingUsername(false);  // Выключить индикатор загрузки
                 if (data.isUnique) {
                     navigation.navigate('TopicSelectionScreen', { username });
                 } else {
@@ -38,7 +43,7 @@ const UsernameScreen = ({ navigation }: Props) => {
                 }
             },
             onError: (error) => {
-
+                setIsCheckingUsername(false);  // Выключить индикатор загрузки в случае ошибки
             }
         });
     };
@@ -62,8 +67,18 @@ const UsernameScreen = ({ navigation }: Props) => {
                     />
                     {isUsernameTaken && <Text style={{ color: RED, textAlign: 'center', width: '100%' }}>Username is already taken</Text>}
                 </View>
-                <TouchableOpacity style={[styles.continueButton, (isUsernameTaken || username === '') && {backgroundColor: '#ccc'}]} onPress={handleContinuePress}>
-                    <Text style={[styles.textButton, (isUsernameTaken || username === '') && {opacity: 0.5}]} disabled={isUsernameTaken || username === ''}>Continue</Text>
+                <TouchableOpacity
+                    style={[styles.continueButton, (isUsernameTaken || username === '') && {backgroundColor: '#ccc'}]}
+                    onPress={handleContinuePress}
+                    disabled={isUsernameTaken || username === '' || isCheckingUsername}
+                >
+                    {isCheckingUsername ? (
+                        <ActivityIndicator color="#fff" />
+                    ) : (
+                        <Text style={[styles.textButton, (isUsernameTaken || username === '') && {opacity: 0.5}]}>
+                            Continue
+                        </Text>
+                    )}
                 </TouchableOpacity>
             </SafeAreaView>
         </ScrollView>

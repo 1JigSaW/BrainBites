@@ -1,5 +1,6 @@
 import React, {useContext, useEffect, useState} from 'react';
 import {
+    ActivityIndicator,
     SafeAreaView,
     ScrollView,
     StyleSheet, Text, TouchableOpacity, View,
@@ -47,7 +48,12 @@ const MyTopicsScreen = ({navigation, route}: Props) => {
         });
     };
 
-    if (isLoading) return <Text>Loading...</Text>;
+    if (isLoading) return (
+        <SafeAreaView style={styles.safeContainer}>
+            <ActivityIndicator size="large" color={BLUE} />
+        </SafeAreaView>
+
+        );
     if (isError) return <Text>Error loading topics</Text>;
 
     return (

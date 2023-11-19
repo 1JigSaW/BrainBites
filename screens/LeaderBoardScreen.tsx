@@ -1,5 +1,6 @@
 import React, {useContext, useEffect, useState} from 'react';
 import {
+    ActivityIndicator,
     Image,
     SafeAreaView,
     ScrollView,
@@ -50,24 +51,28 @@ const LeaderBoardScreen = ({navigation}: Props) => {
                         </TouchableOpacity>
                     </View>
                     <View>
-                        {users && users.map((user, index) => (
-                            <React.Fragment key={user.id}>
-                                <View style={styles.listItemContainer}>
-                                    <Text style={styles.listNumber}>#{index+1}</Text>
-                                    <Image
-                                        source={{ uri: 'https://cdn.pixabay.com/photo/2018/02/08/22/27/flower-3140492_1280.jpg' }}
-                                        style={styles.listImage}
-                                    />
-                                    <Text style={styles.listText}>{user.username}</Text>
-                                    <Text style={styles.listEndNumber}>
-                                        {sortBy === 'xp' ? user.xp :
-                                            sortBy === 'read_cards' ? user.read_cards :
-                                                sortBy === 'badges' ? user.badges_count : ''}
-                                    </Text>
-                                </View>
-                                {users.indexOf(user) < users.length - 1 && <View style={styles.listSeparator} />}
-                            </React.Fragment>
-                        ))}
+                        {isLoadingUsers ? (
+                            <ActivityIndicator size="large" color={BLUE} />
+                        ) : (
+                            users && users.map((user, index) => (
+                                <React.Fragment key={user.id}>
+                                    <View style={styles.listItemContainer}>
+                                        <Text style={styles.listNumber}>#{index+1}</Text>
+                                        <Image
+                                            source={{ uri: 'https://cdn.pixabay.com/photo/2018/02/08/22/27/flower-3140492_1280.jpg' }}
+                                            style={styles.listImage}
+                                        />
+                                        <Text style={styles.listText}>{user.username}</Text>
+                                        <Text style={styles.listEndNumber}>
+                                            {sortBy === 'xp' ? user.xp :
+                                                sortBy === 'read_cards' ? user.read_cards :
+                                                    sortBy === 'badges' ? user.badges_count : ''}
+                                        </Text>
+                                    </View>
+                                    {users.indexOf(user) < users.length - 1 && <View style={styles.listSeparator} />}
+                                </React.Fragment>
+                            ))
+                        )}
                     </View>
                 </View>
             </SafeAreaView>

@@ -14,6 +14,7 @@ import {Quiz} from "../api/quiz.api";
 import {Card} from "../api/card.api";
 import {useCheckUserAchievements} from "../queries/badge";
 import Toast from "react-native-toast-message";
+import {BLUE} from "../colors";
 
 type Props = StackScreenProps<CardsStackParamList, 'CardsScreen'>;
 
@@ -134,7 +135,6 @@ const CardsScreen = ({ navigation }: Props) => {
 
     // Функция для обработки продолжения после викторины
     const handleContinueFromQuiz = async () => {
-        handleCheckAchievements();
         await AsyncStorage.removeItem(QuizState)
         setIsQuizVisible(false); // Скрыть викторину
         saveTestState(false); // Обнуляем состояние теста
@@ -188,6 +188,7 @@ const CardsScreen = ({ navigation }: Props) => {
             setQuizzes(quizzesData);
             console.log('quizes', quizzesData)
             setFetchEnabledQuiz(false);
+            handleCheckAchievements();
         }
     }, [fetchEnabledQuiz, quizzesData]);
 
@@ -195,7 +196,7 @@ const CardsScreen = ({ navigation }: Props) => {
     return (
         <View style={styles.container}>
             {isLoadingCards ? (
-                <ActivityIndicator size="large" color="#0000ff" />
+                <ActivityIndicator size="large" color={BLUE} />
             ) : cards && cards.length > 0 ? (
                 <Swiper
                     key={swipeKey}

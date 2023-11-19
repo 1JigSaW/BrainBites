@@ -5,6 +5,7 @@ import {QuizState} from "../constants";
 import {Quiz} from "../api/quiz.api";
 import {useUpdateUserXp} from "../queries/card";
 import MainContext from "../navigation/MainContext";
+import {BLACK} from "../colors";
 
 interface QuizOverlayProps {
     isVisible: boolean;
@@ -86,8 +87,12 @@ const QuizOverlay = ({ isVisible, onContinue, quizzes }: QuizOverlayProps) => {
                             {quizzes[currentQuestionIndex].question}
                         </Text>
                         {quizzes[currentQuestionIndex].answers.map((answer, index) => (
-                            <TouchableOpacity key={index} onPress={() => handleAnswer(quizzes[currentQuestionIndex].correct_answer.toString() === answer.toString())}>
-                                <Text>{answer}</Text>
+                            <TouchableOpacity
+                                key={index}
+                                onPress={() => handleAnswer(quizzes[currentQuestionIndex].correct_answer.toString() === answer.toString())}
+                                style={styles.quizAnswer}
+                            >
+                                <Text style={styles.answerText}>{answer}</Text>
                             </TouchableOpacity>
                         ))}
                     </>
@@ -111,10 +116,11 @@ const styles = StyleSheet.create({
         position: 'absolute',
         left: 0,
         right: 0,
-        bottom: 0, // Start from the bottom of the screen
+        top: 0,    // Добавлено для начала блока от верха экрана
+        bottom: 0,
         backgroundColor: 'white',
-        height: 300, // Or whatever height you want
-        // Style your overlay here
+        justifyContent: 'center',
+        height: '100%', // Or whatever height you want
     },
     modalView: {
         margin: 20,
@@ -124,17 +130,32 @@ const styles = StyleSheet.create({
         alignItems: "center",
         shadowColor: "#000",
         shadowOffset: {
-            width: 0,
+            width: 2,
             height: 2
         },
         shadowOpacity: 0.25,
         shadowRadius: 3.84,
         elevation: 5,
+        textAlign: 'center',
+        justifyContent: 'center',
+        borderWidth: 1,
     },
     questionText: {
         marginBottom: 15,
         textAlign: "center",
+        color: BLACK,
     },
+    quizAnswer: {
+        borderWidth: 1,
+        borderRadius: 20,
+        width: '100%',
+        padding: 10,
+        marginVertical: 5,
+    },
+    answerText: {
+        textAlign: 'center',
+        color: BLACK,
+    }
 });
 
 export default QuizOverlay;

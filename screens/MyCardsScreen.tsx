@@ -1,5 +1,6 @@
 import React, {useContext, useEffect, useRef, useState} from 'react';
 import {
+    ActivityIndicator,
     Image,
     SafeAreaView,
     ScrollView,
@@ -7,7 +8,7 @@ import {
 } from 'react-native';
 import {HomeStackParamList} from "../navigation/HomeStack";
 import {StackScreenProps} from "@react-navigation/stack";
-import {BACKGROUND, BLACK} from "../colors";
+import {BACKGROUND, BLACK, BLUE} from "../colors";
 import DeleteIcon from "../components/icons/DeleteIcon";
 import CardComponent from "../components/CardComponent";
 import Swiper from 'react-native-deck-swiper';
@@ -55,14 +56,29 @@ const MyCardsScreen = ({ navigation }: Props) => {
     }, [isFocused]);
 
     if (isLoading) {
-        // Add your loading indicator
-        return <Text>Loading...</Text>;
+        return (
+            <SafeAreaView style={styles.container}>
+                <ActivityIndicator size="large" color={BLUE} />
+            </SafeAreaView>
+        )
     }
 
     if (isError || !cards) {
-        // Handle error state
-        return <Text>Error fetching cards.</Text>;
+        return (
+            <SafeAreaView style={styles.container}>
+                <Text>No one cards</Text>
+            </SafeAreaView>
+        );
     }
+
+    if (cards.length === 0) {
+        return (
+            <SafeAreaView style={styles.container}>
+                <Text>No one cards</Text>
+            </SafeAreaView>
+        );
+    }
+
 
     return (
         <SafeAreaView style={styles.safeContainer}>

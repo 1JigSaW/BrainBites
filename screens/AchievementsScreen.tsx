@@ -1,12 +1,13 @@
 import React, {useContext, useEffect, useState} from 'react';
 import {
+    ActivityIndicator,
     SafeAreaView,
     ScrollView,
     StyleSheet, Text, View,
 } from 'react-native';
 import {HomeStackParamList} from "../navigation/HomeStack";
 import {StackScreenProps} from "@react-navigation/stack";
-import {BACKGROUND, BLACK} from "../colors";
+import {BACKGROUND, BLACK, BLUE} from "../colors";
 import {useGetUserBadgeProgress} from "../queries/badge";
 import MainContext from "../navigation/MainContext";
 import ArrowRightIcon from "../components/icons/ArrowRight";
@@ -20,7 +21,11 @@ const AchievementsScreen = ({ navigation }: Props) => {
     const { data: badgeProgress, isLoading, error } = useGetUserBadgeProgress(userId, true, false);
     console.log('badgeProgress', badgeProgress);
     if (isLoading) {
-        return <Text>Loading...</Text>;
+        return (
+            <SafeAreaView style={styles.safeContainer}>
+                <ActivityIndicator size="large" color={BLUE} />
+            </SafeAreaView>
+        );
     }
 
     if (error) {
