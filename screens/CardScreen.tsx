@@ -15,6 +15,7 @@ import {Card} from "../api/card.api";
 import {useCheckUserAchievements} from "../queries/badge";
 import Toast from "react-native-toast-message";
 import {BLUE} from "../colors";
+import * as Animatable from 'react-native-animatable';
 
 type Props = StackScreenProps<CardsStackParamList, 'CardsScreen'>;
 
@@ -198,17 +199,17 @@ const CardsScreen = ({ navigation }: Props) => {
             {isLoadingCards ? (
                 <ActivityIndicator size="large" color={BLUE} />
             ) : cards && cards.length > 0 ? (
-                <Swiper
-                    key={swipeKey}
-                    cards={cards}
-                    renderCard={(card) => <CardComponent card={card} />}
-                    onSwiped={handleSwiped}
-                    onSwipedAll={handleTest}
-                    backgroundColor="#f0f0f0"
-                    stackSize={pageSize}
-                    stackScale={10}
-                    stackSeparation={15}
-                />
+                    <Swiper
+                        key={swipeKey}
+                        cards={cards}
+                        renderCard={(card) => <CardComponent card={card} />}
+                        onSwiped={handleSwiped}
+                        onSwipedAll={handleTest}
+                        backgroundColor="#f0f0f0"
+                        stackSize={pageSize}
+                        stackScale={10}
+                        stackSeparation={60}
+                    />
             ) : (
                 <Text>No cards left</Text>
             )}

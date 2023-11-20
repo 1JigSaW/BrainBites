@@ -1,11 +1,12 @@
-import React, {useState, useEffect, useContext} from 'react';
-import {View, Text, Modal, StyleSheet, Button, Animated, TouchableOpacity} from 'react-native';
+import React, {useState, useEffect, useContext, useRef} from 'react';
+import {View, Text, Modal, StyleSheet, Button, TouchableOpacity} from 'react-native';
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import {QuizState} from "../constants";
 import {Quiz} from "../api/quiz.api";
 import {useUpdateUserXp} from "../queries/card";
 import MainContext from "../navigation/MainContext";
 import {BLACK} from "../colors";
+import * as Animatable from 'react-native-animatable';
 
 interface QuizOverlayProps {
     isVisible: boolean;
@@ -14,19 +15,21 @@ interface QuizOverlayProps {
 }
 
 const QuizOverlay = ({ isVisible, onContinue, quizzes }: QuizOverlayProps) => {
-    const [slideAnim] = useState(new Animated.Value(0));
     const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
     const [correctAnswersCount, setCorrectAnswersCount] = useState(0);
     const [quizCompleted, setQuizCompleted] = useState(false);
     const { userId } = useContext(MainContext);
-    const { mutate: updateUserXp } = useUpdateUserXp();
+    const { mutate: updateUserXp } = useUpdateUserXp()
+
+    const animatableRef = useRef(null);
 
     useEffect(() => {
-        Animated.timing(slideAnim, {
-            toValue: isVisible ? 0 : -300,
-            duration: 500,
-            useNativeDriver: true,
-        }).start();
+        if (animatableRef.current) {
+            animatableRef.current.bounceInRight(500);
+        }
+    }, [currentQuestionIndex]);
+
+    useEffect(() => {
         const loadQuizState = async () => {
             const savedState = await AsyncStorage.getItem(QuizState);
             if (savedState) {
@@ -39,7 +42,7 @@ const QuizOverlay = ({ isVisible, onContinue, quizzes }: QuizOverlayProps) => {
         if (isVisible) {
             loadQuizState();
         }
-    }, [isVisible, slideAnim]);
+    }, [isVisible]);
 
     useEffect(() => {
         const saveQuizState = async () => {
@@ -72,14 +75,15 @@ const QuizOverlay = ({ isVisible, onContinue, quizzes }: QuizOverlayProps) => {
         }
     };
     return (
-        <Animated.View
-            style={[
-                styles.overlay,
-                {
-                    transform: [{ translateY: slideAnim }],
-                },
-            ]}
+        <Animatable.View
+            animation={isVisible ? 'slideInUp' : 'slideOutDown'} // Use appropriate animation names
+            duration={500}
+            style={styles.overlay}
         >
+            <Animatable.View
+                ref={animatableRef}
+                style={{ width: '100%' }}
+            >
             <View style={styles.modalView}>
                 {quizzes.length > 0 && currentQuestionIndex < quizzes.length && !quizCompleted ? (
                     <>
@@ -106,7 +110,8 @@ const QuizOverlay = ({ isVisible, onContinue, quizzes }: QuizOverlayProps) => {
                     <Text>Loading quizzes or no quiz available...</Text>
                 )}
             </View>
-        </Animated.View>
+            </Animatable.View>
+        </Animatable.View>
     );
 
 };
