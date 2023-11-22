@@ -196,7 +196,7 @@ const CardsScreen = ({ navigation }: Props) => {
 
     return (
         <View style={styles.container}>
-            {isLoadingCards ? (
+            {(isLoadingCards && fetchEnabled) ? (
                 <ActivityIndicator size="large" color={BLUE} />
             ) : cards && cards.length > 0 ? (
                     <Swiper
