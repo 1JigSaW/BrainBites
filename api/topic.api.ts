@@ -13,6 +13,14 @@ export interface UserTopicProgressResponse {
     total_cards: number;
 }
 
+export interface UserSubtitleProgressResponse {
+    subtitle_id: number;
+    subtitle_name: string;
+    progress: number;
+    viewed_cards: number;
+    total_cards: number;
+}
+
 export class TopicsApi {
     static async getAllTopics(): Promise<TopicResponse[]> {
         try {
@@ -36,6 +44,15 @@ export class TopicsApi {
         try {
             const { data } = await API.get(`/api/topics-progress/${user_id}/`);
             return data.user_topics;
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    static async getUserSubtitlesProgress(user_id: number, topic_id: number): Promise<UserSubtitleProgressResponse[]> {
+        try {
+            const { data } = await API.get(`/api/subtitles-progress/${user_id}/topic/${topic_id}/`);
+            return data.subtitles_progress;
         } catch (error) {
             throw error;
         }

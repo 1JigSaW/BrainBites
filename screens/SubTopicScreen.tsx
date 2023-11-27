@@ -1,50 +1,44 @@
 import {StackScreenProps} from "@react-navigation/stack";
-import React, {useContext} from "react";
-import MainContext from "../navigation/MainContext";
-import {useGetUserTopicsProgress} from "../queries/topic";
-import {
-    ActivityIndicator,
-    SafeAreaView,
-    ScrollView,
-    StyleSheet,
-    Text, TouchableOpacity,
-    View
-} from "react-native";
-import {BACKGROUND, BLACK, BLUE, PROGRESS_BACKGROUND} from "../colors";
 import {CardsStackParamList} from "../navigation/CardsStack";
+import React, {useContext, useEffect, useLayoutEffect} from "react";
+import MainContext from "../navigation/MainContext";
+import {useGetUserSubtitlesProgress, useGetUserTopicsProgress} from "../queries/topic";
+import {SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View} from "react-native";
 import ArrowRightIcon from "../components/icons/ArrowRight";
+import {BACKGROUND, BLACK, PROGRESS_BACKGROUND} from "../colors";
 
-type Props = StackScreenProps<CardsStackParamList, 'CardTopicScreen'>;
+type Props = StackScreenProps<CardsStackParamList, 'SubTopicScreen'>;
 
-const CardTopicScreen = ({ navigation, route }: Props) => {
+const SubTopicScreen = ({ navigation, route }: Props) => {
     const { userId } = useContext(MainContext);
-    const { data: topicsProgress, isLoading, error } = useGetUserTopicsProgress(userId);
+    const {topic_id, topic_name} = route.params;
+    const { data: subtitlesProgress, isLoading, error } =
+        useGetUserSubtitlesProgress(userId, topic_id);
+    console.log('topic_name', topic_name);
+    useLayoutEffect(() => {
+        if (topic_name) {
+            navigation.setOptions({ title: topic_name})
+        }
+    }, [topic_name, navigation]);
 
     if (error) return <Text>Error loading topics</Text>;
+    if (isLoading) return <Text>Loading...</Text>;
 
     return (
         <ScrollView style={styles.scrollView}>
             <SafeAreaView style={styles.safeContainer}>
-                {isLoading ? (
-                    <ActivityIndicator size="large" color={BLUE} />
-                ) : (
-                    topicsProgress?.map((topic) => (
-                        <TouchableOpacity
-                            key={topic.topic_id}
-                            style={styles.roundedContainer}
-                            onPress={() => navigation.navigate('SubTopicScreen', {
-                                topic_id: topic.topic_id,
-                                topic_name: topic.topic_name,
-                            })}
-                        >
-                            <View style={[styles.progressOverlay, { width: `${topic.progress * 100}%` }]} />
-                            <View style={styles.infoContainer}>
-                                <Text style={styles.mainText}>{topic.topic_name}</Text>
-                                <ArrowRightIcon size={40} color={BLACK} />
-                            </View>
-                        </TouchableOpacity>
-                    ))
-                )}
+                {subtitlesProgress?.map((subtitle) => (
+                    <TouchableOpacity
+                        key={subtitle.subtitle_id}
+                        style={styles.roundedContainer}
+                    >
+                        <View style={[styles.progressOverlay, { width: `${subtitle.progress * 100}%` }]} />
+                        <View style={styles.infoContainer}>
+                            <Text style={styles.mainText}>{subtitle.subtitle_name}</Text>
+                            <ArrowRightIcon size={40} color={BLACK} />
+                        </View>
+                    </TouchableOpacity>
+                ))}
             </SafeAreaView>
         </ScrollView>
     );
@@ -56,6 +50,7 @@ const styles = StyleSheet.create({
         backgroundColor: BACKGROUND,
         paddingHorizontal: 10,
         paddingVertical: 5,
+        marginBottom: 40,
     },
     scrollView: {
         flex: 1,
@@ -107,4 +102,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default CardTopicScreen;
+export default SubTopicScreen;

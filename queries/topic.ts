@@ -1,5 +1,5 @@
 import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
-import {TopicsApi, TopicResponse, UserTopicProgressResponse} from "../api/topic.api";
+import {TopicsApi, TopicResponse, UserTopicProgressResponse, UserSubtitleProgressResponse} from "../api/topic.api";
 import { AxiosError } from "axios";
 
 export const TOPICS_QUERY_KEY = ['topics'];
@@ -47,3 +47,16 @@ export const useGetUserTopicsProgress = (user_id: null | number) => {
         }
     );
 };
+
+export const useGetUserSubtitlesProgress = (user_id: number | null, topic_id: number) => {
+    return useQuery<UserSubtitleProgressResponse[], AxiosError>(
+        ['user_subtitles_progress', user_id, topic_id],
+        () => TopicsApi.getUserSubtitlesProgress(user_id, topic_id),
+        {
+            onError: (error) => {
+                console.error(error);
+            }
+        }
+    );
+};
+
