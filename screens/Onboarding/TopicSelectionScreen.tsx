@@ -24,7 +24,7 @@ type Props = StackScreenProps<OnboardingStackParamList, 'TopicSelectionScreen'>;
 
 const TopicSelectionScreen = ({ navigation, route }: Props) => {
     const { completeOnboarding } = useContext(MainContext);
-    const { username } = route.params;
+    const { username, count_cards } = route.params;
     const [selectedTopics, setSelectedTopics] = useState<string[]>([]);
     const { data: topics, isLoading, isError } = useGetAllTopics();
     const [isCreatingUser, setIsCreatingUser] = useState(false);
@@ -50,9 +50,9 @@ const TopicSelectionScreen = ({ navigation, route }: Props) => {
         const topicIds = topics
             .filter(topic => selectedTopics.includes(topic.title))
             .map(topic => topic.id);
-
+        console.log(username, topicIds, count_cards)
         createUserMutation.mutate(
-            { username, topicIds },
+            { username, topicIds, count_cards },
             {
                 onSuccess: async (data) => {
                     try {

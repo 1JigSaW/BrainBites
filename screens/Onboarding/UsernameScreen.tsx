@@ -37,7 +37,7 @@ const UsernameScreen = ({ navigation }: Props) => {
             onSuccess: (data) => {
                 setIsCheckingUsername(false);  // Выключить индикатор загрузки
                 if (data.isUnique) {
-                    navigation.navigate('TopicSelectionScreen', { username });
+                    navigation.navigate('CardCountSelectionScreen', { username });
                 } else {
                     setIsUsernameTaken(true);
                 }

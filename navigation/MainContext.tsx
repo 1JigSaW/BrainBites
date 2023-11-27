@@ -4,14 +4,16 @@ interface MainContextProps {
     userId: number | null;
     completeOnboarding: (newUserId: number) => Promise<void>;
     cardCount: number;
-    setCardCount: (count: (prevCardCount) => any) => void;
+    setCardCount: (count: (prevCardCount: any) => any) => void;
+    everyDayCards: number;
 }
 
 const MainContext = React.createContext<MainContextProps>({
     userId: null,
     completeOnboarding: async () => {},
     cardCount: 0,
-    setCardCount: () => {}
+    setCardCount: () => {},
+    everyDayCards: 0,
 });
 
 export default MainContext;

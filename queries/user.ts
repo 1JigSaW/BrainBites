@@ -31,8 +31,8 @@ export const useCheckUsernameUnique = () => {
 };
 
 export const useCreateUser = () => {
-    return useMutation<CreateUserResponse, AxiosError, { username: string; topicIds: number[] }>(
-        ({ username, topicIds }) => UserApi.createUser(username, topicIds),
+    return useMutation<CreateUserResponse, AxiosError, { username: string; topicIds: number[], count_cards: number }>(
+        ({ username, topicIds, count_cards }) => UserApi.createUser(username, topicIds, count_cards),
         {
             onError: (error) => {
                 console.error('Error creating user:', error);

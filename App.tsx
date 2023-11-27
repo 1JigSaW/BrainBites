@@ -4,7 +4,7 @@ import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
 import MainNavigator from "./navigation/MainNavigator";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import OnboardingNavigator from "./navigation/OnboardingNavigator";
-import {CARDS_COUNT, firstLaunchTest, user} from "./constants";
+import {CARDS_COUNT, EVERYDAY_CARDS, firstLaunchTest, user} from "./constants";
 import MainContext from './navigation/MainContext';
 import Toast from "react-native-toast-message";
 
@@ -14,6 +14,7 @@ function App(): JSX.Element | null {
     const [userId, setUserId] = useState<number | null>(null);
     const [isFirstLaunch, setIsFirstLaunch] = useState<boolean | null>(null);
     const [cardCount, setCardCount] = useState<number>(0);
+    const [everyDayCards, setEveryDayCards] = useState<number>(0);
 
     useEffect(() => {
         AsyncStorage.getItem(firstLaunchTest).then(value => {
@@ -34,6 +35,11 @@ function App(): JSX.Element | null {
                 setCardCount(Number(value));
             }
         });
+        AsyncStorage.getItem(EVERYDAY_CARDS).then(value => {
+            if (value !== null) {
+                setEveryDayCards(Number(value));
+            }
+        });
     }, []);
 
     const completeOnboarding = async (newUserId: number) => {
@@ -48,7 +54,7 @@ function App(): JSX.Element | null {
 
     console.log('userId', userId);
   return (
-      <MainContext.Provider value={{ userId, completeOnboarding, cardCount, setCardCount }}>
+      <MainContext.Provider value={{ userId, completeOnboarding, cardCount, setCardCount, everyDayCards }}>
           <QueryClientProvider client={queryClient}>
               <NavigationContainer>
                   {isFirstLaunch ? <OnboardingNavigator /> : <MainNavigator />}
