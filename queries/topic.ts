@@ -1,5 +1,5 @@
 import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
-import { TopicsApi, TopicResponse } from "../api/topic.api";
+import {TopicsApi, TopicResponse, UserTopicProgressResponse} from "../api/topic.api";
 import { AxiosError } from "axios";
 
 export const TOPICS_QUERY_KEY = ['topics'];
@@ -31,6 +31,19 @@ export const useUpdateUserTopics = () => {
                 // Invalidate and refetch
                 queryClient.invalidateQueries(TOPICS_QUERY_KEY);
             },
+        }
+    );
+};
+
+
+export const useGetUserTopicsProgress = (user_id: null | number) => {
+    return useQuery<UserTopicProgressResponse[], AxiosError>(
+        ['user_topics_progress', user_id],
+        () => TopicsApi.getUserTopicsProgress(user_id),
+        {
+            onError: (error) => {
+                console.error(error);
+            }
         }
     );
 };
