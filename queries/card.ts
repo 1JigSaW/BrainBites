@@ -112,3 +112,15 @@ export const useUpdateUserXp = (
         }
     );
 };
+
+
+export const useGetUnseenCardsBySubtitle = (subtitleId: number, userId: number | null, limit: number, options?: UseQueryOptions<Card[], Error>) => {
+    return useQuery<Card[], Error>(
+        ['unseen_cards_by_subtitle', subtitleId, userId, limit],
+        () => CardApi.getUnseenCardsBySubtitle(subtitleId, userId, limit),
+        {
+            ...options,
+        }
+    );
+};
+

@@ -6,22 +6,22 @@ import {BACKGROUND, BLUE} from "../colors";
 import CardComponent from "../components/CardComponent";
 import Swiper from "react-native-deck-swiper";
 import {CardsStackParamList} from "../navigation/CardsStack";
+import {useGetUnseenCardsBySubtitle} from "../queries/card";
+import MainContext from "../navigation/MainContext";
 
 type Props = StackScreenProps<CardsStackParamList, 'CardsSubtopicScreen'>;
 
-const CardsSubtopicScreen = ({ navigation }: Props) => {
-    const [cards, setCards] = useState([]); // предположим, что карточки загружаются из API
+const CardsSubtopicScreen = ({ navigation, route }: Props) => {
+    const {subtopic_id} = route.params;
+    const { userId, everyDayCards } = useContext(MainContext);
     const [isLoading, setLoading] = useState(true);
+    const { data: cards, error, isLoading: isQueryLoading } = useGetUnseenCardsBySubtitle(subtopic_id, userId, everyDayCards);
 
     useEffect(() => {
-        // Здесь должна быть логика для получения карточек из API
-        // Пример:
-        // fetchCards().then(data => {
-        //     setCards(data);
-        //     setLoading(false);
-        // });
-        setLoading(false); // Удалить, когда реализуете загрузку данных
-    }, []);
+        if (!isQueryLoading) {
+            setLoading(false);
+        }
+    }, [isQueryLoading]);
 
     const handleSwiped = (index: number) => {
         console.log(`Card at ${index} was swiped`);
@@ -43,20 +43,22 @@ const CardsSubtopicScreen = ({ navigation }: Props) => {
 
     return (
         <SafeAreaView style={styles.safeContainer}>
-            {cards.length > 0 ? (
+            {isQueryLoading ? (
+                <ActivityIndicator size="large" color={BLUE} />
+            ) : (cards && cards.length > 0 ? (
                 <Swiper
                     cards={cards}
                     renderCard={(card) => <CardComponent card={card} />}
                     onSwiped={handleSwiped}
                     onSwipedAll={handleTest}
                     backgroundColor="#f0f0f0"
-                    stackSize={3} // Пример количества карточек в стеке
-                    stackScale={10}
-                    stackSeparation={15}
+                    stackSize={everyDayCards} // Пример количества карточек в стеке
+                    stackScale={5}
+                    stackSeparation={30}
                 />
             ) : (
                 <Text>No cards available</Text>
-            )}
+            ))}
         </SafeAreaView>
     );
 };

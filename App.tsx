@@ -54,7 +54,7 @@ function App(): JSX.Element | null {
 
     console.log('userId', userId);
   return (
-      <MainContext.Provider value={{ userId, completeOnboarding, cardCount, setCardCount, everyDayCards }}>
+      <MainContext.Provider value={{ userId, completeOnboarding, cardCount, setCardCount, everyDayCards, setEveryDayCards }}>
           <QueryClientProvider client={queryClient}>
               <NavigationContainer>
                   {isFirstLaunch ? <OnboardingNavigator /> : <MainNavigator />}

@@ -1,15 +1,17 @@
-import React, { useState } from 'react';
+import React, {useContext, useState} from 'react';
 import { SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { StackScreenProps } from "@react-navigation/stack";
 import { OnboardingStackParamList } from "../../navigation/OnboardingNavigator";
 import { BACKGROUND, BLACK, BLUE } from "../../colors";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import {EVERYDAY_CARDS, QuizState} from "../../constants";
+import MainContext from "../../navigation/MainContext";
 
 type Props = StackScreenProps<OnboardingStackParamList, 'CardCountSelectionScreen'>;
 
 const CardCountSelectionScreen = ({ navigation, route }: Props) => {
     const {username} = route.params;
+    const {setEveryDayCards} = useContext(MainContext);
     const [selectedCardCount, setSelectedCardCount] = useState<number | null>(null);
 
     const cardCounts = [10, 20, 25];
@@ -21,6 +23,7 @@ const CardCountSelectionScreen = ({ navigation, route }: Props) => {
     const handleContinuePress = async () => {
         if (selectedCardCount !== null) {
             await AsyncStorage.setItem(EVERYDAY_CARDS, String(selectedCardCount));
+            setEveryDayCards(Number(selectedCardCount));
             navigation.navigate('TopicSelectionScreen', {username: username, count_cards: selectedCardCount})
         }
     };
