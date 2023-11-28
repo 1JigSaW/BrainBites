@@ -3,9 +3,9 @@ import {CardsStackParamList} from "../navigation/CardsStack";
 import React, {useContext, useEffect, useLayoutEffect} from "react";
 import MainContext from "../navigation/MainContext";
 import {useGetUserSubtitlesProgress, useGetUserTopicsProgress} from "../queries/topic";
-import {SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View} from "react-native";
+import {ActivityIndicator, SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View} from "react-native";
 import ArrowRightIcon from "../components/icons/ArrowRight";
-import {BACKGROUND, BLACK, PROGRESS_BACKGROUND} from "../colors";
+import {BACKGROUND, BLACK, BLUE, PROGRESS_BACKGROUND} from "../colors";
 
 type Props = StackScreenProps<CardsStackParamList, 'SubTopicScreen'>;
 
@@ -22,15 +22,20 @@ const SubTopicScreen = ({ navigation, route }: Props) => {
     }, [topic_name, navigation]);
 
     if (error) return <Text>Error loading topics</Text>;
-    if (isLoading) return <Text>Loading...</Text>;
 
     return (
         <ScrollView style={styles.scrollView}>
             <SafeAreaView style={styles.safeContainer}>
-                {subtitlesProgress?.map((subtitle) => (
+                {isLoading ? (
+                    <ActivityIndicator size="large" color={BLUE} />
+                ) : (
+                subtitlesProgress?.map((subtitle) => (
                     <TouchableOpacity
                         key={subtitle.subtitle_id}
                         style={styles.roundedContainer}
+                        onPress={() => {navigation.navigate('CardsSubtopicScreen', {
+                            subtopic_id: subtitle.subtitle_id,
+                        })}}
                     >
                         <View style={[styles.progressOverlay, { width: `${subtitle.progress * 100}%` }]} />
                         <View style={styles.infoContainer}>
@@ -38,7 +43,7 @@ const SubTopicScreen = ({ navigation, route }: Props) => {
                             <ArrowRightIcon size={40} color={BLACK} />
                         </View>
                     </TouchableOpacity>
-                ))}
+                )))}
             </SafeAreaView>
         </ScrollView>
     );

@@ -4,6 +4,7 @@ import CardsScreen from "../screens/CardScreen";
 import CardTopicScreen from "../screens/CardTopicScreen";
 import SubTopicScreen from "../screens/SubTopicScreen";
 import ArrowBackIcon from "../components/icons/ArrowBackIcon";
+import CardsSubtopicScreen from "../screens/CardsSubtopicScreen";
 
 
 export type CardsStackParamList = {
@@ -13,12 +14,17 @@ export type CardsStackParamList = {
     SubTopicScreen: {
         topic_id: number,
         topic_name: string,
-    }
+    };
+    CardsSubtopicScreen: {
+        subtopic_id: number
+    };
 };
 
 const Stack = createStackNavigator<CardsStackParamList>();
 
 const CardsStack = () => {
+
+
     return (
         <Stack.Navigator>
             {/*<Stack.Screen name="CardsScreen" component={CardsScreen} options={{headerShown: false}}/>*/}
@@ -37,6 +43,10 @@ const CardsStack = () => {
                         fontSize: 28,
                     },
                 }}
+            />
+            <Stack.Screen name="CardsSubtopicScreen"
+                          component={CardsSubtopicScreen}
+                          options={{headerShown: false}}
             />
         </Stack.Navigator>
     );

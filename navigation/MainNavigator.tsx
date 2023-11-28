@@ -4,10 +4,19 @@ import BrainIcon from "../components/icons/BrainIcon";
 import {BLUE} from "../colors";
 import CardsStack from "./CardsStack";
 import CardsIcon from "../components/icons/CardsIcon";
+import {useNavigationState} from "@react-navigation/native";
 
 const Tab = createBottomTabNavigator();
 
+export const useCurrentRoute = () => {
+    const currentRoute = useNavigationState(state => state?.routes[state.index]);
+    return currentRoute?.state?.index;
+};
 const MainNavigator = () => {
+
+    const currentRoute = useCurrentRoute();
+    console.log('currentRoute', currentRoute)
+
     return (
         <Tab.Navigator
             screenOptions={{
@@ -26,6 +35,7 @@ const MainNavigator = () => {
                     shadowOpacity: 0.1,
                     shadowOffset: { width: 0, height: -1 },
                     borderWidth: 1,
+                    display: currentRoute === 2 ? 'none' : 'flex',
                 },
                 tabBarActiveTintColor: 'blue',  // Цвет иконки при активации
             }}>

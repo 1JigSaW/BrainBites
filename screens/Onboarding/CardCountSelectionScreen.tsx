@@ -12,7 +12,7 @@ const CardCountSelectionScreen = ({ navigation, route }: Props) => {
     const {username} = route.params;
     const [selectedCardCount, setSelectedCardCount] = useState<number | null>(null);
 
-    const cardCounts = [10, 15, 20, 25];
+    const cardCounts = [10, 20, 25];
 
     const handleCardCountPress = (count: number) => {
         setSelectedCardCount(count);
