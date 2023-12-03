@@ -25,13 +25,26 @@ export class QuizApi {
         }
     }
 
+    // static async getQuizzesByCardIds(cardIds: number[]): Promise<Quiz[]> {
+    //     try {
+    //         const response = await API.get(`api/quizzes-by-cards/`, {
+    //             params: { card_ids: cardIds.join(',') } // Преобразование массива ID в строку
+    //         });
+    //         if (response.status === 200) {
+    //             return response.data;
+    //         }
+    //         throw new Error(`Error: ${response.statusText}`);
+    //     } catch (error) {
+    //         console.error('Error fetching quizzes by card IDs:', error);
+    //         throw error;
+    //     }
+    // }
+
     static async getQuizzesByCardIds(cardIds: number[]): Promise<Quiz[]> {
         try {
-            const response = await API.get(`api/quizzes-by-cards/`, {
-                params: { card_ids: cardIds.join(',') } // Преобразование массива ID в строку
-            });
+            const response = await API.post(`/api/get-quizzes-by-card-ids/`, { card_ids: cardIds });
             if (response.status === 200) {
-                return response.data;
+                return response.data.quizzes;
             }
             throw new Error(`Error: ${response.statusText}`);
         } catch (error) {

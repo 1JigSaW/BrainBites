@@ -110,7 +110,7 @@ export class CardApi {
         }
     }
 
-    static async getUnseenCardsBySubtitle(subtitleId: number, userId: number, limit: number): Promise<Card[]> {
+    static async getUnseenCardsBySubtitle(subtitleId: number, userId: number | null, limit: number): Promise<Card[]> {
         try {
             const response = await API.get(`api/cards_subtitle/${subtitleId}/${userId}/${limit}`);
             console.log('response.data', response.data);

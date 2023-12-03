@@ -11,23 +11,26 @@ import * as Animatable from 'react-native-animatable';
 interface QuizOverlayProps {
     isVisible: boolean;
     onContinue: () => void;
-    quizzes: Quiz[]; // Replace 'Quiz[]' with the appropriate type for your quizzes
+    quizzes: Quiz[];
+    onQuizChange: (currentQuizIndex: number) => void;
 }
 
-const QuizOverlay = ({ isVisible, onContinue, quizzes }: QuizOverlayProps) => {
+const QuizOverlay = ({ isVisible, onContinue, quizzes, onQuizChange }: QuizOverlayProps) => {
     const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
     const [correctAnswersCount, setCorrectAnswersCount] = useState(0);
     const [quizCompleted, setQuizCompleted] = useState(false);
     const { userId } = useContext(MainContext);
     const { mutate: updateUserXp } = useUpdateUserXp()
 
-    const animatableRef = useRef(null);
+    const animatableRef = useRef<Animatable.View & View>(null);
+
 
     useEffect(() => {
-        if (animatableRef.current) {
+        if (animatableRef.current && typeof animatableRef.current.bounceInRight === 'function') {
             animatableRef.current.bounceInRight(500);
         }
     }, [currentQuestionIndex]);
+
 
     useEffect(() => {
         const loadQuizState = async () => {
@@ -63,6 +66,7 @@ const QuizOverlay = ({ isVisible, onContinue, quizzes }: QuizOverlayProps) => {
             setQuizCompleted(true);
             AsyncStorage.removeItem(QuizState);
         }
+        onQuizChange(currentQuestionIndex + 1);
     };
 
     const handleContinue = () => {
@@ -118,14 +122,7 @@ const QuizOverlay = ({ isVisible, onContinue, quizzes }: QuizOverlayProps) => {
 
 const styles = StyleSheet.create({
     overlay: {
-        position: 'absolute',
-        left: 0,
-        right: 0,
-        top: 0,    // Добавлено для начала блока от верха экрана
-        bottom: 0,
-        backgroundColor: 'white',
-        justifyContent: 'center',
-        height: '100%', // Or whatever height you want
+
     },
     modalView: {
         margin: 20,

@@ -1,13 +1,15 @@
 import {StackScreenProps} from "@react-navigation/stack";
 import {HomeStackParamList} from "../navigation/HomeStack";
 import React, {useContext, useEffect, useRef, useState} from "react";
-import {ActivityIndicator, SafeAreaView, StyleSheet, Text, TouchableOpacity, View} from "react-native";
-import {BACKGROUND, BLUE} from "../colors";
+import {ActivityIndicator, Alert, SafeAreaView, StyleSheet, Text, TouchableOpacity, View} from "react-native";
+import {BACKGROUND, BLACK, BLUE} from "../colors";
 import CardComponent from "../components/CardComponent";
 import Swiper from "react-native-deck-swiper";
 import {CardsStackParamList} from "../navigation/CardsStack";
 import {useGetUnseenCardsBySubtitle} from "../queries/card";
 import MainContext from "../navigation/MainContext";
+import {useGetQuizzesByCardIds} from "../queries/quiz";
+import QuizModal from "../components/QuizModal";
 
 type Props = StackScreenProps<CardsStackParamList, 'CardsSubtopicScreen'>;
 
@@ -16,6 +18,34 @@ const CardsSubtopicScreen = ({ navigation, route }: Props) => {
     const { userId, everyDayCards } = useContext(MainContext);
     const [isLoading, setLoading] = useState(true);
     const { data: cards, error, isLoading: isQueryLoading } = useGetUnseenCardsBySubtitle(subtopic_id, userId, everyDayCards);
+    const [isQuizVisible, setQuizVisible] = useState(false);
+    const [swipedCardIds, setSwipedCardIds] = useState<number[]>([]);
+    const [swipedCardCount, setSwipedCardCount] = useState(0);
+    const [modalVisible, setModalVisible] = useState(false);
+    const { data: quizzes, error: quizError, isLoading: isQuizLoading } = useGetQuizzesByCardIds(swipedCardIds);
+
+    const [currentQuizNumber, setCurrentQuizNumber] = useState(0);
+
+    const handleQuizChange = (quizNumber: number) => {
+        setCurrentQuizNumber(quizNumber);
+    };
+
+    useEffect(() => {
+        // Check if all cards are swiped
+        if (cards && swipedCardCount >= cards.length) {
+            handleTest();
+        }
+    }, [swipedCardCount, cards]);
+
+    const handleTest = async () => {
+        console.log('All cards swiped');
+        if (quizzes && quizzes.length > 0) {
+            setQuizVisible(true); // Show the quiz
+        } else {
+            console.log('No quizzes available for swiped cards');
+        }
+    };
+
 
     useEffect(() => {
         if (!isQueryLoading) {
@@ -25,13 +55,36 @@ const CardsSubtopicScreen = ({ navigation, route }: Props) => {
 
     const handleSwiped = (index: number) => {
         console.log(`Card at ${index} was swiped`);
+
+        if (cards && index < cards.length && cards[index].id != null) {
+            // Проверяем, что id карточки действительно является числом
+            const swipedCardId = cards[index].id;
+
+            if (typeof swipedCardId === 'number') {
+                console.log('swipedCardId', swipedCardId);
+                setSwipedCardIds(prevIds => [...prevIds, swipedCardId]);
+            }
+        }
+        setSwipedCardCount(swipedCardCount + 1);
     };
 
-    const handleTest = () => {
-        // Переход к викторине
-        console.log('All cards swiped');
-        navigation.navigate('QuizScreen'); // Убедитесь, что у вас есть QuizScreen в вашем StackNavigator
+
+    const handleExitPress = () => {
+        Alert.alert(
+            "Внимание",
+            "Ваш прогресс будет сброшен. Вы уверены, что хотите выйти?",
+            [
+                { text: "Отмена", style: "cancel" },
+                { text: "Выйти", onPress: () => navigation.goBack() }
+            ]
+        );
     };
+
+    const handleContinueFromQuiz = () => {
+        setQuizVisible(false); // Hide the quiz
+        navigation.goBack(); // Navigate the user back to the previous screen
+    };
+
 
     if (isLoading) {
         return (
@@ -42,7 +95,13 @@ const CardsSubtopicScreen = ({ navigation, route }: Props) => {
     }
 
     return (
-        <SafeAreaView style={styles.safeContainer}>
+        <SafeAreaView style={styles.fullScreen}>
+            <View>
+                <TouchableOpacity style={styles.exitButton} onPress={handleExitPress}>
+                    <Text style={{fontSize: 20, color: BLACK}}>✕</Text>
+                </TouchableOpacity>
+                <Text style={styles.counterText}>{isQuizVisible ? `Quiz: ${currentQuizNumber}` : `Card ${swipedCardCount}`} / {cards?.length}</Text>
+            </View>
             {isQueryLoading ? (
                 <ActivityIndicator size="large" color={BLUE} />
             ) : (cards && cards.length > 0 ? (
@@ -52,13 +111,23 @@ const CardsSubtopicScreen = ({ navigation, route }: Props) => {
                     onSwiped={handleSwiped}
                     onSwipedAll={handleTest}
                     backgroundColor="#f0f0f0"
-                    stackSize={everyDayCards} // Пример количества карточек в стеке
+                    stackSize={everyDayCards}
                     stackScale={5}
                     stackSeparation={30}
                 />
             ) : (
                 <Text>No cards available</Text>
             ))}
+            {isQuizVisible && quizzes && quizzes.length > 0 && (
+                <View style={styles.quizModalWrapper}>
+                    <QuizModal
+                        isVisible={isQuizVisible}
+                        quizzes={quizzes}
+                        onContinue={handleContinueFromQuiz}
+                        onQuizChange={handleQuizChange}
+                    />
+                </View>
+            )}
         </SafeAreaView>
     );
 };
@@ -75,6 +144,37 @@ const styles = StyleSheet.create({
         backgroundColor: BACKGROUND,
         paddingHorizontal: 23,
         height: 50,
+    },
+    exitButton: {
+        position: 'absolute',
+        top: 10,
+        zIndex: 10,
+        color: BLACK,
+    },
+    counterText: {
+        position: 'absolute',
+        top: 10,
+        alignSelf: 'center',
+        zIndex: 10,
+        color: BLACK,
+        fontSize: 20,
+    },
+    fullScreen: {
+        flex: 1,
+        backgroundColor: BACKGROUND,
+        paddingHorizontal: 23,
+    },
+    headerContainer: {
+        height: 50,
+        justifyContent: 'center',
+        alignItems: 'center',
+        position: 'relative',
+    },
+    quizModalWrapper: {
+        flex: 1, // Take up all available space
+        justifyContent: 'center', // Center vertically
+        alignItems: 'center', // Center horizontally
+        width: '100%', // Ensure it takes the full width
     },
 });
 
