@@ -6,15 +6,17 @@ import {BACKGROUND, BLACK, BLUE} from "../colors";
 import CardComponent from "../components/CardComponent";
 import Swiper from "react-native-deck-swiper";
 import {CardsStackParamList} from "../navigation/CardsStack";
-import {useGetUnseenCardsBySubtitle} from "../queries/card";
+import {useGetUnseenCardsBySubtitle, useMarkCardsAsViewedAndUpdateQuizzes} from "../queries/card";
 import MainContext from "../navigation/MainContext";
 import {useGetQuizzesByCardIds} from "../queries/quiz";
 import QuizModal from "../components/QuizModal";
+import {useIsFocused} from "@react-navigation/native";
 
 type Props = StackScreenProps<CardsStackParamList, 'CardsSubtopicScreen'>;
 
 const CardsSubtopicScreen = ({ navigation, route }: Props) => {
     const {subtopic_id} = route.params;
+    const isFocused = useIsFocused();
     const { userId, everyDayCards } = useContext(MainContext);
     const [isLoading, setLoading] = useState(true);
     const { data: cards, error, isLoading: isQueryLoading } = useGetUnseenCardsBySubtitle(subtopic_id, userId, everyDayCards);
@@ -25,6 +27,7 @@ const CardsSubtopicScreen = ({ navigation, route }: Props) => {
     const { data: quizzes, error: quizError, isLoading: isQuizLoading } = useGetQuizzesByCardIds(swipedCardIds);
 
     const [currentQuizNumber, setCurrentQuizNumber] = useState(0);
+    const markCardsAndViewQuizzes = useMarkCardsAsViewedAndUpdateQuizzes();
 
     const handleQuizChange = (quizNumber: number) => {
         setCurrentQuizNumber(quizNumber);
@@ -80,7 +83,16 @@ const CardsSubtopicScreen = ({ navigation, route }: Props) => {
         );
     };
 
-    const handleContinueFromQuiz = () => {
+    const handleContinueFromQuiz = async  () => {
+        if (swipedCardIds.length > 0 && userId) {
+            // Вызываем API для маркировки просмотренных карточек и обновления викторин
+            try {
+                const result = await markCardsAndViewQuizzes.mutateAsync({ userId, cardIds: swipedCardIds });
+                console.log(result.message); // Логируем ответ API
+            } catch (error) {
+                console.error('Error in marking cards and updating quizzes:', error);
+            }
+        }
         setQuizVisible(false); // Hide the quiz
         navigation.goBack(); // Navigate the user back to the previous screen
     };

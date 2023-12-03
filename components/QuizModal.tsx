@@ -5,14 +5,14 @@ import {QuizState} from "../constants";
 import {Quiz} from "../api/quiz.api";
 import {useUpdateUserXp} from "../queries/card";
 import MainContext from "../navigation/MainContext";
-import {BLACK} from "../colors";
+import {BACKGROUND, BLACK, BLUE} from "../colors";
 import * as Animatable from 'react-native-animatable';
 
 interface QuizOverlayProps {
     isVisible: boolean;
     onContinue: () => void;
     quizzes: Quiz[];
-    onQuizChange: (currentQuizIndex: number) => void;
+    onQuizChange?: (currentQuizIndex: number) => void;
 }
 
 const QuizOverlay = ({ isVisible, onContinue, quizzes, onQuizChange }: QuizOverlayProps) => {
@@ -24,37 +24,20 @@ const QuizOverlay = ({ isVisible, onContinue, quizzes, onQuizChange }: QuizOverl
 
     const animatableRef = useRef<Animatable.View & View>(null);
 
-
     useEffect(() => {
         if (animatableRef.current && typeof animatableRef.current.bounceInRight === 'function') {
             animatableRef.current.bounceInRight(500);
         }
     }, [currentQuestionIndex]);
 
-
     useEffect(() => {
-        const loadQuizState = async () => {
-            const savedState = await AsyncStorage.getItem(QuizState);
-            if (savedState) {
-                const { index, correctCount } = JSON.parse(savedState);
-                setCurrentQuestionIndex(index);
-                setCorrectAnswersCount(correctCount);
-            }
-        };
-
+        // Сброс состояния при появлении теста
         if (isVisible) {
-            loadQuizState();
+            setCurrentQuestionIndex(0);
+            setCorrectAnswersCount(0);
+            setQuizCompleted(false);
         }
     }, [isVisible]);
-
-    useEffect(() => {
-        const saveQuizState = async () => {
-            const state = JSON.stringify({ index: currentQuestionIndex, correctCount: correctAnswersCount });
-            await AsyncStorage.setItem(QuizState, state);
-        };
-
-        saveQuizState();
-    }, [currentQuestionIndex, correctAnswersCount]);
 
     const handleAnswer = (isCorrect: any) => {
         if (isCorrect) {
@@ -64,9 +47,10 @@ const QuizOverlay = ({ isVisible, onContinue, quizzes, onQuizChange }: QuizOverl
             setCurrentQuestionIndex(currentQuestionIndex + 1);
         } else {
             setQuizCompleted(true);
-            AsyncStorage.removeItem(QuizState);
         }
-        onQuizChange(currentQuestionIndex + 1);
+        if (onQuizChange) {
+            onQuizChange(currentQuestionIndex + 1);
+        }
     };
 
     const handleContinue = () => {
@@ -105,11 +89,14 @@ const QuizOverlay = ({ isVisible, onContinue, quizzes, onQuizChange }: QuizOverl
                         ))}
                     </>
                 ) : quizCompleted ? (
-                    <>
-                        <Text>You have completed the quiz!</Text>
-                        <Text>Correct answers: {correctAnswersCount} out of {quizzes.length}</Text>
-                        <Button title="Continue" onPress={handleContinue} />
-                    </>
+                    <Animatable.View style={{ justifyContent: 'center', alignItems: 'center' }}>
+                        <Text style={{fontSize: 25, textAlign: 'center', color: BLACK}}>You have completed the quiz!</Text>
+                        <Text style={{ fontSize: 20, textAlign: 'center', color: BLACK, marginTop: 10 }}>Correct answers: {correctAnswersCount} out of {quizzes.length}</Text>
+                        <TouchableOpacity style={styles.button} onPress={handleContinue} >
+                            <Text style={styles.buttonText}>Continue</Text>
+                        </TouchableOpacity>
+                    </Animatable.View>
+
                 ) : (
                     <Text>Loading quizzes or no quiz available...</Text>
                 )}
@@ -129,6 +116,7 @@ const styles = StyleSheet.create({
         backgroundColor: "white",
         borderRadius: 20,
         padding: 35,
+        paddingBottom: 10,
         alignItems: "center",
         shadowColor: "#000",
         shadowOffset: {
@@ -157,6 +145,20 @@ const styles = StyleSheet.create({
     answerText: {
         textAlign: 'center',
         color: BLACK,
+    },
+    button: {
+        padding: 10,
+        borderRadius: 20,
+        alignItems: 'center',
+        width: '100%',
+        marginBottom: 10,
+        alignSelf: 'center',
+        backgroundColor: BLUE,
+        marginTop: 20,
+    },
+    buttonText: {
+        color: BACKGROUND,
+        fontSize: 20,
     }
 });
 

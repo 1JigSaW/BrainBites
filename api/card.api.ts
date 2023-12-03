@@ -1,4 +1,5 @@
 import { API } from "./API";
+import axios from "axios";
 
 export interface Card {
     id: number | null;
@@ -117,6 +118,25 @@ export class CardApi {
             return response.data;
         } catch (error) {
             console.error('Error fetching unseen cards:', error);
+            throw error;
+        }
+    }
+
+    static async markCardsAsViewedAndUpdateQuizzes(userId: number | null, cardIds: number[]): Promise<{ message: string }> {
+        try {
+            const response = await API.post(`api/mark-cards-as-viewed-and-update-quizzes/`, {
+                user_id: userId,
+                card_ids: cardIds
+            });
+
+            if (response.status === 200) {
+                console.log('response.data', response.data);
+                return response.data;
+            }
+
+            throw new Error(`Error: ${response.statusText}`);
+        } catch (error) {
+            console.error('Error marking cards as viewed and updating quizzes:', error);
             throw error;
         }
     }

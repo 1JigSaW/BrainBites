@@ -124,3 +124,25 @@ export const useGetUnseenCardsBySubtitle = (subtitleId: number, userId: number |
     );
 };
 
+interface MarkCardsAsViewedAndUpdateQuizzesResult {
+    message: string;
+}
+
+export const useMarkCardsAsViewedAndUpdateQuizzes = (
+    options?: UseMutationOptions<MarkCardsAsViewedAndUpdateQuizzesResult, AxiosError, { userId: number | null, cardIds: number[] }>
+) => {
+    return useMutation<MarkCardsAsViewedAndUpdateQuizzesResult, AxiosError, { userId: number | null, cardIds: number[] }>(
+        ({ userId, cardIds }) => CardApi.markCardsAsViewedAndUpdateQuizzes(userId, cardIds),
+        {
+            ...options,
+            onSuccess: (data) => {
+                // Дополнительная логика при успешном запросе
+                console.log('Cards marked as viewed and quizzes updated:', data.message);
+            },
+            onError: (error) => {
+                // Обработка ошибок
+                console.error('Error during marking cards as viewed and updating quizzes:', error.message);
+            }
+        }
+    );
+};

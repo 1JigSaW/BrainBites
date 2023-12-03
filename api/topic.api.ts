@@ -49,7 +49,7 @@ export class TopicsApi {
         }
     }
 
-    static async getUserSubtitlesProgress(user_id: number, topic_id: number): Promise<UserSubtitleProgressResponse[]> {
+    static async getUserSubtitlesProgress(user_id: number | null, topic_id: number): Promise<UserSubtitleProgressResponse[]> {
         try {
             const { data } = await API.get(`/api/subtitles-progress/${user_id}/topic/${topic_id}/`);
             return data.subtitles_progress;

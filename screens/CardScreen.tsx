@@ -218,8 +218,7 @@ const CardsScreen = ({ navigation }: Props) => {
                 <QuizModal
                     isVisible={isQuizVisible}
                     onContinue={handleContinueFromQuiz}
-                    quizzes={quizzes}
-                />
+                    quizzes={quizzes}/>
             )}
         </View>
     );
