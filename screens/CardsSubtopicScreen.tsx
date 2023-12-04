@@ -105,8 +105,8 @@ const CardsSubtopicScreen = ({ navigation, route }: Props) => {
 
     return (
         <SafeAreaView style={styles.fullScreen}>
-            <View>
-                <TouchableOpacity style={styles.exitButton} onPress={handleExitPress}>
+            <View style={{}}>
+                <TouchableOpacity style={styles.exitButton} onPress={handleExitPress} hitSlop={{ top: 40, bottom: 40, left: 40, right: 40 }}>
                     <Text style={{fontSize: 20, color: BLACK}}>✕</Text>
                 </TouchableOpacity>
                 <Text style={styles.counterText}>{isQuizVisible ? `Quiz: ${currentQuizNumber}` : `Card ${swipedCardCount}`} / {cards?.length}</Text>
@@ -172,6 +172,7 @@ const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: BACKGROUND,
         paddingHorizontal: 23,
+        width: '100%',
     },
     headerContainer: {
         height: 50,

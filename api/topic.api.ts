@@ -1,4 +1,5 @@
 import {API} from "./API";
+import {ReactNode} from "react";
 
 export interface TopicResponse {
     id: number;
@@ -14,11 +15,14 @@ export interface UserTopicProgressResponse {
 }
 
 export interface UserSubtitleProgressResponse {
+    cost: ReactNode;
     subtitle_id: number;
     subtitle_name: string;
     progress: number;
     viewed_cards: number;
     total_cards: number;
+    is_free: boolean;
+    is_purchased: boolean;
 }
 
 export class TopicsApi {
@@ -53,6 +57,14 @@ export class TopicsApi {
         try {
             const { data } = await API.get(`/api/subtitles-progress/${user_id}/topic/${topic_id}/`);
             return data.subtitles_progress;
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    static async purchaseSubtitle(user_id: number | null, subtitle_id: number): Promise<void> {
+        try {
+            await API.post('/api/purchase-subtitle/', { user_id, subtitle_id });
         } catch (error) {
             throw error;
         }

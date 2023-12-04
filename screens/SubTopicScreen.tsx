@@ -2,11 +2,21 @@ import {StackScreenProps} from "@react-navigation/stack";
 import {CardsStackParamList} from "../navigation/CardsStack";
 import React, {useContext, useEffect, useLayoutEffect} from "react";
 import MainContext from "../navigation/MainContext";
-import {useGetUserSubtitlesProgress, useGetUserTopicsProgress} from "../queries/topic";
-import {ActivityIndicator, SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View} from "react-native";
+import {useGetUserSubtitlesProgress, useGetUserTopicsProgress, usePurchaseSubtitle} from "../queries/topic";
+import {
+    ActivityIndicator,
+    Alert,
+    SafeAreaView,
+    ScrollView,
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    View
+} from "react-native";
 import ArrowRightIcon from "../components/icons/ArrowRight";
 import {BACKGROUND, BLACK, BLUE, PROGRESS_BACKGROUND} from "../colors";
 import {useIsFocused} from "@react-navigation/native";
+import LockIcon from "../components/icons/LockIcon";
 
 type Props = StackScreenProps<CardsStackParamList, 'SubTopicScreen'>;
 
@@ -14,6 +24,7 @@ const SubTopicScreen = ({ navigation, route }: Props) => {
     const { userId } = useContext(MainContext);
     const { topic_id, topic_name } = route.params;
     const isFocused = useIsFocused();
+    const { mutate: purchase, isLoading: isPurchasing } = usePurchaseSubtitle();
 
     // Хук для получения прогресса
     const { data: subtitlesProgress, isLoading, error, refetch } = useGetUserSubtitlesProgress(userId, topic_id);
@@ -30,6 +41,34 @@ const SubTopicScreen = ({ navigation, route }: Props) => {
         }
     }, [topic_name, navigation]);
 
+    const handleSubtitlePress = (subtitle: any) => {
+        if (subtitle.is_purchased || subtitle.is_free) {
+            navigation.navigate('CardsSubtopicScreen', {
+                subtopic_id: subtitle.subtitle_id,
+            });
+        } else {
+            // Показать модальное окно или алерт для подтверждения покупки
+            Alert.alert(
+                "Purchase Subtitle",
+                `Do you really want to purchase this subtitle for ${subtitle.cost} XP?`,
+                [
+                    {
+                        text: "Cancel",
+                        style: "cancel"
+                    },
+                    {
+                        text: "OK",
+                        onPress: () => purchaseSubtitle(subtitle.subtitle_id)
+                    }
+                ]
+            );
+        }
+    };
+
+    const purchaseSubtitle = (subtitleId: number) => {
+        purchase({ user_id: userId, subtitle_id: subtitleId });
+    };
+
     if (error) return <Text>Error loading topics</Text>;
 
     return (
@@ -42,14 +81,21 @@ const SubTopicScreen = ({ navigation, route }: Props) => {
                         <TouchableOpacity
                             key={subtitle.subtitle_id}
                             style={styles.roundedContainer}
-                            onPress={() => navigation.navigate('CardsSubtopicScreen', {
-                                subtopic_id: subtitle.subtitle_id,
-                            })}
+                            onPress={() => handleSubtitlePress(subtitle)}
                         >
                             <View style={[styles.progressOverlay, { width: `${subtitle.progress * 100}%` }]} />
-                            <View style={styles.infoContainer}>
-                                <Text style={styles.mainText}>{subtitle.subtitle_name}</Text>
-                                <ArrowRightIcon size={40} color={BLACK} />
+                            <View style={[styles.infoContainer]}>
+                                {!(subtitle.is_purchased || subtitle.is_free) && <LockIcon size={2} color={BLACK} style={{opacity: 0.5}}/>}
+                                <Text style={[styles.mainText, !(subtitle.is_purchased || subtitle.is_free) && {opacity: 0.2}]}>{subtitle.subtitle_name}</Text>
+                                {
+                                    subtitle.is_purchased ||
+                                    subtitle.is_free ? (
+                                    <ArrowRightIcon size={40} color={BLACK} />
+                                ) : (
+                                    <View>
+                                        <Text style={{opacity: 1}}>{subtitle.cost} XP</Text>
+                                    </View>
+                                )}
                             </View>
                         </TouchableOpacity>
                     ))
@@ -106,6 +152,7 @@ const styles = StyleSheet.create({
         fontSize: 17,
         fontStyle: 'normal',
         fontWeight: '900',
+        width: '80%',
     },
 
     subText: {

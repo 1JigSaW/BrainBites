@@ -1,6 +1,7 @@
 import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
 import {TopicsApi, TopicResponse, UserTopicProgressResponse, UserSubtitleProgressResponse} from "../api/topic.api";
 import { AxiosError } from "axios";
+import {Alert} from "react-native";
 
 export const TOPICS_QUERY_KEY = ['topics'];
 
@@ -56,6 +57,33 @@ export const useGetUserSubtitlesProgress = (user_id: number | null, topic_id: nu
             onError: (error) => {
                 console.error(error);
             }
+        }
+    );
+};
+
+interface ErrorResponse {
+    error: string;
+}
+
+export const usePurchaseSubtitle = () => {
+    const queryClient = useQueryClient();
+
+    return useMutation<void, AxiosError, { user_id: number | null; subtitle_id: number }>(
+        ({ user_id, subtitle_id }) => TopicsApi.purchaseSubtitle(user_id, subtitle_id),
+        {
+            onError: (error) => {
+                const response = error.response?.data as ErrorResponse;
+                if (error.response?.status === 400 && response?.error === 'Insufficient XP.') {
+                    Alert.alert("Purchase Failed", "Insufficient XP to purchase the subtitle.");
+                } else {
+                    console.error('Error purchasing subtitle:', error);
+                    Alert.alert("Purchase Failed", "There was an error purchasing the subtitle.");
+                }
+            },
+            onSuccess: () => {
+                queryClient.invalidateQueries(['user_subtitles_progress']);
+                Alert.alert("Purchase Successful", "The subtitle has been successfully purchased.");
+            },
         }
     );
 };
