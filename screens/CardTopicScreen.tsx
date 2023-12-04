@@ -1,5 +1,5 @@
 import {StackScreenProps} from "@react-navigation/stack";
-import React, {useContext} from "react";
+import React, {useContext, useEffect} from "react";
 import MainContext from "../navigation/MainContext";
 import {useGetUserTopicsProgress} from "../queries/topic";
 import {
@@ -13,12 +13,20 @@ import {
 import {BACKGROUND, BLACK, BLUE, PROGRESS_BACKGROUND} from "../colors";
 import {CardsStackParamList} from "../navigation/CardsStack";
 import ArrowRightIcon from "../components/icons/ArrowRight";
+import {useIsFocused} from "@react-navigation/native";
 
 type Props = StackScreenProps<CardsStackParamList, 'CardTopicScreen'>;
 
 const CardTopicScreen = ({ navigation, route }: Props) => {
     const { userId } = useContext(MainContext);
-    const { data: topicsProgress, isLoading, error } = useGetUserTopicsProgress(userId);
+    const { data: topicsProgress, isLoading, error, refetch } = useGetUserTopicsProgress(userId);
+    const isFocused = useIsFocused();
+
+    useEffect(() => {
+        if (isFocused) {
+            refetch();
+        }
+    }, [userId, refetch, isFocused]);
 
     if (error) return <Text>Error loading topics</Text>;
 

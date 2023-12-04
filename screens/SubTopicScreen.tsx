@@ -6,18 +6,27 @@ import {useGetUserSubtitlesProgress, useGetUserTopicsProgress} from "../queries/
 import {ActivityIndicator, SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View} from "react-native";
 import ArrowRightIcon from "../components/icons/ArrowRight";
 import {BACKGROUND, BLACK, BLUE, PROGRESS_BACKGROUND} from "../colors";
+import {useIsFocused} from "@react-navigation/native";
 
 type Props = StackScreenProps<CardsStackParamList, 'SubTopicScreen'>;
 
 const SubTopicScreen = ({ navigation, route }: Props) => {
     const { userId } = useContext(MainContext);
-    const {topic_id, topic_name} = route.params;
-    const { data: subtitlesProgress, isLoading, error } =
-        useGetUserSubtitlesProgress(userId, topic_id);
-    console.log('topic_name', topic_name);
+    const { topic_id, topic_name } = route.params;
+    const isFocused = useIsFocused();
+
+    // Хук для получения прогресса
+    const { data: subtitlesProgress, isLoading, error, refetch } = useGetUserSubtitlesProgress(userId, topic_id);
+
+    useEffect(() => {
+        if (isFocused) {
+            refetch();
+        }
+    }, [userId, topic_id, refetch, isFocused]);
+
     useLayoutEffect(() => {
         if (topic_name) {
-            navigation.setOptions({ title: topic_name})
+            navigation.setOptions({ title: topic_name });
         }
     }, [topic_name, navigation]);
 
@@ -29,21 +38,22 @@ const SubTopicScreen = ({ navigation, route }: Props) => {
                 {isLoading ? (
                     <ActivityIndicator size="large" color={BLUE} />
                 ) : (
-                subtitlesProgress?.map((subtitle) => (
-                    <TouchableOpacity
-                        key={subtitle.subtitle_id}
-                        style={styles.roundedContainer}
-                        onPress={() => {navigation.navigate('CardsSubtopicScreen', {
-                            subtopic_id: subtitle.subtitle_id,
-                        })}}
-                    >
-                        <View style={[styles.progressOverlay, { width: `${subtitle.progress * 100}%` }]} />
-                        <View style={styles.infoContainer}>
-                            <Text style={styles.mainText}>{subtitle.subtitle_name}</Text>
-                            <ArrowRightIcon size={40} color={BLACK} />
-                        </View>
-                    </TouchableOpacity>
-                )))}
+                    subtitlesProgress?.map((subtitle) => (
+                        <TouchableOpacity
+                            key={subtitle.subtitle_id}
+                            style={styles.roundedContainer}
+                            onPress={() => navigation.navigate('CardsSubtopicScreen', {
+                                subtopic_id: subtitle.subtitle_id,
+                            })}
+                        >
+                            <View style={[styles.progressOverlay, { width: `${subtitle.progress * 100}%` }]} />
+                            <View style={styles.infoContainer}>
+                                <Text style={styles.mainText}>{subtitle.subtitle_name}</Text>
+                                <ArrowRightIcon size={40} color={BLACK} />
+                            </View>
+                        </TouchableOpacity>
+                    ))
+                )}
             </SafeAreaView>
         </ScrollView>
     );

@@ -57,14 +57,12 @@ const CardsSubtopicScreen = ({ navigation, route }: Props) => {
     }, [isQueryLoading]);
 
     const handleSwiped = (index: number) => {
-        console.log(`Card at ${index} was swiped`);
 
         if (cards && index < cards.length && cards[index].id != null) {
             // Проверяем, что id карточки действительно является числом
             const swipedCardId = cards[index].id;
 
             if (typeof swipedCardId === 'number') {
-                console.log('swipedCardId', swipedCardId);
                 setSwipedCardIds(prevIds => [...prevIds, swipedCardId]);
             }
         }
@@ -84,16 +82,15 @@ const CardsSubtopicScreen = ({ navigation, route }: Props) => {
     };
 
     const handleContinueFromQuiz = async  () => {
+        setQuizVisible(false); // Hide the quiz
         if (swipedCardIds.length > 0 && userId) {
             // Вызываем API для маркировки просмотренных карточек и обновления викторин
             try {
                 const result = await markCardsAndViewQuizzes.mutateAsync({ userId, cardIds: swipedCardIds });
-                console.log(result.message); // Логируем ответ API
             } catch (error) {
                 console.error('Error in marking cards and updating quizzes:', error);
             }
         }
-        setQuizVisible(false); // Hide the quiz
         navigation.goBack(); // Navigate the user back to the previous screen
     };
 

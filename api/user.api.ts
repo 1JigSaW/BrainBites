@@ -49,7 +49,6 @@ export class UserApi {
     // New method for creating a user
     static async createUser(username: string, topicIds: number[], count_cards: number): Promise<CreateUserResponse> {
         try {
-            console.log(username, topicIds, count_cards)
             const { data } = await API.post('/api/create-user/', {
                 username: username,
                 topic_ids: topicIds,

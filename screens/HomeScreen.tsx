@@ -64,9 +64,8 @@ const HomeScreen = ({ navigation, route }: Props) => {
 
     useEffect(() => {
         if (isFocused && userId) {
-            refetch(); // Refetch user stats when the screen is in focus
+            refetch();
             refetchBadge();
-            // Now, call the mutation to update the read cards count
             updateReadCardsCount({
                 userId,
                 readCardsCount: cardCount,

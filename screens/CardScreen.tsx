@@ -187,7 +187,6 @@ const CardsScreen = ({ navigation }: Props) => {
     useEffect(() => {
         if (fetchEnabledQuiz && quizzesData) {
             setQuizzes(quizzesData);
-            console.log('quizes', quizzesData)
             setFetchEnabledQuiz(false);
             handleCheckAchievements();
         }

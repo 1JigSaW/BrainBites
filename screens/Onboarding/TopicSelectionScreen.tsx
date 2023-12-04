@@ -50,7 +50,6 @@ const TopicSelectionScreen = ({ navigation, route }: Props) => {
         const topicIds = topics
             .filter(topic => selectedTopics.includes(topic.title))
             .map(topic => topic.id);
-        console.log(username, topicIds, count_cards)
         createUserMutation.mutate(
             { username, topicIds, count_cards },
             {

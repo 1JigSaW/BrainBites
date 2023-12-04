@@ -100,7 +100,7 @@ const styles = StyleSheet.create({
         width: '100%',
     },
     title: {
-        maxWidth: '95%',
+        maxWidth: '90%',
         fontSize: 20,
         marginLeft: 10,
         fontWeight: '700',
