@@ -1,6 +1,6 @@
 import {StackScreenProps} from "@react-navigation/stack";
 import {HomeStackParamList} from "../navigation/HomeStack";
-import React, {useContext, useEffect, useRef, useState} from "react";
+import React, {useContext, useEffect, useLayoutEffect, useRef, useState} from "react";
 import {ActivityIndicator, Alert, SafeAreaView, StyleSheet, Text, TouchableOpacity, View} from "react-native";
 import {BACKGROUND, BLACK, BLUE} from "../colors";
 import CardComponent from "../components/CardComponent";
@@ -13,6 +13,7 @@ import QuizModal from "../components/QuizModal";
 import {useIsFocused} from "@react-navigation/native";
 import {useCheckUserAchievements} from "../queries/badge";
 import Toast from "react-native-toast-message";
+import ArrowBackIcon from "../components/icons/ArrowBackIcon";
 
 type Props = StackScreenProps<CardsStackParamList, 'CardsSubtopicScreen'>;
 
@@ -59,6 +60,23 @@ const CardsSubtopicScreen = ({ navigation, route }: Props) => {
             setLoading(false);
         }
     }, [isQueryLoading]);
+
+    useLayoutEffect(() => {
+        navigation.setOptions({
+            headerBackTitleVisible: false,
+            headerTitleAlign: 'center',
+            headerTitleStyle: {
+                fontFamily: 'Abel',
+                fontSize: 28,
+            },
+            title: isQuizVisible ? `Quiz: ${currentQuizNumber}` : `Card ${swipedCardCount} / ${cards?.length}`,
+            headerLeft: () => (
+                <TouchableOpacity onPress={handleExitPress} style={{ marginLeft: 20, marginTop: 5 }}>
+                    <ArrowBackIcon color={BLACK} size={25} />
+                </TouchableOpacity>
+            )
+        });
+    }, [isQuizVisible, currentQuizNumber, swipedCardCount, cards?.length, navigation]);
 
     const handleSwiped = (index: number) => {
 
@@ -126,12 +144,12 @@ const CardsSubtopicScreen = ({ navigation, route }: Props) => {
 
     return (
         <SafeAreaView style={styles.fullScreen}>
-            <View>
-                <TouchableOpacity style={styles.exitButton} onPress={handleExitPress} hitSlop={{ top: 20, bottom: 20, left: 20, right: 20  }}>
-                    <Text style={{fontSize: 20, color: BLACK}}>✕</Text>
-                </TouchableOpacity>
-                <Text style={styles.counterText}>{isQuizVisible ? `Quiz: ${currentQuizNumber}` : `Card ${swipedCardCount}`} / {cards?.length}</Text>
-            </View>
+            {/*<View>*/}
+            {/*    <TouchableOpacity style={styles.exitButton} onPress={handleExitPress} hitSlop={{ top: 20, bottom: 20, left: 20, right: 20  }}>*/}
+            {/*        <Text style={{fontSize: 20, color: BLACK}}>✕</Text>*/}
+            {/*    </TouchableOpacity>*/}
+            {/*    <Text style={styles.counterText}>{isQuizVisible ? `Quiz: ${currentQuizNumber}` : `Card ${swipedCardCount}`} / {cards?.length}</Text>*/}
+            {/*</View>*/}
             {isQueryLoading ? (
                 <ActivityIndicator size="large" color={BLUE} />
             ) : (cards && cards.length > 0 ? (

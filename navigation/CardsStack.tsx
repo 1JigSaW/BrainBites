@@ -61,7 +61,17 @@ const CardsStack = () => {
             />
             <Stack.Screen name="CardsSubtopicScreen"
                           component={CardsSubtopicScreen}
-                          options={{headerShown: false}}
+                          options={{
+                              headerBackTitleVisible: false,
+                              // headerTitleAlign: 'center',
+                              // headerBackImage: ({ tintColor }) => (
+                              //     <ArrowBackIcon color={tintColor} size={25} style={{marginLeft: 10, marginTop: 5}} />
+                              // ),
+                              // headerTitleStyle: {
+                              //     fontFamily: 'Abel',
+                              //     fontSize: 28,
+                              // },
+                          }}
             />
         </Stack.Navigator>
     );
