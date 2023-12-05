@@ -11,6 +11,8 @@ import MainContext from "../navigation/MainContext";
 import {useGetQuizzesByCardIds} from "../queries/quiz";
 import QuizModal from "../components/QuizModal";
 import {useIsFocused} from "@react-navigation/native";
+import {useCheckUserAchievements} from "../queries/badge";
+import Toast from "react-native-toast-message";
 
 type Props = StackScreenProps<CardsStackParamList, 'CardsSubtopicScreen'>;
 
@@ -24,10 +26,12 @@ const CardsSubtopicScreen = ({ navigation, route }: Props) => {
     const [swipedCardIds, setSwipedCardIds] = useState<number[]>([]);
     const [swipedCardCount, setSwipedCardCount] = useState(0);
     const [modalVisible, setModalVisible] = useState(false);
+    const [earnedBadges, setEarnedBadges] = useState([]);
     const { data: quizzes, error: quizError, isLoading: isQuizLoading } = useGetQuizzesByCardIds(swipedCardIds);
 
     const [currentQuizNumber, setCurrentQuizNumber] = useState(0);
     const markCardsAndViewQuizzes = useMarkCardsAsViewedAndUpdateQuizzes();
+    const checkAchievements = useCheckUserAchievements(userId);
 
     const handleQuizChange = (quizNumber: number) => {
         setCurrentQuizNumber(quizNumber);
@@ -91,7 +95,24 @@ const CardsSubtopicScreen = ({ navigation, route }: Props) => {
                 console.error('Error in marking cards and updating quizzes:', error);
             }
         }
+        await handleCheckAchievements();
         navigation.goBack(); // Navigate the user back to the previous screen
+    };
+
+
+    const handleCheckAchievements = async () => {
+        try {
+            const badges = await checkAchievements.refetch();
+            setEarnedBadges(badges.data);
+            if (badges.data?.length > 0) {
+                Toast.show({
+                    type: 'success',
+                    text1: 'You get a new badge',
+                });
+            }
+        } catch (error) {
+            console.error('Error checking achievements:', error);
+        }
     };
 
 
@@ -105,8 +126,8 @@ const CardsSubtopicScreen = ({ navigation, route }: Props) => {
 
     return (
         <SafeAreaView style={styles.fullScreen}>
-            <View style={{}}>
-                <TouchableOpacity style={styles.exitButton} onPress={handleExitPress} hitSlop={{ top: 40, bottom: 40, left: 40, right: 40 }}>
+            <View>
+                <TouchableOpacity style={styles.exitButton} onPress={handleExitPress} hitSlop={{ top: 20, bottom: 20, left: 20, right: 20  }}>
                     <Text style={{fontSize: 20, color: BLACK}}>✕</Text>
                 </TouchableOpacity>
                 <Text style={styles.counterText}>{isQuizVisible ? `Quiz: ${currentQuizNumber}` : `Card ${swipedCardCount}`} / {cards?.length}</Text>
@@ -125,7 +146,17 @@ const CardsSubtopicScreen = ({ navigation, route }: Props) => {
                     stackSeparation={30}
                 />
             ) : (
-                <Text>No cards available</Text>
+                <View style={{
+                    flex: 1, // Take up all available space
+                    justifyContent: 'center', // Center vertically
+                    alignItems: 'center', // Center horizontally
+                    width: '100%', // Ensure it takes the full width
+                }}>
+                    <Text style={{color: BLACK, fontSize: 20}}>You completed all the cards in this topic</Text>
+                    <TouchableOpacity style={styles.button} onPress={() => {navigation.goBack()}} >
+                        <Text style={styles.buttonText}>Back</Text>
+                    </TouchableOpacity>
+                </View>
             ))}
             {isQuizVisible && quizzes && quizzes.length > 0 && (
                 <View style={styles.quizModalWrapper}>
@@ -164,7 +195,7 @@ const styles = StyleSheet.create({
         position: 'absolute',
         top: 10,
         alignSelf: 'center',
-        zIndex: 10,
+        zIndex: 100000,
         color: BLACK,
         fontSize: 20,
     },
@@ -179,12 +210,27 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         position: 'relative',
+
     },
     quizModalWrapper: {
         flex: 1, // Take up all available space
         justifyContent: 'center', // Center vertically
         alignItems: 'center', // Center horizontally
         width: '100%', // Ensure it takes the full width
+    },
+    buttonText: {
+        color: BACKGROUND,
+        fontSize: 20,
+    },
+    button: {
+        padding: 10,
+        borderRadius: 20,
+        alignItems: 'center',
+        width: '100%',
+        marginBottom: 10,
+        alignSelf: 'center',
+        backgroundColor: BLUE,
+        marginTop: 20,
     },
 });
 

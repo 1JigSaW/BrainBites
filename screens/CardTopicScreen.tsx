@@ -104,6 +104,9 @@ const styles = StyleSheet.create({
         fontSize: 17,
         fontStyle: 'normal',
         fontWeight: '900',
+        backgroundColor: BACKGROUND,
+        paddingHorizontal: 10,
+        borderRadius: 20,
     },
 
     subText: {

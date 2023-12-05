@@ -28,7 +28,22 @@ const CardsStack = () => {
     return (
         <Stack.Navigator>
             {/*<Stack.Screen name="CardsScreen" component={CardsScreen} options={{headerShown: false}}/>*/}
-            <Stack.Screen name="CardTopicScreen" component={CardTopicScreen} options={{headerShown: false}}/>
+            <Stack.Screen
+                name="CardTopicScreen"
+                component={CardTopicScreen}
+                options={{
+                  headerBackTitleVisible: false,
+                  headerTitleAlign: 'center',
+                  headerTitle: 'Topic',
+                  headerBackImage: ({ tintColor }) => (
+                      <ArrowBackIcon color={tintColor} size={25} style={{marginLeft: 10, marginTop: 5}} />
+                  ),
+                  headerTitleStyle: {
+                      fontFamily: 'Abel',
+                      fontSize: 28,
+                  },
+                }}
+            />
             <Stack.Screen
                 name="SubTopicScreen"
                 component={SubTopicScreen}

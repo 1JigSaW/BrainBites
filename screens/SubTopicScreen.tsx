@@ -70,7 +70,7 @@ const SubTopicScreen = ({ navigation, route }: Props) => {
     };
 
     if (error) return <Text>Error loading topics</Text>;
-
+    console.log('subtitlesProgress', subtitlesProgress)
     return (
         <ScrollView style={styles.scrollView}>
             <SafeAreaView style={styles.safeContainer}>
@@ -83,7 +83,7 @@ const SubTopicScreen = ({ navigation, route }: Props) => {
                             style={styles.roundedContainer}
                             onPress={() => handleSubtitlePress(subtitle)}
                         >
-                            <View style={[styles.progressOverlay, { width: `${subtitle.progress * 100}%` }]} />
+                            <View style={[styles.progressOverlay, { width: `${subtitle.progress*1.2 * 100}%` }]} />
                             <View style={[styles.infoContainer]}>
                                 {!(subtitle.is_purchased || subtitle.is_free) && <LockIcon size={2} color={BLACK} style={{opacity: 0.5}}/>}
                                 <Text style={[styles.mainText, !(subtitle.is_purchased || subtitle.is_free) && {opacity: 0.2}]}>{subtitle.subtitle_name}</Text>
@@ -152,7 +152,9 @@ const styles = StyleSheet.create({
         fontSize: 17,
         fontStyle: 'normal',
         fontWeight: '900',
-        width: '80%',
+        backgroundColor: BACKGROUND,
+        paddingHorizontal: 10,
+        borderRadius: 20,
     },
 
     subText: {
