@@ -39,7 +39,7 @@ const AchievementsScreen = ({ navigation }: Props) => {
                 {badgeProgress?.map((badge, index) => (
                     <View key={index} style={styles.roundedContainer}>
                         <View style={styles.infoContainer}>
-                            <View>
+                            <View style={{width: '85%'}}>
                                 <Text style={styles.mainText}>{badge.name}</Text>
                                 <Text style={styles.subText}>{badge.description}</Text>
                             </View>

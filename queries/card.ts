@@ -129,10 +129,10 @@ interface MarkCardsAsViewedAndUpdateQuizzesResult {
 }
 
 export const useMarkCardsAsViewedAndUpdateQuizzes = (
-    options?: UseMutationOptions<MarkCardsAsViewedAndUpdateQuizzesResult, AxiosError, { userId: number | null, cardIds: number[] }>
+    options?: UseMutationOptions<MarkCardsAsViewedAndUpdateQuizzesResult, AxiosError, { userId: number | null, cardIds: number[], correctAnswerIds: number[] }>
 ) => {
-    return useMutation<MarkCardsAsViewedAndUpdateQuizzesResult, AxiosError, { userId: number | null, cardIds: number[] }>(
-        ({ userId, cardIds }) => CardApi.markCardsAsViewedAndUpdateQuizzes(userId, cardIds),
+    return useMutation<MarkCardsAsViewedAndUpdateQuizzesResult, AxiosError, { userId: number | null, cardIds: number[], correctAnswerIds: number[] }>(
+        ({ userId, cardIds, correctAnswerIds }) => CardApi.markCardsAsViewedAndUpdateQuizzes(userId, cardIds, correctAnswerIds),
         {
             ...options,
             onSuccess: (data) => {

@@ -113,7 +113,7 @@ const HomeScreen = ({ navigation, route }: Props) => {
                         {/*{userStats && <Avvvatars value={userStats.username} />}*/}
                         <SvgUri
                             style={styles.avatar}
-                            uri="https://api.dicebear.com/7.x/shapes/svg"
+                            uri={`https://api.dicebear.com/7.x/shapes/svg?seed=${userStats?.username}`}
                         />
                         <Text
                             style={[
@@ -163,7 +163,7 @@ const HomeScreen = ({ navigation, route }: Props) => {
                     badgeProgress?.map((badge, index) => (
                         <View key={index} style={styles.roundedContainer}>
                             <View style={styles.infoContainer}>
-                                <View>
+                                <View style={{width: '85%'}}>
                                     <Text style={styles.mainText}>{badge.name}</Text>
                                     <Text style={styles.subText}>{badge.description}</Text>
                                 </View>
@@ -214,9 +214,13 @@ const HomeScreen = ({ navigation, route }: Props) => {
                             <React.Fragment key={user.id}>
                                 <View style={styles.listItemContainer}>
                                     <Text style={styles.listNumber}>#{user.user_rank}</Text>
-                                    <Image
-                                        source={{ uri: 'https://cdn.pixabay.com/photo/2018/02/08/22/27/flower-3140492_1280.jpg' }}
+                                    {/*<Image*/}
+                                    {/*    source={{ uri: 'https://cdn.pixabay.com/photo/2018/02/08/22/27/flower-3140492_1280.jpg' }}*/}
+                                    {/*    style={styles.listImage}*/}
+                                    {/*/>*/}
+                                    <SvgUri
                                         style={styles.listImage}
+                                        uri={`https://api.dicebear.com/7.x/shapes/svg?seed=${user.username}`}
                                     />
                                     <Text style={styles.listText}>{user.username}</Text>
                                     <Text style={styles.listEndNumber}>
@@ -410,6 +414,7 @@ const styles = StyleSheet.create({
         fontStyle: 'normal',
         fontWeight: '400',
         marginRight: 15,
+        width: 35
     },
 
     listImage: {

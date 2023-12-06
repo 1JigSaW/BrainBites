@@ -11,6 +11,7 @@ import {StackScreenProps} from "@react-navigation/stack";
 import {BACKGROUND, BLUE} from "../colors";
 import {getButtonStyle, getButtonTextStyle} from "../components/functions/buttonHelpers";
 import {useGetUsers} from "../queries/user";
+import {SvgUri} from "react-native-svg";
 
 type Props = StackScreenProps<HomeStackParamList, 'LeaderBoardScreen'>;
 
@@ -58,9 +59,9 @@ const LeaderBoardScreen = ({navigation}: Props) => {
                                 <React.Fragment key={user.id}>
                                     <View style={styles.listItemContainer}>
                                         <Text style={styles.listNumber}>#{index+1}</Text>
-                                        <Image
-                                            source={{ uri: 'https://cdn.pixabay.com/photo/2018/02/08/22/27/flower-3140492_1280.jpg' }}
+                                        <SvgUri
                                             style={styles.listImage}
+                                            uri={`https://api.dicebear.com/7.x/shapes/svg?seed=${user.username}`}
                                         />
                                         <Text style={styles.listText}>{user.username}</Text>
                                         <Text style={styles.listEndNumber}>
@@ -124,6 +125,7 @@ const styles = StyleSheet.create({
         fontStyle: 'normal',
         fontWeight: '400',
         marginRight: 15,
+        width: 35
     },
 
     listImage: {

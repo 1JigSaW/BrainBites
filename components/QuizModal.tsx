@@ -10,7 +10,7 @@ import * as Animatable from 'react-native-animatable';
 
 interface QuizOverlayProps {
     isVisible: boolean;
-    onContinue: () => void;
+    onContinue: (correctAnswerIds: number[]) => Promise<void>;
     quizzes: Quiz[];
     onQuizChange?: (currentQuizIndex: number) => void;
 }
@@ -21,6 +21,9 @@ const QuizOverlay = ({ isVisible, onContinue, quizzes, onQuizChange }: QuizOverl
     const [quizCompleted, setQuizCompleted] = useState(false);
     const { userId } = useContext(MainContext);
     const [loading, setLoading] = useState(false);
+    const [correctAnswerIds, setCorrectAnswerIds] = useState<number[]>([]);
+
+
     const { mutate: updateUserXp } = useUpdateUserXp()
 
     const animatableRef = useRef<Animatable.View & View>(null);
@@ -40,19 +43,26 @@ const QuizOverlay = ({ isVisible, onContinue, quizzes, onQuizChange }: QuizOverl
         }
     }, [isVisible]);
 
-    const handleAnswer = (isCorrect: any) => {
+    const handleAnswer = (isCorrect: boolean) => {
+        const currentQuiz = quizzes[currentQuestionIndex];
+
         if (isCorrect) {
             setCorrectAnswersCount(correctAnswersCount + 1);
+            console.log('currentQuiz.card', currentQuiz.card_id);
+            setCorrectAnswerIds([...correctAnswerIds, currentQuiz.card_id]); // Добавление id в массив
         }
+
         if (currentQuestionIndex < quizzes.length - 1) {
             setCurrentQuestionIndex(currentQuestionIndex + 1);
         } else {
             setQuizCompleted(true);
         }
+
         if (onQuizChange) {
             onQuizChange(currentQuestionIndex + 1);
         }
     };
+
 
     const handleContinue = () => {
         setLoading(true);
@@ -61,7 +71,7 @@ const QuizOverlay = ({ isVisible, onContinue, quizzes, onQuizChange }: QuizOverl
         if (quizCompleted) {
             updateUserXp({ userId, correctAnswersCount });
         }
-        onContinue();
+        onContinue(correctAnswerIds);
         setLoading(false);
     };
     return (

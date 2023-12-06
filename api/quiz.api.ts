@@ -2,7 +2,7 @@ import { API } from "./API";
 
 export interface Quiz {
     id: number;
-    card: number;
+    card_id: number;
     question: string;
     correct_answer: string;
     answers: string[];

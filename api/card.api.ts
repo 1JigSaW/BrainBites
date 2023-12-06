@@ -122,11 +122,14 @@ export class CardApi {
         }
     }
 
-    static async markCardsAsViewedAndUpdateQuizzes(userId: number | null, cardIds: number[]): Promise<{ message: string }> {
+    static async markCardsAsViewedAndUpdateQuizzes(userId: number | null, cardIds: number[], correctAnswerIds: number[]): Promise<{
+        message: string
+    }> {
         try {
             const response = await API.post(`api/mark-cards-as-viewed-and-update-quizzes/`, {
                 user_id: userId,
-                card_ids: cardIds
+                card_ids: cardIds,
+                correct_answer_ids: correctAnswerIds
             });
 
             if (response.status === 200) {

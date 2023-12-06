@@ -94,21 +94,22 @@ const CardsSubtopicScreen = ({ navigation, route }: Props) => {
 
     const handleExitPress = () => {
         Alert.alert(
-            "Внимание",
-            "Ваш прогресс будет сброшен. Вы уверены, что хотите выйти?",
+            "Attention",
+            "Your progress will be reset. Are you sure you want to exit?",
             [
-                { text: "Отмена", style: "cancel" },
-                { text: "Выйти", onPress: () => navigation.goBack() }
+                { text: "Cancel", style: "cancel" },
+                { text: "Exit", onPress: () => navigation.goBack() }
             ]
         );
     };
 
-    const handleContinueFromQuiz = async  () => {
+
+    const handleContinueFromQuiz = async  (correctAnswerIds: number[]) => {
         setQuizVisible(false); // Hide the quiz
         if (swipedCardIds.length > 0 && userId) {
             // Вызываем API для маркировки просмотренных карточек и обновления викторин
             try {
-                const result = await markCardsAndViewQuizzes.mutateAsync({ userId, cardIds: swipedCardIds });
+                const result = await markCardsAndViewQuizzes.mutateAsync({ userId, cardIds: swipedCardIds, correctAnswerIds });
             } catch (error) {
                 console.error('Error in marking cards and updating quizzes:', error);
             }
