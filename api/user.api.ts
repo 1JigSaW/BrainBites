@@ -22,6 +22,7 @@ export interface UserStatsResponse {
     topics: Topic[];
     user_rank: number;
     badges_count: number;
+    avatar_url: string;
 }
 
 export interface Badge {
@@ -47,12 +48,13 @@ export class UserApi {
     }
 
     // New method for creating a user
-    static async createUser(username: string, topicIds: number[], count_cards: number): Promise<CreateUserResponse> {
+    static async createUser(username: string, topicIds: number[], count_cards: number, avatarUrl: string): Promise<CreateUserResponse> {
         try {
             const { data } = await API.post('/api/create-user/', {
                 username: username,
                 topic_ids: topicIds,
                 count_cards: count_cards,
+                avatar_url: avatarUrl,
             });
             return data;
         } catch (error) {

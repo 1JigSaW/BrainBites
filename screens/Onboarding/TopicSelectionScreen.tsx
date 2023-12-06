@@ -39,7 +39,7 @@ const TopicSelectionScreen = ({ navigation, route }: Props) => {
         );
     };
 
-    const handleContinue = () => {
+    const handleContinue = async () => {
         if (!topics) {
             console.error('Topics data is not available.');
             return;
@@ -50,8 +50,12 @@ const TopicSelectionScreen = ({ navigation, route }: Props) => {
         const topicIds = topics
             .filter(topic => selectedTopics.includes(topic.title))
             .map(topic => topic.id);
+
+        // Генерация URL аватара
+        const avatarUrl = `https://api.dicebear.com/7.x/identicon/svg`;
+
         createUserMutation.mutate(
-            { username, topicIds, count_cards },
+            { username, topicIds, count_cards, avatarUrl },
             {
                 onSuccess: async (data) => {
                     try {

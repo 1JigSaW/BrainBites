@@ -26,6 +26,7 @@ import {useIsFocused} from "@react-navigation/native";
 import {useUpdateReadCardsCount} from "../queries/card";
 import {useGetUserBadgeProgress} from "../queries/badge";
 import {calculateProgressBarWidth} from "../utils";
+import {SvgUri} from "react-native-svg";
 
 const getFontSizeForName = (name: string) => {
     if (name.length <= 5) {
@@ -49,6 +50,8 @@ const HomeScreen = ({ navigation, route }: Props) => {
         isError,
         refetch,
     } = useGetUserStats(userId);
+
+    console.log('userStats', userStats)
 
     const sortBy = activeButton;
     const returnAll = false;
@@ -102,9 +105,15 @@ const HomeScreen = ({ navigation, route }: Props) => {
                         <Text style={styles.iconText}>My topics</Text>
                     </TouchableOpacity>
                     <View style={styles.iconContainer}>
-                        <Image
-                            source={{ uri: 'https://cdn.pixabay.com/photo/2018/02/08/22/27/flower-3140492_1280.jpg' }}
+                        {/*<Image*/}
+                        {/*    source={{ uri: 'https://api.dicebear.com/7.x/identicon/svg' }}*/}
+                        {/*    style={styles.avatar}*/}
+                        {/*/>*/}
+
+                        {/*{userStats && <Avvvatars value={userStats.username} />}*/}
+                        <SvgUri
                             style={styles.avatar}
+                            uri="https://api.dicebear.com/7.x/shapes/svg"
                         />
                         <Text
                             style={[
