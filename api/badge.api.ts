@@ -1,6 +1,7 @@
 import { API } from "./API";
 
 export interface BadgeProgress {
+    image: string | undefined;
     description: string;
     name: string;
     badge: string;

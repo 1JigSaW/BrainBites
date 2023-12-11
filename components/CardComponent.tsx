@@ -65,10 +65,6 @@ const CardComponent = ({ card, myCards, handleRemoveCard }: any) => {
                     )}
                 </TouchableOpacity>
             </View>
-            <Image
-                style={styles.image}
-                source={{ uri: 'https://via.placeholder.com/150' }}
-            />
             <Text style={styles.text}>{card.content}</Text>
             <Text style={styles.source}>{card.source}</Text>
             <Text style={styles.tag}>{card.topic}</Text>
@@ -79,7 +75,7 @@ const CardComponent = ({ card, myCards, handleRemoveCard }: any) => {
 const styles = StyleSheet.create({
     card: {
         width: '100%',
-        height: '100%',
+        height: '90%',
         backgroundColor: BACKGROUND,
         justifyContent: 'flex-start',
         borderRadius: 20,
@@ -101,7 +97,7 @@ const styles = StyleSheet.create({
     },
     title: {
         maxWidth: '90%',
-        fontSize: 20,
+        fontSize: 30,
         marginLeft: 10,
         fontWeight: '700',
         color: BLACK,
@@ -117,16 +113,17 @@ const styles = StyleSheet.create({
         marginBottom: 10,
     },
     text: {
+        marginTop: 30,
         marginLeft: 10,
         marginBottom: 10,
         fontFamily: 'Abel',
-        fontSize: 15,
+        fontSize: 20,
         fontWeight: '400',
         color: BLACK,
     },
     source: {
         position: 'absolute',
-        bottom: 40,
+        bottom: 60,
         left: 20,
         color: BLACK,
         fontFamily: 'Abel',
@@ -135,11 +132,11 @@ const styles = StyleSheet.create({
     },
     tag: {
         position: 'absolute',
-        bottom: 10,
+        bottom: 15,
         left: 20,
         color: BLACK,
         fontFamily: 'Abel',
-        fontSize: 15,
+        fontSize: 20,
         fontWeight: '400',
         borderWidth: 1,
         paddingVertical: 2,

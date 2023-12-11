@@ -167,7 +167,7 @@ const HomeScreen = ({ navigation, route }: Props) => {
                                     <Text style={styles.mainText}>{badge.name}</Text>
                                     <Text style={styles.subText}>{badge.description}</Text>
                                 </View>
-                                <ArrowRightIcon size={40} color={BLACK} />
+                                <Image source={{ uri: badge.image }} width={50} height={40}/>
                             </View>
 
                             <View style={styles.progressBarBackground}>
