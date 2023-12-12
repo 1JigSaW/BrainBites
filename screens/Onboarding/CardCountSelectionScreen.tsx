@@ -2,10 +2,11 @@ import React, {useContext, useState} from 'react';
 import { SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { StackScreenProps } from "@react-navigation/stack";
 import { OnboardingStackParamList } from "../../navigation/OnboardingNavigator";
-import { BACKGROUND, BLACK, BLUE } from "../../colors";
+import {BACKGROUND, BLACK, BLUE, GREEN} from "../../colors";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import {EVERYDAY_CARDS, QuizState} from "../../constants";
 import MainContext from "../../navigation/MainContext";
+import {Nunito_Bold, Nunito_Regular, Nunito_Semibold} from "../../fonts";
 
 type Props = StackScreenProps<OnboardingStackParamList, 'CardCountSelectionScreen'>;
 
@@ -38,7 +39,7 @@ const CardCountSelectionScreen = ({ navigation, route }: Props) => {
                             key={count}
                             style={[
                                 styles.cardCountButton,
-                                selectedCardCount === count && { backgroundColor: BLUE }
+                                selectedCardCount === count && { backgroundColor: GREEN, borderWidth: 0 }
                             ]}
                             onPress={() => handleCardCountPress(count)}
                         >
@@ -80,21 +81,21 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     cardCountButton: {
-        padding: 15,
+        padding: 10,
         backgroundColor: BACKGROUND,
         borderRadius: 20,
-        marginBottom: 10,
+        marginBottom: 12,
         width: '100%',
         alignItems: 'center',
         borderWidth: 1,
     },
     cardCountText: {
-        fontSize: 17,
-        fontFamily: 'Abel',
+        fontSize: 24,
+        fontFamily: Nunito_Regular,
         color: BLACK,
     },
     continueButton: {
-        padding: 15,
+        padding: 10,
         backgroundColor: BLUE,
         borderRadius: 20,
         color: BACKGROUND,
@@ -102,15 +103,15 @@ const styles = StyleSheet.create({
     },
     textButton: {
         color: BACKGROUND,
-        fontSize: 15,
-        fontFamily: 'Abel',
+        fontSize: 20,
+        fontFamily: Nunito_Semibold,
         textAlign: 'center',
     },
     question: {
-        fontFamily: 'Abel',
+        fontFamily: Nunito_Bold,
         color: BLACK,
-        marginBottom: 10,
-        fontSize: 20,
+        marginBottom: 20,
+        fontSize: 28,
         textAlign: 'center',
     }
 });

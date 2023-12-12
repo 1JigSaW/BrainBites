@@ -8,7 +8,7 @@ import {
 import {HomeStackParamList} from "../navigation/HomeStack";
 import {StackScreenProps} from "@react-navigation/stack";
 import {BACKGROUND, BLACK, BLUE} from "../colors";
-import {Regular} from "../fonts";
+import {Nunito_Bold, Nunito_Regular, Nunito_Semibold, Regular} from "../fonts";
 import TopicsIcon from "../components/icons/TopicsIcon";
 import MyCardsIcon from "../components/icons/MyCardsIcon";
 import CountCardsIcon from "../components/icons/CountCardsIcon";
@@ -167,7 +167,7 @@ const HomeScreen = ({ navigation, route }: Props) => {
                                     <Text style={styles.mainText}>{badge.name}</Text>
                                     <Text style={styles.subText}>{badge.description}</Text>
                                 </View>
-                                <Image source={{ uri: badge.image }} width={50} height={40}/>
+                                <Image source={{ uri: badge.image }} width={45} height={40}/>
                             </View>
 
                             <View style={styles.progressBarBackground}>
@@ -214,10 +214,7 @@ const HomeScreen = ({ navigation, route }: Props) => {
                             <React.Fragment key={user.id}>
                                 <View style={styles.listItemContainer}>
                                     <Text style={styles.listNumber}>#{user.user_rank}</Text>
-                                    {/*<Image*/}
-                                    {/*    source={{ uri: 'https://cdn.pixabay.com/photo/2018/02/08/22/27/flower-3140492_1280.jpg' }}*/}
-                                    {/*    style={styles.listImage}*/}
-                                    {/*/>*/}
+
                                     <SvgUri
                                         style={styles.listImage}
                                         uri={`https://api.dicebear.com/7.x/shapes/svg?seed=${user.username}`}
@@ -277,12 +274,12 @@ const styles = StyleSheet.create({
         marginBottom: 5,
     },
     iconText: {
-        fontFamily: Regular,
+        fontFamily: Nunito_Regular,
         fontSize: 16,
         color: '#000',
     },
     nameText: {
-        fontFamily: Regular,
+        fontFamily: Nunito_Regular,
         fontSize: 24,
         color: '#000',
     },
@@ -294,17 +291,13 @@ const styles = StyleSheet.create({
     },
     textBold: {
         color: '#000',
-        fontFamily: 'Abel',
-        fontSize: 26,
-        fontStyle: 'normal',
-        fontWeight: '900',
+        fontFamily: Nunito_Bold,
+        fontSize: 28,
     },
     textDefault: {
         color: '#000',
-        fontFamily: 'Abel',
+        fontFamily: Nunito_Semibold,
         fontSize: 20,
-        fontStyle: 'normal',
-        fontWeight: '400',
     },
     lineContainer: {
         flexDirection: 'row',
@@ -314,16 +307,15 @@ const styles = StyleSheet.create({
     },
     separator: {
         height: 1,
-        backgroundColor: 'rgba(0, 0, 0, 0.20)',  // Цвет линии. Вы можете изменить его по своему желанию
+        backgroundColor: 'rgba(0, 0, 0, 0.20)',
         width: '100%',
         marginBottom: 10,
     },
     subtitle: {
         color: '#000',
-        fontFamily: 'Abel',
-        fontSize: 14,
+        fontFamily: Nunito_Bold,
+        fontSize: 20,
         fontStyle: 'normal',
-        fontWeight: '700',
     },
     roundedContainer: {
         backgroundColor: 'white',
@@ -347,38 +339,37 @@ const styles = StyleSheet.create({
 
     mainText: {
         color: '#000',
-        fontFamily: 'Abel',
-        fontSize: 17,
+        fontFamily: Nunito_Bold,
+        fontSize: 20,
         fontStyle: 'normal',
-        fontWeight: '900',
     },
 
     subText: {
         color: '#000',
-        fontFamily: 'Abel',
-        fontSize: 14,
+        fontFamily: Nunito_Regular,
+        fontSize: 16,
         fontStyle: 'normal',
-        fontWeight: '400',
     },
 
     progressBarBackground: {
         height: 15,
         borderRadius: 10,
-        backgroundColor: '#fff', // Цвет фона
+        backgroundColor: '#fff',
         marginTop: 10,
         borderWidth: 1,
     },
 
     progressBarFill: {
         height: '100%',
-        width: '50%', // Положение этой строки меняется в зависимости от вашего прогресса
+        width: '50%',
         borderRadius: 10,
-        backgroundColor: 'blue',
+        backgroundColor: BLUE,
     },
 
     buttonContainer: {
         flexDirection: 'row',
         justifyContent: 'space-between',
+        marginTop: 5,
     },
 
     roundedButton: {
@@ -392,11 +383,10 @@ const styles = StyleSheet.create({
     },
 
     buttonText: {
-        color: '#000',
-        fontFamily: 'Abel',
-        fontSize: 18,
+        color: BLACK,
+        fontFamily: Nunito_Semibold,
+        fontSize: 20,
         fontStyle: 'normal',
-        fontWeight: '400',
     },
 
     listItemContainer: {
@@ -409,10 +399,9 @@ const styles = StyleSheet.create({
 
     listNumber: {
         color: '#000',
-        fontFamily: 'Abel',
+        fontFamily: Nunito_Regular,
         fontSize: 14,
         fontStyle: 'normal',
-        fontWeight: '400',
         marginRight: 15,
         width: 35
     },
@@ -427,18 +416,16 @@ const styles = StyleSheet.create({
     listText: {
         flex: 1,
         color: '#000',
-        fontFamily: 'Abel',
+        fontFamily: Nunito_Regular,
         fontSize: 14,
         fontStyle: 'normal',
-        fontWeight: '400',
     },
 
     listEndNumber: {
         color: '#000',
-        fontFamily: 'Abel',
-        fontSize: 18,
+        fontFamily: Nunito_Bold,
+        fontSize: 20,
         fontStyle: 'normal',
-        fontWeight: '700',
         marginLeft: 15,
     },
 
@@ -453,6 +440,7 @@ const styles = StyleSheet.create({
     },
     activeButton: {
         backgroundColor: BLUE,
+        borderColor: BLUE,
     },
     activeButtonText: {
         color: BACKGROUND,

@@ -11,7 +11,7 @@ import {
 } from 'react-native';
 import { StackScreenProps } from '@react-navigation/stack';
 import { OnboardingStackParamList } from '../../navigation/OnboardingNavigator';
-import { BACKGROUND, BLACK, BLUE } from '../../colors';
+import {BACKGROUND, BLACK, BLUE, GREEN} from '../../colors';
 import { useGetAllTopics } from '../../queries/topic';
 import {useMutation} from "@tanstack/react-query";
 import {UserApi} from "../../api/user.api";
@@ -19,6 +19,7 @@ import {useCreateUser} from "../../queries/user";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import {user} from "../../constants";
 import MainContext from "../../navigation/MainContext";
+import {Nunito_Bold, Nunito_Regular, Nunito_Semibold} from "../../fonts";
 
 type Props = StackScreenProps<OnboardingStackParamList, 'TopicSelectionScreen'>;
 
@@ -133,8 +134,8 @@ const styles = StyleSheet.create({
     },
     instructions: {
         marginBottom: 20,
-        fontFamily: 'Abel',
-        fontSize: 20,
+        fontFamily: Nunito_Bold,
+        fontSize: 32,
         color: BLACK,
     },
     topicsContainer: {
@@ -151,33 +152,36 @@ const styles = StyleSheet.create({
         borderColor: BLACK,
     },
     topicTitle: {
-        fontFamily: 'Abel',
-        color: BLACK, // Default color
+        fontFamily: Nunito_Regular,
+        color: BLACK,
+        fontSize: 20,
     },
     selectedTopic: {
-        backgroundColor: BLUE,
-        borderColor: BLUE,
+        backgroundColor: GREEN,
+        borderColor: GREEN,
     },
     selectedTopicTitle: {
         color: BACKGROUND, // Text color for selected topics
     },
     buttonText: {
         color: 'white',
+        fontFamily: Nunito_Semibold,
+        fontSize: 20,
     },
     button: {
         padding: 10,
         borderRadius: 20,
         alignItems: 'center',
-        width: '80%', // Set a fixed width for the buttons
+        width: '90%', // Set a fixed width for the buttons
         marginBottom: 10,
     },
     activeButton: {
         backgroundColor: BLUE,
-        marginTop: 10,
+        marginTop: 20,
     },
     disabledButton: {
         backgroundColor: '#ccc',
-        marginTop: 10,
+        marginTop: 20,
     },
 });
 
