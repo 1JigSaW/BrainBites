@@ -5,6 +5,7 @@ import SaveIcon from "./icons/SaveIcon";
 import SaveEmptyIcon from "./icons/SaveEmptyIcon";
 import {useSaveCard} from "../queries/card";
 import MainContext from "../navigation/MainContext";
+import {Nunito_Bold, Nunito_Regular, Nunito_Semibold} from "../fonts";
 
 
 const CardComponent = ({ card, myCards, handleRemoveCard }: any) => {
@@ -97,9 +98,9 @@ const styles = StyleSheet.create({
     },
     title: {
         maxWidth: '90%',
-        fontSize: 30,
+        fontSize: 28,
         marginLeft: 10,
-        fontWeight: '700',
+        fontFamily: Nunito_Bold,
         color: BLACK,
     },
     saveIcon: {
@@ -116,9 +117,8 @@ const styles = StyleSheet.create({
         marginTop: 30,
         marginLeft: 10,
         marginBottom: 10,
-        fontFamily: 'Abel',
+        fontFamily: Nunito_Semibold,
         fontSize: 20,
-        fontWeight: '400',
         color: BLACK,
     },
     source: {
@@ -126,21 +126,19 @@ const styles = StyleSheet.create({
         bottom: 60,
         left: 20,
         color: BLACK,
-        fontFamily: 'Abel',
-        fontSize: 15,
-        fontWeight: '400',
+        fontFamily: Nunito_Regular,
+        fontSize: 16,
     },
     tag: {
         position: 'absolute',
         bottom: 15,
         left: 20,
         color: BLACK,
-        fontFamily: 'Abel',
+        fontFamily: Nunito_Semibold,
         fontSize: 20,
-        fontWeight: '400',
         borderWidth: 1,
-        paddingVertical: 2,
-        paddingHorizontal: 5,
+        paddingVertical: 4,
+        paddingHorizontal: 8,
         textAlign: "center",
         borderRadius: 20,
     },

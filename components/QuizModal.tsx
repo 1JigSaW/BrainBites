@@ -7,6 +7,7 @@ import {useUpdateUserXp} from "../queries/card";
 import MainContext from "../navigation/MainContext";
 import {BACKGROUND, BLACK, BLUE} from "../colors";
 import * as Animatable from 'react-native-animatable';
+import {Nunito_Regular, Nunito_Semibold} from "../fonts";
 
 interface QuizOverlayProps {
     isVisible: boolean;
@@ -129,7 +130,7 @@ const styles = StyleSheet.create({
     },
     modalView: {
         margin: 20,
-        backgroundColor: "white",
+        backgroundColor: BACKGROUND,
         borderRadius: 20,
         padding: 35,
         paddingBottom: 10,
@@ -150,6 +151,8 @@ const styles = StyleSheet.create({
         marginBottom: 15,
         textAlign: "center",
         color: BLACK,
+        fontFamily: Nunito_Semibold,
+        fontSize: 20,
     },
     quizAnswer: {
         borderWidth: 1,
@@ -161,6 +164,8 @@ const styles = StyleSheet.create({
     answerText: {
         textAlign: 'center',
         color: BLACK,
+        fontFamily: Nunito_Regular,
+        fontSize: 16
     },
     button: {
         padding: 10,

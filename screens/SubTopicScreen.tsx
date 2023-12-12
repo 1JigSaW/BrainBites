@@ -17,6 +17,7 @@ import ArrowRightIcon from "../components/icons/ArrowRight";
 import {BACKGROUND, BLACK, BLUE, PROGRESS_BACKGROUND} from "../colors";
 import {useIsFocused} from "@react-navigation/native";
 import LockIcon from "../components/icons/LockIcon";
+import {Nunito_Bold, Nunito_Regular} from "../fonts";
 
 type Props = StackScreenProps<CardsStackParamList, 'SubTopicScreen'>;
 
@@ -148,10 +149,9 @@ const styles = StyleSheet.create({
 
     mainText: {
         color: '#000',
-        fontFamily: 'Abel',
-        fontSize: 17,
+        fontFamily: Nunito_Bold,
+        fontSize: 20,
         fontStyle: 'normal',
-        fontWeight: '900',
         backgroundColor: BACKGROUND,
         paddingHorizontal: 10,
         borderRadius: 20,
@@ -159,10 +159,9 @@ const styles = StyleSheet.create({
 
     subText: {
         color: '#000',
-        fontFamily: 'Abel',
-        fontSize: 14,
+        fontFamily: Nunito_Regular,
+        fontSize: 16,
         fontStyle: 'normal',
-        fontWeight: '400',
     },
 });
 

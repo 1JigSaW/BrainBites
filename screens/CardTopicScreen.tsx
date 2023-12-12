@@ -14,6 +14,7 @@ import {BACKGROUND, BLACK, BLUE, PROGRESS_BACKGROUND} from "../colors";
 import {CardsStackParamList} from "../navigation/CardsStack";
 import ArrowRightIcon from "../components/icons/ArrowRight";
 import {useIsFocused} from "@react-navigation/native";
+import {Nunito_Bold} from "../fonts";
 
 type Props = StackScreenProps<CardsStackParamList, 'CardTopicScreen'>;
 
@@ -70,7 +71,7 @@ const styles = StyleSheet.create({
         backgroundColor: BACKGROUND,
     },
     roundedContainer: {
-        backgroundColor: 'white',
+        backgroundColor: BACKGROUND,
         borderRadius: 15,
         marginBottom: 10,
         paddingHorizontal: 20,
@@ -82,28 +83,27 @@ const styles = StyleSheet.create({
         shadowRadius: 2,
         borderWidth: 1,
         position: 'relative',
-        overflow: 'hidden',  // Ensure the overlay doesn't spill out of the container
+        overflow: 'hidden',
     },
     progressOverlay: {
         position: 'absolute',
         left: 0,
         top: 0,
         bottom: 0,
-        backgroundColor: PROGRESS_BACKGROUND,  // Choose a color that indicates progress
+        backgroundColor: PROGRESS_BACKGROUND,
     },
     infoContainer: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        zIndex: 1,  // Ensure text and icons appear above the progress overlay
+        zIndex: 1,
     },
 
     mainText: {
         color: '#000',
-        fontFamily: 'Abel',
-        fontSize: 17,
+        fontFamily: Nunito_Bold,
+        fontSize: 20,
         fontStyle: 'normal',
-        fontWeight: '900',
         backgroundColor: BACKGROUND,
         paddingHorizontal: 10,
         borderRadius: 20,

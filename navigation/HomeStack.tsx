@@ -6,6 +6,7 @@ import ArrowBackIcon from "../components/icons/ArrowBackIcon";
 import AchievementsScreen from "../screens/AchievementsScreen";
 import MyCardsScreen from "../screens/MyCardsScreen";
 import MyTopicsScreen from "../screens/MyTopicsScreen";
+import {Nunito_Semibold} from "../fonts";
 
 export type HomeStackParamList = {
     HomeScreen: undefined;
@@ -37,7 +38,7 @@ const HomeStack = () => {
                         <ArrowBackIcon color={tintColor} size={25} style={{marginLeft: 10, marginTop: 5}} />
                     ),
                     headerTitleStyle: {
-                        fontFamily: 'Abel',
+                        fontFamily: Nunito_Semibold,
                         fontSize: 28,
                     },
                 }}
@@ -54,7 +55,7 @@ const HomeStack = () => {
                         <ArrowBackIcon color={tintColor} size={25} style={{marginLeft: 10, marginTop: 5}} />
                     ),
                     headerTitleStyle: {
-                        fontFamily: 'Abel',
+                        fontFamily: Nunito_Semibold,
                         fontSize: 28,
                     },
                 }}
@@ -71,7 +72,7 @@ const HomeStack = () => {
                         <ArrowBackIcon color={tintColor} size={25} style={{marginLeft: 10, marginTop: 5}} />
                     ),
                     headerTitleStyle: {
-                        fontFamily: 'Abel',
+                        fontFamily: Nunito_Semibold,
                         fontSize: 28,
                     },
                 }}
@@ -88,7 +89,7 @@ const HomeStack = () => {
                         <ArrowBackIcon color={tintColor} size={25} style={{marginLeft: 10, marginTop: 5}} />
                     ),
                     headerTitleStyle: {
-                        fontFamily: 'Abel',
+                        fontFamily: Nunito_Semibold,
                         fontSize: 28,
                     },
                 }}

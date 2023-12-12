@@ -8,10 +8,11 @@ import {
 } from 'react-native';
 import {HomeStackParamList} from "../navigation/HomeStack";
 import {StackScreenProps} from "@react-navigation/stack";
-import {BACKGROUND, BLUE} from "../colors";
+import {BACKGROUND, BLACK, BLUE} from "../colors";
 import {getButtonStyle, getButtonTextStyle} from "../components/functions/buttonHelpers";
 import {useGetUsers} from "../queries/user";
 import {SvgUri} from "react-native-svg";
+import {Nunito_Bold, Nunito_Regular, Nunito_Semibold} from "../fonts";
 
 type Props = StackScreenProps<HomeStackParamList, 'LeaderBoardScreen'>;
 
@@ -105,10 +106,9 @@ const styles = StyleSheet.create({
 
     buttonText: {
         color: '#000',
-        fontFamily: 'Abel',
-        fontSize: 18,
+        fontFamily: Nunito_Semibold,
+        fontSize: 20,
         fontStyle: 'normal',
-        fontWeight: '400',
     },
     listItemContainer: {
         flexDirection: 'row',
@@ -120,10 +120,9 @@ const styles = StyleSheet.create({
 
     listNumber: {
         color: '#000',
-        fontFamily: 'Abel',
-        fontSize: 14,
+        fontFamily: Nunito_Regular,
+        fontSize: 16,
         fontStyle: 'normal',
-        fontWeight: '400',
         marginRight: 15,
         width: 35
     },
@@ -138,29 +137,28 @@ const styles = StyleSheet.create({
     listText: {
         flex: 1,
         color: '#000',
-        fontFamily: 'Abel',
-        fontSize: 14,
+        fontFamily: Nunito_Regular,
+        fontSize: 16,
         fontStyle: 'normal',
-        fontWeight: '400',
     },
 
     listEndNumber: {
         color: '#000',
-        fontFamily: 'Abel',
+        fontFamily: Nunito_Bold,
         fontSize: 18,
         fontStyle: 'normal',
-        fontWeight: '700',
         marginLeft: 15,
     },
 
     listSeparator: {
         height: 1,
-        backgroundColor: 'black',
+        backgroundColor: BLACK,
         marginLeft: 10,
         marginRight: 10,
     },
     activeButton: {
         backgroundColor: BLUE,
+        borderColor: BLUE,
     },
     activeButtonText: {
         color: BACKGROUND,

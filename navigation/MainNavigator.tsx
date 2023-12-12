@@ -5,6 +5,7 @@ import {BLUE} from "../colors";
 import CardsStack from "./CardsStack";
 import CardsIcon from "../components/icons/CardsIcon";
 import {useNavigationState} from "@react-navigation/native";
+import {Nunito_Regular} from "../fonts";
 
 const Tab = createBottomTabNavigator();
 
@@ -45,16 +46,27 @@ const MainNavigator = () => {
                 options={{
                     title: 'Home',
                     tabBarIcon: ({ color, focused }) =>
-                        <BrainIcon size={70} color={focused ? BLUE : color} style={{ marginTop: 10 }} />
+                        <BrainIcon size={70} color={focused ? BLUE : color} style={{ marginTop: 10 }} />,
+                    tabBarLabelStyle: {
+                        fontFamily: Nunito_Regular,
+                        fontSize: 12,
+                        fontStyle: 'normal',
+                    }
                 }}
             />
+
             <Tab.Screen
                 name="Cards"
                 component={CardsStack}
                 options={{
                     title: 'Cards',
                     tabBarIcon: ({ color, focused }) =>
-                        <CardsIcon size={23} color={focused ? BLUE : color} style={{ marginTop: 10 }} />
+                        <CardsIcon size={23} color={focused ? BLUE : color} style={{ marginTop: 10 }} />,
+                    tabBarLabelStyle: {
+                        fontFamily: Nunito_Regular,
+                        fontSize: 12,
+                        fontStyle: 'normal',
+                    }
                 }}
             />
         </Tab.Navigator>

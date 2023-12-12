@@ -13,6 +13,7 @@ import MainContext from "../navigation/MainContext";
 import ArrowRightIcon from "../components/icons/ArrowRight";
 import {Criteria} from "../api/badge.api";
 import {calculateProgressBarWidth} from "../utils";
+import {Nunito_Bold, Nunito_Regular} from "../fonts";
 
 type Props = StackScreenProps<HomeStackParamList, 'AchievementsScreen'>;
 
@@ -86,18 +87,16 @@ const styles = StyleSheet.create({
 
     mainText: {
         color: '#000',
-        fontFamily: 'Abel',
-        fontSize: 17,
+        fontFamily: Nunito_Bold,
+        fontSize: 20,
         fontStyle: 'normal',
-        fontWeight: '900',
     },
 
     subText: {
         color: '#000',
-        fontFamily: 'Abel',
-        fontSize: 14,
+        fontFamily: Nunito_Regular,
+        fontSize: 16,
         fontStyle: 'normal',
-        fontWeight: '400',
     },
 
     progressBarBackground: {
@@ -110,9 +109,9 @@ const styles = StyleSheet.create({
 
     progressBarFill: {
         height: '100%',
-        width: '50%', // Положение этой строки меняется в зависимости от вашего прогресса
+        width: '50%',
         borderRadius: 10,
-        backgroundColor: 'blue',
+        backgroundColor: BLUE,
     },
 });
 

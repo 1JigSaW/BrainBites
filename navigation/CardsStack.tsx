@@ -5,6 +5,7 @@ import CardTopicScreen from "../screens/CardTopicScreen";
 import SubTopicScreen from "../screens/SubTopicScreen";
 import ArrowBackIcon from "../components/icons/ArrowBackIcon";
 import CardsSubtopicScreen from "../screens/CardsSubtopicScreen";
+import {Nunito_Semibold} from "../fonts";
 
 
 export type CardsStackParamList = {
@@ -39,7 +40,7 @@ const CardsStack = () => {
                       <ArrowBackIcon color={tintColor} size={25} style={{marginLeft: 10, marginTop: 5}} />
                   ),
                   headerTitleStyle: {
-                      fontFamily: 'Abel',
+                      fontFamily: Nunito_Semibold,
                       fontSize: 28,
                   },
                 }}
@@ -54,7 +55,7 @@ const CardsStack = () => {
                         <ArrowBackIcon color={tintColor} size={25} style={{marginLeft: 10, marginTop: 5}} />
                     ),
                     headerTitleStyle: {
-                        fontFamily: 'Abel',
+                        fontFamily: Nunito_Semibold,
                         fontSize: 28,
                     },
                 }}
@@ -63,6 +64,10 @@ const CardsStack = () => {
                           component={CardsSubtopicScreen}
                           options={{
                               headerBackTitleVisible: false,
+                              headerTitleStyle: {
+                                  fontFamily: Nunito_Semibold,
+                                  fontSize: 28,
+                              },
                               // headerTitleAlign: 'center',
                               // headerBackImage: ({ tintColor }) => (
                               //     <ArrowBackIcon color={tintColor} size={25} style={{marginLeft: 10, marginTop: 5}} />

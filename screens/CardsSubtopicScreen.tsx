@@ -14,6 +14,7 @@ import {useIsFocused} from "@react-navigation/native";
 import {useCheckUserAchievements} from "../queries/badge";
 import Toast from "react-native-toast-message";
 import ArrowBackIcon from "../components/icons/ArrowBackIcon";
+import {Nunito_Semibold} from "../fonts";
 
 type Props = StackScreenProps<CardsStackParamList, 'CardsSubtopicScreen'>;
 
@@ -66,7 +67,7 @@ const CardsSubtopicScreen = ({ navigation, route }: Props) => {
             headerBackTitleVisible: false,
             headerTitleAlign: 'center',
             headerTitleStyle: {
-                fontFamily: 'Abel',
+                fontFamily: Nunito_Semibold,
                 fontSize: 28,
             },
             title: isQuizVisible ? `Quiz: ${currentQuizNumber}` : `Card ${swipedCardCount} / ${cards?.length}`,
@@ -195,7 +196,7 @@ const CardsSubtopicScreen = ({ navigation, route }: Props) => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#fff',
+        backgroundColor: BACKGROUND,
         justifyContent: 'center',
         alignItems: 'center',
     },

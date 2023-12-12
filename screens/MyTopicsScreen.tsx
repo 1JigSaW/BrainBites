@@ -7,10 +7,11 @@ import {
 } from 'react-native';
 import {HomeStackParamList} from "../navigation/HomeStack";
 import {StackScreenProps} from "@react-navigation/stack";
-import {BACKGROUND, BLACK, BLUE} from "../colors";
+import {BACKGROUND, BLACK, BLUE, GREEN} from "../colors";
 import {useGetAllTopics, useUpdateUserTopics} from "../queries/topic";
 import MainContext from "../navigation/MainContext";
 import Toast from "react-native-toast-message";
+import {Nunito_Regular, Nunito_Semibold} from "../fonts";
 
 type Props = StackScreenProps<HomeStackParamList, 'MyTopicsScreen'>;
 
@@ -127,12 +128,13 @@ const styles = StyleSheet.create({
         borderColor: BLACK,
     },
     topicButtonText: {
-        fontFamily: 'Abel',
-        color: BLACK, // Default color
+        fontFamily: Nunito_Regular,
+        color: BLACK,
+        fontSize: 16,
     },
     selectedTopicButton: {
-        backgroundColor: BLUE,
-        borderColor: BLUE,
+        backgroundColor: GREEN,
+        borderColor: GREEN,
     },
     selectedTopicButtonText: {
         color: BACKGROUND,
@@ -144,11 +146,13 @@ const styles = StyleSheet.create({
         alignSelf: 'center',
         backgroundColor: BLUE,
         marginTop: 10,
-        width: '80%',
+        width: '90%',
     },
     buttonText: {
         color: BACKGROUND,
-        textAlign: 'center'
+        textAlign: 'center',
+        fontFamily: Nunito_Semibold,
+        fontSize: 20,
     },
     activeButton: {
         backgroundColor: BLUE,
