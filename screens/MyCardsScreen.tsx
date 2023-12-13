@@ -16,6 +16,7 @@ import {useGetSavedCards} from "../queries/card";
 import MainContext from "../navigation/MainContext";
 import {Card} from "../api/card.api";
 import {useIsFocused} from "@react-navigation/native";
+import {Nunito_Regular} from "../fonts";
 
 type Props = StackScreenProps<HomeStackParamList, 'MyCardsScreen'>;
 
@@ -66,7 +67,7 @@ const MyCardsScreen = ({ navigation }: Props) => {
     if (isError || !cards) {
         return (
             <SafeAreaView style={styles.container}>
-                <Text>No one cards</Text>
+                <Text style={{fontFamily: Nunito_Regular}}>No one cards</Text>
             </SafeAreaView>
         );
     }

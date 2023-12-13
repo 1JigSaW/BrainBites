@@ -91,7 +91,6 @@ const styles = StyleSheet.create({
         fontSize: 20,
         fontStyle: 'normal',
     },
-
     subText: {
         color: '#000',
         fontFamily: Nunito_Regular,

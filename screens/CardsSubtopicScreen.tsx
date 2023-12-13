@@ -70,7 +70,8 @@ const CardsSubtopicScreen = ({ navigation, route }: Props) => {
                 fontFamily: Nunito_Semibold,
                 fontSize: 28,
             },
-            title: isQuizVisible ? `Quiz: ${currentQuizNumber}` : `Card ${swipedCardCount} / ${cards?.length}`,
+            title: isQuizVisible ? `Quiz: ${currentQuizNumber} / ${cards?.length}`  :
+                (isQueryLoading ? 'Loading...' : `Card ${swipedCardCount} / ${cards?.length}`),
             headerLeft: () => (
                 <TouchableOpacity onPress={handleExitPress} style={{ marginLeft: 20, marginTop: 5 }}>
                     <ArrowBackIcon color={BLACK} size={25} />
@@ -155,16 +156,18 @@ const CardsSubtopicScreen = ({ navigation, route }: Props) => {
             {isQueryLoading ? (
                 <ActivityIndicator size="large" color={BLUE} />
             ) : (cards && cards.length > 0 ? (
-                <Swiper
-                    cards={cards}
-                    renderCard={(card) => <CardComponent card={card} />}
-                    onSwiped={handleSwiped}
-                    onSwipedAll={handleTest}
-                    backgroundColor="#f0f0f0"
-                    stackSize={everyDayCards}
-                    stackScale={5}
-                    stackSeparation={30}
-                />
+                <View style={{backgroundColor: BACKGROUND}}>
+                    <Swiper
+                        cards={cards}
+                        renderCard={(card) => <CardComponent card={card} />}
+                        onSwiped={handleSwiped}
+                        onSwipedAll={handleTest}
+                        backgroundColor="#f0f0f0"
+                        stackSize={everyDayCards}
+                        stackScale={5}
+                        stackSeparation={30}
+                    />
+                </View>
             ) : (
                 <View style={{
                     flex: 1, // Take up all available space
@@ -222,7 +225,6 @@ const styles = StyleSheet.create({
     fullScreen: {
         flex: 1,
         backgroundColor: BACKGROUND,
-        paddingHorizontal: 23,
         width: '100%',
     },
     headerContainer: {

@@ -155,6 +155,7 @@ const styles = StyleSheet.create({
         backgroundColor: BACKGROUND,
         paddingHorizontal: 10,
         borderRadius: 20,
+        width: '80%',
     },
 
     subText: {
