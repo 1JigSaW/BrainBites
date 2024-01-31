@@ -1,12 +1,25 @@
 import React, {useContext, useState} from "react";
 import {BACKGROUND, BLACK, BLUE} from "../colors";
-import {Image, StyleSheet, Text, TouchableOpacity, View} from "react-native";
+import {Dimensions, Image, StyleSheet, Text, TouchableOpacity, View} from "react-native";
 import SaveIcon from "./icons/SaveIcon";
 import SaveEmptyIcon from "./icons/SaveEmptyIcon";
 import {useSaveCard} from "../queries/card";
 import MainContext from "../navigation/MainContext";
 import {Nunito_Bold, Nunito_Regular, Nunito_Semibold} from "../fonts";
 
+
+const { height } = Dimensions.get('window');
+
+// Define a base screen height. This value should represent the height of the screen
+// for which the design was originally made.
+const baseScreenHeight = 667; // Example: iPhone 8 screen height in points
+
+// Calculate the font size based on the screen height relative to the base screen height
+const calculateFontSize = (size: number) => {
+    const ratio = size / baseScreenHeight; // Get the ratio of the font size to the base screen height
+    const newSize = Math.round(ratio * height);
+    return newSize > size ? size : newSize; // Optional: Prevent the font size from scaling up too much
+};
 
 const CardComponent = ({ card, myCards, handleRemoveCard }: any) => {
     const { userId } = useContext(MainContext);
@@ -118,7 +131,7 @@ const styles = StyleSheet.create({
         marginLeft: 10,
         marginBottom: 10,
         fontFamily: Nunito_Semibold,
-        fontSize: 20,
+        fontSize: calculateFontSize(17),
         color: BLACK,
     },
     source: {
