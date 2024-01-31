@@ -7,7 +7,7 @@ import {
     Text,
     TouchableOpacity,
     View,
-    TextInput, ActivityIndicator,
+    TextInput, ActivityIndicator, Platform,
 } from 'react-native';
 import { StackScreenProps } from "@react-navigation/stack";
 import { OnboardingStackParamList } from "../../navigation/OnboardingNavigator";
@@ -102,7 +102,10 @@ const styles = StyleSheet.create({
         paddingVertical: 5,
         justifyContent: 'center', // Center content vertically
         alignItems: 'center', // Center content horizontally
-        marginHorizontal: 10,
+        ...Platform.select({
+                ios: {
+                    marginHorizontal: 10,
+                }})
     },
     inputContainer: {
         width: '100%',
