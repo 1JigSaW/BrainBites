@@ -102,6 +102,7 @@ const styles = StyleSheet.create({
         paddingVertical: 5,
         justifyContent: 'center', // Center content vertically
         alignItems: 'center', // Center content horizontally
+        marginHorizontal: 10,
     },
     inputContainer: {
         width: '100%',

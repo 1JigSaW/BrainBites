@@ -74,6 +74,7 @@ const styles = StyleSheet.create({
         paddingVertical: 5,
         justifyContent: 'center',
         alignItems: 'center',
+        marginHorizontal: 10,
     },
     selectionContainer: {
         marginBottom: 20,
