@@ -22,7 +22,7 @@ const CardTopicScreen = ({ navigation, route }: Props) => {
     const { userId } = useContext(MainContext);
     const { data: topicsProgress, isLoading, error, refetch } = useGetUserTopicsProgress(userId);
     const isFocused = useIsFocused();
-
+    
     useEffect(() => {
         if (isFocused) {
             refetch();

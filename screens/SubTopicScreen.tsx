@@ -87,7 +87,10 @@ const SubTopicScreen = ({ navigation, route }: Props) => {
                             <View style={[styles.progressOverlay, { width: `${subtitle.progress*1.2 * 100}%` }]} />
                             <View style={[styles.infoContainer]}>
                                 {!(subtitle.is_purchased || subtitle.is_free) && <LockIcon size={2} color={BLACK} style={{opacity: 0.5}}/>}
-                                <Text style={[styles.mainText, !(subtitle.is_purchased || subtitle.is_free) && {opacity: 0.2}]}>{subtitle.subtitle_name}</Text>
+
+                                <View style={styles.mainContainer}>
+                                    <Text style={[styles.mainText, !(subtitle.is_purchased || subtitle.is_free) && {opacity: 0.2}]}>{subtitle.subtitle_name}</Text>
+                                </View>
                                 {
                                     subtitle.is_purchased ||
                                     subtitle.is_free ? (
@@ -146,16 +149,17 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         zIndex: 1,  // Ensure text and icons appear above the progress overlay
     },
-
+    mainContainer: {
+        backgroundColor: BACKGROUND,
+        borderRadius: 20,
+        width: '80%',
+    },
     mainText: {
         color: '#000',
         fontFamily: Nunito_Bold,
         fontSize: 20,
         fontStyle: 'normal',
-        backgroundColor: BACKGROUND,
         paddingHorizontal: 10,
-        borderRadius: 20,
-        width: '80%',
     },
 
     subText: {
