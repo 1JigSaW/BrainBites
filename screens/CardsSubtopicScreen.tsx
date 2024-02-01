@@ -174,6 +174,7 @@ const CardsSubtopicScreen = ({ navigation, route }: Props) => {
                     justifyContent: 'center', // Center vertically
                     alignItems: 'center', // Center horizontally
                     width: '100%', // Ensure it takes the full width
+                    paddingHorizontal: 10,
                 }}>
                     <Text style={{color: BLACK, fontSize: 20}}>You completed all the cards in this topic</Text>
                     <TouchableOpacity style={styles.button} onPress={() => {navigation.goBack()}} >
