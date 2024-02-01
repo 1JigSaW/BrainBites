@@ -7,6 +7,7 @@ import AchievementsScreen from "../screens/AchievementsScreen";
 import MyCardsScreen from "../screens/MyCardsScreen";
 import MyTopicsScreen from "../screens/MyTopicsScreen";
 import {Nunito_Semibold} from "../fonts";
+import {Platform} from "react-native";
 
 export type HomeStackParamList = {
     HomeScreen: undefined;
@@ -35,7 +36,7 @@ const HomeStack = () => {
                     headerTitle: 'Leaderboard',
                     headerTitleAlign: 'center',
                     headerBackImage: ({ tintColor }) => (
-                        <ArrowBackIcon color={tintColor} size={25} style={{marginLeft: 10, marginTop: 5}} />
+                        <ArrowBackIcon color={Platform.OS === 'ios' ? 'black': tintColor} size={25} style={{marginLeft: 10, marginTop: 5}} />
                     ),
                     headerTitleStyle: {
                         fontFamily: Nunito_Semibold,
@@ -52,7 +53,7 @@ const HomeStack = () => {
                     headerTitle: 'Achievements',
                     headerTitleAlign: 'center',
                     headerBackImage: ({ tintColor }) => (
-                        <ArrowBackIcon color={tintColor} size={25} style={{marginLeft: 10, marginTop: 5}} />
+                        <ArrowBackIcon color={Platform.OS === 'ios' ? 'black': tintColor} size={25} style={{marginLeft: 10, marginTop: 5}} />
                     ),
                     headerTitleStyle: {
                         fontFamily: Nunito_Semibold,
@@ -69,7 +70,7 @@ const HomeStack = () => {
                     headerTitle: 'My Cards',
                     headerTitleAlign: 'center',
                     headerBackImage: ({ tintColor }) => (
-                        <ArrowBackIcon color={tintColor} size={25} style={{marginLeft: 10, marginTop: 5}} />
+                        <ArrowBackIcon color={Platform.OS === 'ios' ? 'black': tintColor} size={25} style={{marginLeft: 10, marginTop: 5}} />
                     ),
                     headerTitleStyle: {
                         fontFamily: Nunito_Semibold,
@@ -86,7 +87,7 @@ const HomeStack = () => {
                     headerTitle: 'My Topics',
                     headerTitleAlign: 'center',
                     headerBackImage: ({ tintColor }) => (
-                        <ArrowBackIcon color={tintColor} size={25} style={{marginLeft: 10, marginTop: 5}} />
+                        <ArrowBackIcon color={Platform.OS === 'ios' ? 'black': tintColor} size={25} style={{marginLeft: 10, marginTop: 5}} />
                     ),
                     headerTitleStyle: {
                         fontFamily: Nunito_Semibold,

@@ -1,5 +1,5 @@
 import React, {useContext, useState} from 'react';
-import { SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import {Platform, SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import { StackScreenProps } from "@react-navigation/stack";
 import { OnboardingStackParamList } from "../../navigation/OnboardingNavigator";
 import {BACKGROUND, BLACK, BLUE, GREEN} from "../../colors";
@@ -74,7 +74,10 @@ const styles = StyleSheet.create({
         paddingVertical: 5,
         justifyContent: 'center',
         alignItems: 'center',
-        marginHorizontal: 10,
+        ...Platform.select({
+            ios: {
+                marginHorizontal: 10,
+            }})
     },
     selectionContainer: {
         marginBottom: 20,

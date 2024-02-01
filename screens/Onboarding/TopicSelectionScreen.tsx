@@ -1,7 +1,7 @@
 import React, {useContext, useState} from 'react';
 import {
     ActivityIndicator,
-    Button,
+    Button, Platform,
     SafeAreaView,
     ScrollView,
     StyleSheet,
@@ -131,7 +131,10 @@ const styles = StyleSheet.create({
         alignItems: 'center', // Center content horizontally
         justifyContent: 'center', // Center content vertically
         padding: 10, // Added padding for spacing
-        marginHorizontal: 10,
+        ...Platform.select({
+            ios: {
+                marginHorizontal: 10,
+            }})
     },
     instructions: {
         marginBottom: 20,

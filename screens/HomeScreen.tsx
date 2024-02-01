@@ -1,7 +1,7 @@
 import React, {useContext, useEffect, useState} from 'react';
 import {
     ActivityIndicator,
-    Image,
+    Image, Platform,
     SafeAreaView, ScrollView,
     StyleSheet, Text, TouchableOpacity, View,
 } from 'react-native';
@@ -245,6 +245,10 @@ const styles = StyleSheet.create({
         backgroundColor: BACKGROUND,
         paddingHorizontal: 23,
         paddingVertical: 23,
+        ...Platform.select({
+            ios: {
+                margin: 23,
+            }})
     },
     headerContainer: {
         flexDirection: 'row',

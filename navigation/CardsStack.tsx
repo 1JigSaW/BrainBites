@@ -6,6 +6,7 @@ import SubTopicScreen from "../screens/SubTopicScreen";
 import ArrowBackIcon from "../components/icons/ArrowBackIcon";
 import CardsSubtopicScreen from "../screens/CardsSubtopicScreen";
 import {Nunito_Semibold} from "../fonts";
+import {Platform} from "react-native";
 
 
 export type CardsStackParamList = {
@@ -37,7 +38,7 @@ const CardsStack = () => {
                   headerTitleAlign: 'center',
                   headerTitle: 'Topic',
                   headerBackImage: ({ tintColor }) => (
-                      <ArrowBackIcon color={tintColor} size={25} style={{marginLeft: 10, marginTop: 5}} />
+                      <ArrowBackIcon color={Platform.OS === 'ios' ? 'black': tintColor} size={25} style={{marginLeft: 10, marginTop: 5}} />
                   ),
                   headerTitleStyle: {
                       fontFamily: Nunito_Semibold,
@@ -52,7 +53,7 @@ const CardsStack = () => {
                     headerBackTitleVisible: false,
                     headerTitleAlign: 'center',
                     headerBackImage: ({ tintColor }) => (
-                        <ArrowBackIcon color={tintColor} size={25} style={{marginLeft: 10, marginTop: 5}} />
+                        <ArrowBackIcon color={Platform.OS === 'ios' ? 'black': tintColor} size={25} style={{marginLeft: 10, marginTop: 5}} />
                     ),
                     headerTitleStyle: {
                         fontFamily: Nunito_Semibold,
