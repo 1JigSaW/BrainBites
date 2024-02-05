@@ -84,6 +84,7 @@ const HomeScreen = ({ navigation, route }: Props) => {
             backgroundColor: BACKGROUND,
             paddingHorizontal: 23,
             marginBottom: 20,
+            paddingTop: 10,
             }}>
                 <View style={styles.headerContainer}>
                     <TouchableOpacity
