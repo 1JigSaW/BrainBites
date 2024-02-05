@@ -29,8 +29,8 @@ const LeaderBoardScreen = ({navigation}: Props) => {
     } = useGetUsers({ sortBy, returnAll });;
 
     return (
-        <ScrollView style={{ flex: 1, backgroundColor: BACKGROUND }}>
-            <SafeAreaView style={styles.safeContainer}>
+        <SafeAreaView style={{ flex: 1, backgroundColor: BACKGROUND }}>
+            <ScrollView style={styles.safeContainer}>
                 <View>
                     <View style={styles.buttonContainer}>
                         <TouchableOpacity
@@ -77,8 +77,8 @@ const LeaderBoardScreen = ({navigation}: Props) => {
                         )}
                     </View>
                 </View>
-            </SafeAreaView>
-        </ScrollView>
+            </ScrollView>
+        </SafeAreaView>
     );
 };
 

@@ -22,7 +22,7 @@ const CardTopicScreen = ({ navigation, route }: Props) => {
     const { userId } = useContext(MainContext);
     const { data: topicsProgress, isLoading, error, refetch } = useGetUserTopicsProgress(userId);
     const isFocused = useIsFocused();
-    
+
     useEffect(() => {
         if (isFocused) {
             refetch();
@@ -32,8 +32,8 @@ const CardTopicScreen = ({ navigation, route }: Props) => {
     if (error) return <Text>Error loading topics</Text>;
 
     return (
-        <ScrollView style={styles.scrollView}>
-            <SafeAreaView style={styles.safeContainer}>
+        <SafeAreaView style={styles.scrollView}>
+            <ScrollView style={styles.safeContainer}>
                 {isLoading ? (
                     <ActivityIndicator size="large" color={BLUE} />
                 ) : (
@@ -54,8 +54,8 @@ const CardTopicScreen = ({ navigation, route }: Props) => {
                         </TouchableOpacity>
                     ))
                 )}
-            </SafeAreaView>
-        </ScrollView>
+            </ScrollView>
+        </SafeAreaView>
     );
 };
 

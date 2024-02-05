@@ -73,8 +73,8 @@ const SubTopicScreen = ({ navigation, route }: Props) => {
     if (error) return <Text>Error loading topics</Text>;
     console.log('subtitlesProgress', subtitlesProgress)
     return (
-        <ScrollView style={styles.scrollView}>
-            <SafeAreaView style={styles.safeContainer}>
+        <SafeAreaView style={styles.scrollView}>
+            <ScrollView style={styles.safeContainer}>
                 {isLoading ? (
                     <ActivityIndicator size="large" color={BLUE} />
                 ) : (
@@ -104,8 +104,8 @@ const SubTopicScreen = ({ navigation, route }: Props) => {
                         </TouchableOpacity>
                     ))
                 )}
-            </SafeAreaView>
-        </ScrollView>
+            </ScrollView>
+        </SafeAreaView>
     );
 };
 

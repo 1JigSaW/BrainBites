@@ -35,8 +35,8 @@ const AchievementsScreen = ({ navigation }: Props) => {
 
 
     return (
-        <ScrollView style={{ flex: 1, backgroundColor: BACKGROUND }}>
-            <SafeAreaView style={styles.safeContainer}>
+        <SafeAreaView style={{ flex: 1, backgroundColor: BACKGROUND }}>
+            <ScrollView style={styles.safeContainer}>
                 {badgeProgress?.map((badge, index) => (
                     <View key={index} style={styles.roundedContainer}>
                         <View style={styles.infoContainer}>
@@ -52,8 +52,8 @@ const AchievementsScreen = ({ navigation }: Props) => {
                         </View>
                     </View>
                 ))}
-            </SafeAreaView>
-        </ScrollView>
+            </ScrollView>
+        </SafeAreaView>
     );
 };
 

@@ -76,21 +76,14 @@ const HomeScreen = ({ navigation, route }: Props) => {
         }
     }, [isFocused, userId, refetch, cardCount, updateReadCardsCount]);
 
-
-    // if (isLoading) {
-    //     // Show some loading indicator
-    //     return <LoadingIndicator />;
-    // }
-    //
-    // if (isError) {
-    //     // Handle error state
-    //     return <ErrorMessage message="Could not load user stats." />;
-    // }
+    console.log(1)
     return (
         <SafeAreaView style={styles.safeContainer}>
-        <ScrollView style={{ flex: 1, backgroundColor: BACKGROUND,
+        <ScrollView style={{
+            flex: 1,
+            backgroundColor: BACKGROUND,
             paddingHorizontal: 23,
-            paddingVertical: 23
+            marginBottom: 20,
             }}>
                 <View style={styles.headerContainer}>
                     <TouchableOpacity
@@ -236,6 +229,7 @@ const HomeScreen = ({ navigation, route }: Props) => {
                 </View>
 
 
+
             </ScrollView>
         </SafeAreaView>
     );
@@ -247,7 +241,7 @@ const styles = StyleSheet.create({
         backgroundColor: BACKGROUND,
         ...Platform.select({
             ios: {
-                margin: 23,
+                padding: 23,
             }})
     },
     headerContainer: {

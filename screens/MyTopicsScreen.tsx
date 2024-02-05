@@ -58,8 +58,8 @@ const MyTopicsScreen = ({navigation, route}: Props) => {
     if (isError) return <Text>Error loading topics</Text>;
 
     return (
-        <ScrollView style={{ flex: 1, backgroundColor: BACKGROUND }}>
-            <SafeAreaView style={styles.safeContainer}>
+        <SafeAreaView style={{ flex: 1, backgroundColor: BACKGROUND }}>
+            <ScrollView style={styles.safeContainer}>
                 <View style={styles.buttonContainer}>
                     {topicsAll.map((topic) => (
                         <TouchableOpacity
@@ -85,8 +85,8 @@ const MyTopicsScreen = ({navigation, route}: Props) => {
                 >
                     <Text style={styles.buttonText}>Save</Text>
                 </TouchableOpacity>
-            </SafeAreaView>
-        </ScrollView>
+            </ScrollView>
+        </SafeAreaView>
     );
 };
 
