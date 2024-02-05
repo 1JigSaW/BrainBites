@@ -87,8 +87,11 @@ const HomeScreen = ({ navigation, route }: Props) => {
     //     return <ErrorMessage message="Could not load user stats." />;
     // }
     return (
-        <ScrollView style={{ flex: 1, backgroundColor: BACKGROUND }}>
-            <SafeAreaView style={styles.safeContainer}>
+        <SafeAreaView style={styles.safeContainer}>
+        <ScrollView style={{ flex: 1, backgroundColor: BACKGROUND,
+            paddingHorizontal: 23,
+            paddingVertical: 23
+            }}>
                 <View style={styles.headerContainer}>
                     <TouchableOpacity
                         style={styles.iconContainer}
@@ -233,9 +236,8 @@ const HomeScreen = ({ navigation, route }: Props) => {
                 </View>
 
 
-
-            </SafeAreaView>
-        </ScrollView>
+            </ScrollView>
+        </SafeAreaView>
     );
 };
 
@@ -243,8 +245,6 @@ const styles = StyleSheet.create({
     safeContainer: {
         flex: 1,
         backgroundColor: BACKGROUND,
-        paddingHorizontal: 23,
-        paddingVertical: 23,
         ...Platform.select({
             ios: {
                 margin: 23,
