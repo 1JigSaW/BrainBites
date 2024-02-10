@@ -42,7 +42,6 @@ const CardsSubtopicScreen = ({ navigation, route }: Props) => {
     };
 
     useEffect(() => {
-        // Check if all cards are swiped
         if (cards && swipedCardCount >= cards.length) {
             handleTest();
         }
@@ -72,8 +71,8 @@ const CardsSubtopicScreen = ({ navigation, route }: Props) => {
                 fontFamily: Nunito_Semibold,
                 fontSize: 28,
             },
-            title: isQuizVisible ? `Quiz: ${currentQuizNumber} / ${cards?.length}`  :
-                (isQueryLoading ? 'Loading...' : `Card ${swipedCardCount} / ${cards?.length}`),
+            title: isQuizVisible ? `Quiz: ${currentQuizNumber + 1} / ${cards?.length}`  :
+                (isQueryLoading ? 'Loading...' : `Card ${swipedCardCount  + 1} / ${cards?.length}`),
             headerLeft: () => (
                 <TouchableOpacity onPress={handleExitPress} style={{ marginLeft: 20, marginTop: 5 }}>
                     <ArrowBackIcon color={BLACK} size={25} />
@@ -84,8 +83,6 @@ const CardsSubtopicScreen = ({ navigation, route }: Props) => {
 
     const handleSwiped = (index: number) => {
         if (cards && index < cards.length && cards[index].id != null) {
-            // Проверяем, что id карточки действительно является числом
-            console.log(222)
             const swipedCardId = cards[index].id;
 
             if (typeof swipedCardId === 'number') {
@@ -111,7 +108,6 @@ const CardsSubtopicScreen = ({ navigation, route }: Props) => {
     const handleContinueFromQuiz = async  (correctAnswerIds: number[]) => {
         setQuizVisible(false); // Hide the quiz
         if (swipedCardIds.length > 0 && userId) {
-            // Вызываем API для маркировки просмотренных карточек и обновления викторин
             try {
                 const result = await markCardsAndViewQuizzes.mutateAsync({ userId, cardIds: swipedCardIds, correctAnswerIds });
             } catch (error) {
