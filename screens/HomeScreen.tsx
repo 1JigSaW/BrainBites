@@ -51,7 +51,7 @@ const HomeScreen = ({ navigation, route }: Props) => {
         refetch,
     } = useGetUserStats(userId);
 
-    console.log('userStats', userStats)
+    console.log('cardCount', cardCount)
 
     const sortBy = activeButton;
     const returnAll = false;

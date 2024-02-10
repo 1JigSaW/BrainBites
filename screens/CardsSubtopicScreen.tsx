@@ -15,18 +15,20 @@ import {useCheckUserAchievements} from "../queries/badge";
 import Toast from "react-native-toast-message";
 import ArrowBackIcon from "../components/icons/ArrowBackIcon";
 import {Nunito_Semibold} from "../fonts";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import {CARDS_COUNT, CARDS_INDEX_KEY, CARDS_KEY} from "../constants";
 
 type Props = StackScreenProps<CardsStackParamList, 'CardsSubtopicScreen'>;
 
 const CardsSubtopicScreen = ({ navigation, route }: Props) => {
     const {subtopic_id} = route.params;
     const isFocused = useIsFocused();
-    const { userId, everyDayCards } = useContext(MainContext);
+    const { userId, everyDayCards,setCardCount } = useContext(MainContext);
     const [isLoading, setLoading] = useState(true);
     const { data: cards, error, isLoading: isQueryLoading } = useGetUnseenCardsBySubtitle(subtopic_id, userId, everyDayCards);
     const [isQuizVisible, setQuizVisible] = useState(false);
     const [swipedCardIds, setSwipedCardIds] = useState<number[]>([]);
-    const [swipedCardCount, setSwipedCardCount] = useState(0);
+    const [swipedCardCount, setSwipedCardCount] = useState<number>(0);
     const [modalVisible, setModalVisible] = useState(false);
     const [earnedBadges, setEarnedBadges] = useState([]);
     const { data: quizzes, error: quizError, isLoading: isQuizLoading } = useGetQuizzesByCardIds(swipedCardIds);
@@ -81,9 +83,9 @@ const CardsSubtopicScreen = ({ navigation, route }: Props) => {
     }, [isQuizVisible, currentQuizNumber, swipedCardCount, cards?.length, navigation]);
 
     const handleSwiped = (index: number) => {
-
         if (cards && index < cards.length && cards[index].id != null) {
             // Проверяем, что id карточки действительно является числом
+            console.log(222)
             const swipedCardId = cards[index].id;
 
             if (typeof swipedCardId === 'number') {
@@ -116,6 +118,10 @@ const CardsSubtopicScreen = ({ navigation, route }: Props) => {
                 console.error('Error in marking cards and updating quizzes:', error);
             }
         }
+        setCardCount(swipedCardCount);
+        AsyncStorage.setItem(CARDS_COUNT, String(swipedCardCount)).catch((error) => {
+                console.error('AsyncStorage error:', error);
+            });
         await handleCheckAchievements();
         navigation.goBack(); // Navigate the user back to the previous screen
     };

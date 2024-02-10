@@ -4,7 +4,7 @@ interface MainContextProps {
     userId: number | null;
     completeOnboarding: (newUserId: number) => Promise<void>;
     cardCount: number;
-    setCardCount: (count: (prevCardCount: any) => any) => void;
+    setCardCount: (count: number) => void;
     everyDayCards: number;
     setEveryDayCards: (count: number) => void;
 }

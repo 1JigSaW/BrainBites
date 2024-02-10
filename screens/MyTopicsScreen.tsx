@@ -42,6 +42,7 @@ const MyTopicsScreen = ({navigation, route}: Props) => {
         }
 
         updateUserTopics({ user_id: userId, topic_ids: activeTopics });
+        navigation.navigate('HomeScreen');
         Toast.show({
             type: 'success',
             text1: 'Success',

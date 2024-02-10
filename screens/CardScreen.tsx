@@ -100,9 +100,8 @@ const CardsScreen = ({ navigation }: Props) => {
 
     // Функция для обработки свайпа карточки
     const handleSwiped = (cardIndex: number) => {
-        // Save the new card index to local storage
+        console.log(111)
         saveProgress(cardIndex + 1);
-
         // Update the card count state and AsyncStorage simultaneously
         setCardCount(prevCardCount => {
             const newCardCount = prevCardCount + 1;
@@ -191,7 +190,6 @@ const CardsScreen = ({ navigation }: Props) => {
             handleCheckAchievements();
         }
     }, [fetchEnabledQuiz, quizzesData]);
-
 
     return (
         <View style={styles.container}>
