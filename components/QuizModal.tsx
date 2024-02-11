@@ -1,5 +1,5 @@
 import React, {useState, useEffect, useContext, useRef} from 'react';
-import {View, Text, Modal, StyleSheet, Button, TouchableOpacity, ActivityIndicator} from 'react-native';
+import {View, Text, Modal, StyleSheet, Button, TouchableOpacity, ActivityIndicator, Alert} from 'react-native';
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import {QuizState} from "../constants";
 import {Quiz} from "../api/quiz.api";
@@ -8,6 +8,7 @@ import MainContext from "../navigation/MainContext";
 import {BACKGROUND, BLACK, BLUE} from "../colors";
 import * as Animatable from 'react-native-animatable';
 import {Nunito_Regular, Nunito_Semibold} from "../fonts";
+import CircularTimer from "./functions/CircularTimer";
 
 interface QuizOverlayProps {
     isVisible: boolean;
@@ -23,11 +24,46 @@ const QuizOverlay = ({ isVisible, onContinue, quizzes, onQuizChange }: QuizOverl
     const { userId } = useContext(MainContext);
     const [loading, setLoading] = useState(false);
     const [correctAnswerIds, setCorrectAnswerIds] = useState<number[]>([]);
-
+    const [timer, setTimer] = useState(15);
+    const [showTimeoutWarning, setShowTimeoutWarning] = useState(false);
+    console.log('onQuizChange', onQuizChange);
 
     const { mutate: updateUserXp } = useUpdateUserXp()
 
     const animatableRef = useRef<Animatable.View & View>(null);
+
+
+    useEffect(() => {
+        // Запускаем таймер только если викторина видна, не завершена, и индекс вопроса в пределах количества вопросов
+        if (isVisible && !quizCompleted && currentQuestionIndex < quizzes.length) {
+            // Сбрасываем таймер до 15 секунд при каждом новом вопросе
+            setTimer(15); // Переместили сюда для избежания зависимости от timer
+
+            const interval = setInterval(() => {
+                setTimer(prevTimer => prevTimer > 0 ? prevTimer - 1 : 0); // Уменьшаем таймер, если больше 0, иначе оставляем 0
+            }, 1000);
+
+            // Очистка интервала при размонтировании компонента, смене вопроса, или когда таймер достигнет 0
+            return () => clearInterval(interval);
+        }
+        // Убрали timer из списка зависимостей, чтобы избежать постоянного перезапуска таймера
+    }, [isVisible, quizCompleted, currentQuestionIndex, quizzes.length]); // Оставляем основные зависимости
+
+
+    // Обработка истечения времени таймера
+    useEffect(() => {
+        if (timer === 0) {
+            // Автоматически переходим к следующему вопросу или завершаем квиз, если это был последний вопрос
+            Alert.alert(
+                "Время вышло!",
+                "К сожалению, время на ответ истекло.",
+                [
+                    { text: "OK", onPress: () => handleAnswer(false) }
+                ],
+                { cancelable: false } // Предотвращаем закрытие алерта кликом вне его области
+            );
+        }
+    }, [timer]);
 
     useEffect(() => {
         if (animatableRef.current && typeof animatableRef.current.bounceInRight === 'function') {
@@ -60,6 +96,7 @@ const QuizOverlay = ({ isVisible, onContinue, quizzes, onQuizChange }: QuizOverl
         }
 
         if (onQuizChange) {
+            console.log(111111111111111111111)
             onQuizChange(currentQuestionIndex + 1);
         }
     };
@@ -91,6 +128,9 @@ const QuizOverlay = ({ isVisible, onContinue, quizzes, onQuizChange }: QuizOverl
                 <View style={styles.modalView}>
                     {quizzes.length > 0 && currentQuestionIndex < quizzes.length && !quizCompleted ? (
                         <>
+                            <View style={{ position: 'absolute', top: 10, right: 10 }}>
+                                <CircularTimer seconds={timer} />
+                            </View>
                             <Text style={styles.questionText}>
                                 {quizzes[currentQuestionIndex].question}
                             </Text>
@@ -180,6 +220,27 @@ const styles = StyleSheet.create({
     buttonText: {
         color: BACKGROUND,
         fontSize: 20,
+    },
+    centeredView: {
+        flex: 1,
+        justifyContent: "center",
+        alignItems: "center",
+        marginTop: 22
+    },
+    buttonClose: {
+        backgroundColor: "#2196F3",
+        borderRadius: 20,
+        padding: 10,
+        elevation: 2
+    },
+    textStyle: {
+        color: "white",
+        fontWeight: "bold",
+        textAlign: "center"
+    },
+    modalText: {
+        marginBottom: 15,
+        textAlign: "center"
     }
 });
 

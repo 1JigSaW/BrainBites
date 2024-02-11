@@ -22,6 +22,7 @@ type Props = StackScreenProps<CardsStackParamList, 'CardsSubtopicScreen'>;
 
 const CardsSubtopicScreen = ({ navigation, route }: Props) => {
     const {subtopic_id} = route.params;
+    const swiperRef = useRef<Swiper<any>>(null);
     const isFocused = useIsFocused();
     const { userId, everyDayCards,setCardCount } = useContext(MainContext);
     const [isLoading, setLoading] = useState(true);
@@ -32,10 +33,13 @@ const CardsSubtopicScreen = ({ navigation, route }: Props) => {
     const [modalVisible, setModalVisible] = useState(false);
     const [earnedBadges, setEarnedBadges] = useState([]);
     const { data: quizzes, error: quizError, isLoading: isQuizLoading } = useGetQuizzesByCardIds(swipedCardIds);
+    const [timer, setTimer] = useState(15);
 
     const [currentQuizNumber, setCurrentQuizNumber] = useState(0);
     const markCardsAndViewQuizzes = useMarkCardsAsViewedAndUpdateQuizzes();
     const checkAchievements = useCheckUserAchievements(userId);
+
+
 
     const handleQuizChange = (quizNumber: number) => {
         setCurrentQuizNumber(quizNumber);
@@ -160,6 +164,7 @@ const CardsSubtopicScreen = ({ navigation, route }: Props) => {
             ) : (cards && cards.length > 0 ? (
                 <View style={{backgroundColor: BACKGROUND}}>
                     <Swiper
+                        ref={swiperRef}
                         cards={cards}
                         renderCard={(card) => <CardComponent card={card} />}
                         onSwiped={handleSwiped}
@@ -205,6 +210,12 @@ const styles = StyleSheet.create({
         backgroundColor: BACKGROUND,
         justifyContent: 'center',
         alignItems: 'center',
+    },
+    timerText: {
+        fontSize: 18,
+        color: '#ff0000', // Пример цвета для таймера
+        textAlign: 'center',
+        margin: 10,
     },
     safeContainer: {
         backgroundColor: BACKGROUND,
