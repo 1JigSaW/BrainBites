@@ -119,19 +119,12 @@ const styles = StyleSheet.create({
     saveIcon: {
         marginRight: 10,
     },
-    image: {
-        width: '90%',
-        height: 200,
-        borderRadius: 10,
-        marginLeft: 10,
-        marginBottom: 10,
-    },
     text: {
         marginTop: 30,
         marginLeft: 10,
         marginBottom: 10,
         fontFamily: Nunito_Semibold,
-        fontSize: calculateFontSize(17),
+        fontSize: calculateFontSize(15),
         color: BLACK,
     },
     source: {
@@ -159,7 +152,14 @@ const styles = StyleSheet.create({
         borderWidth: 1,
         borderRadius: 20,
         padding: 5,
-    }
+    },
+    image: {
+        width: '90%',
+        height: 200,
+        borderRadius: 10,
+        alignSelf: 'center', // Center the image within the card
+        marginBottom: 0, // Ensure there's space between the image and the text below
+    },
 });
 
 export default CardComponent

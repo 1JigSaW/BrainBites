@@ -26,6 +26,9 @@ const QuizOverlay = ({ isVisible, onContinue, quizzes, onQuizChange }: QuizOverl
     const [correctAnswerIds, setCorrectAnswerIds] = useState<number[]>([]);
     const [timer, setTimer] = useState(15);
     const [showTimeoutWarning, setShowTimeoutWarning] = useState(false);
+    const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
+    const [isAnswerCorrect, setIsAnswerCorrect] = useState<boolean | null>(null);
+
     console.log('onQuizChange', onQuizChange);
 
     const { mutate: updateUserXp } = useUpdateUserXp()
@@ -80,23 +83,28 @@ const QuizOverlay = ({ isVisible, onContinue, quizzes, onQuizChange }: QuizOverl
         }
     }, [isVisible]);
 
-    const handleAnswer = (isCorrect: boolean) => {
-        const currentQuiz = quizzes[currentQuestionIndex];
+    const handleAnswer = (selectedAnswerIndex: number) => {
+        const isCorrect = quizzes[currentQuestionIndex].correct_answer === quizzes[currentQuestionIndex].answers[selectedAnswerIndex];
+        setSelectedAnswer(selectedAnswerIndex);
+        setIsAnswerCorrect(isCorrect);
 
         if (isCorrect) {
             setCorrectAnswersCount(correctAnswersCount + 1);
-            console.log('currentQuiz.card', currentQuiz.card_id);
-            setCorrectAnswerIds([...correctAnswerIds, currentQuiz.card_id]); // Добавление id в массив
+            setCorrectAnswerIds([...correctAnswerIds, quizzes[currentQuestionIndex].card_id]);
         }
+        // Don't automatically advance to the next question
+    };
 
+    const handleContinueQuiz = () => {
         if (currentQuestionIndex < quizzes.length - 1) {
             setCurrentQuestionIndex(currentQuestionIndex + 1);
         } else {
             setQuizCompleted(true);
         }
-
-        if (onQuizChange) {
-            console.log(111111111111111111111)
+        // Reset for next question
+        setSelectedAnswer(null);
+        setIsAnswerCorrect(null);
+         if (onQuizChange) {
             onQuizChange(currentQuestionIndex + 1);
         }
     };
@@ -135,14 +143,28 @@ const QuizOverlay = ({ isVisible, onContinue, quizzes, onQuizChange }: QuizOverl
                                 {quizzes[currentQuestionIndex].question}
                             </Text>
                             {quizzes[currentQuestionIndex].answers.map((answer, index) => (
-                                <TouchableOpacity
+                                <Animatable.View
                                     key={index}
-                                    onPress={() => handleAnswer(quizzes[currentQuestionIndex].correct_answer.toString() === answer.toString())}
-                                    style={styles.quizAnswer}
-                                >
-                                    <Text style={styles.answerText}>{answer}</Text>
-                                </TouchableOpacity>
+                                    animation="fadeIn"
+                                    duration={500}>
+                                    <TouchableOpacity
+                                        onPress={() => selectedAnswer === null && handleAnswer(index)}
+                                        style={[
+                                            styles.quizAnswer,
+                                            selectedAnswer === index ? (isAnswerCorrect ? styles.correctAnswer : styles.incorrectAnswer) : {}
+                                        ]}
+                                    >
+                                        <Text style={styles.answerText}>{answer}</Text>
+                                    </TouchableOpacity>
+                                </Animatable.View>
                             ))}
+                            {selectedAnswer !== null && (
+                                <Animatable.View animation="fadeIn" duration={500}>
+                                    <TouchableOpacity style={styles.button} onPress={handleContinueQuiz}>
+                                        <Text style={styles.buttonText}>Continue</Text>
+                                    </TouchableOpacity>
+                                </Animatable.View>
+                            )}
                         </>
                     ) : quizCompleted ? (
                         <Animatable.View style={{ justifyContent: 'center', alignItems: 'center' }}>
@@ -241,7 +263,17 @@ const styles = StyleSheet.create({
     modalText: {
         marginBottom: 15,
         textAlign: "center"
-    }
+    },
+    correctAnswer: {
+        borderColor: 'green',
+        borderWidth: 2,
+        // other styles remain the same
+    },
+    incorrectAnswer: {
+        borderColor: 'red',
+        borderWidth: 2,
+        // other styles remain the same
+    },
 });
 
 export default QuizOverlay;
