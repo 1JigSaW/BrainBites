@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { AnimatedCircularProgress } from 'react-native-circular-progress';
 import {Text} from "react-native";
 
-const CircularTimer = ({ seconds, initialSeconds = 15 }) => {
+const CircularTimer = ({ seconds, initialSeconds = 15 }: any) => {
   const [progress, setProgress] = useState(100);
 
   useEffect(() => {

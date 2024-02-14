@@ -18,17 +18,18 @@ import {BACKGROUND, BLACK, BLUE, PROGRESS_BACKGROUND} from "../colors";
 import {useIsFocused} from "@react-navigation/native";
 import LockIcon from "../components/icons/LockIcon";
 import {Nunito_Bold, Nunito_Regular} from "../fonts";
+import { UserSubtitleProgressResponse } from "../api/topic.api";
 
 type Props = StackScreenProps<CardsStackParamList, 'SubTopicScreen'>;
 
-const SubTopicScreen = ({ navigation, route }: Props) => {
-    const { userId } = useContext(MainContext);
-    const { topic_id, topic_name } = route.params;
+const SubTopicScreen = ({navigation, route}: Props) => {
+    const {userId, lives} = useContext(MainContext);
+    const {topic_id, topic_name} = route.params;
     const isFocused = useIsFocused();
-    const { mutate: purchase, isLoading: isPurchasing } = usePurchaseSubtitle();
+    const {mutate: purchase, isLoading: isPurchasing} = usePurchaseSubtitle();
 
     // Хук для получения прогресса
-    const { data: subtitlesProgress, isLoading, error, refetch } = useGetUserSubtitlesProgress(userId, topic_id);
+    const {data: subtitlesProgress, isLoading, error, refetch} = useGetUserSubtitlesProgress(userId, topic_id);
 
     useEffect(() => {
         if (isFocused) {
@@ -38,23 +39,31 @@ const SubTopicScreen = ({ navigation, route }: Props) => {
 
     useLayoutEffect(() => {
         if (topic_name) {
-            navigation.setOptions({ title: topic_name });
+            navigation.setOptions({title: topic_name});
         }
     }, [topic_name, navigation]);
 
-    const handleSubtitlePress = (subtitle: any) => {
+    const handleSubtitlePress = (subtitle: UserSubtitleProgressResponse) => {
+        if (lives <= 0) {
+            Alert.alert(
+                "Жизни закончились",
+                "К сожалению, у вас не осталось жизней. Дождитесь пополнения, чтобы продолжить.",
+                [{ text: "OK", style: "cancel" }]
+            );
+            return;
+        }
+
         if (subtitle.is_purchased || subtitle.is_free) {
             navigation.navigate('CardsSubtopicScreen', {
                 subtopic_id: subtitle.subtitle_id,
             });
         } else {
-            // Показать модальное окно или алерт для подтверждения покупки
             Alert.alert(
-                "Purchase Subtitle",
-                `Do you really want to purchase this subtitle for ${subtitle.cost} XP?`,
+                "Покупка подтопика",
+                `Вы действительно хотите купить этот подтопик за ${subtitle.cost} XP?`,
                 [
                     {
-                        text: "Cancel",
+                        text: "Отмена",
                         style: "cancel"
                     },
                     {

@@ -9,15 +9,17 @@ import {BACKGROUND, BLACK, BLUE} from "../colors";
 import * as Animatable from 'react-native-animatable';
 import {Nunito_Regular, Nunito_Semibold} from "../fonts";
 import CircularTimer from "./functions/CircularTimer";
+import {useGetLives, useLoseLife} from "../queries/user";
 
 interface QuizOverlayProps {
     isVisible: boolean;
     onContinue: (correctAnswerIds: number[]) => Promise<void>;
     quizzes: Quiz[];
     onQuizChange?: (currentQuizIndex: number) => void;
+    navigation: any;
 }
 
-const QuizOverlay = ({ isVisible, onContinue, quizzes, onQuizChange }: QuizOverlayProps) => {
+const QuizOverlay = ({ isVisible, onContinue, quizzes, onQuizChange, navigation }: QuizOverlayProps) => {
     const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
     const [correctAnswersCount, setCorrectAnswersCount] = useState(0);
     const [quizCompleted, setQuizCompleted] = useState(false);
@@ -28,42 +30,45 @@ const QuizOverlay = ({ isVisible, onContinue, quizzes, onQuizChange }: QuizOverl
     const [showTimeoutWarning, setShowTimeoutWarning] = useState(false);
     const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
     const [isAnswerCorrect, setIsAnswerCorrect] = useState<boolean | null>(null);
+    const [lives, setLives] = useState<number | null>(null);
 
     console.log('onQuizChange', onQuizChange);
 
     const { mutate: updateUserXp } = useUpdateUserXp()
-
+    const { data: livesData, refetch: refetchLives } = useGetLives(userId);
+    const { mutate: loseLife } = useLoseLife();
+    console.log('livesData', livesData)
     const animatableRef = useRef<Animatable.View & View>(null);
 
 
     useEffect(() => {
-        // Запускаем таймер только если викторина видна, не завершена, и индекс вопроса в пределах количества вопросов
         if (isVisible && !quizCompleted && currentQuestionIndex < quizzes.length) {
-            // Сбрасываем таймер до 15 секунд при каждом новом вопросе
-            setTimer(15); // Переместили сюда для избежания зависимости от timer
+            setTimer(15);
 
             const interval = setInterval(() => {
-                setTimer(prevTimer => prevTimer > 0 ? prevTimer - 1 : 0); // Уменьшаем таймер, если больше 0, иначе оставляем 0
+                setTimer(prevTimer => prevTimer > 0 ? prevTimer - 1 : 0);
             }, 1000);
 
-            // Очистка интервала при размонтировании компонента, смене вопроса, или когда таймер достигнет 0
             return () => clearInterval(interval);
         }
-        // Убрали timer из списка зависимостей, чтобы избежать постоянного перезапуска таймера
-    }, [isVisible, quizCompleted, currentQuestionIndex, quizzes.length]); // Оставляем основные зависимости
+    }, [isVisible, quizCompleted, currentQuestionIndex, quizzes.length]);
+
+    useEffect(() => {
+        if (livesData && livesData.lives_remaining != null) {
+            setLives(livesData.lives_remaining);
+        }
+    }, [livesData, userId]);
 
 
-    // Обработка истечения времени таймера
     useEffect(() => {
         if (timer === 0) {
-            // Автоматически переходим к следующему вопросу или завершаем квиз, если это был последний вопрос
             Alert.alert(
                 "Время вышло!",
                 "К сожалению, время на ответ истекло.",
                 [
                     { text: "OK", onPress: () => handleAnswer(false) }
                 ],
-                { cancelable: false } // Предотвращаем закрытие алерта кликом вне его области
+                { cancelable: false }
             );
         }
     }, [timer]);
@@ -83,17 +88,50 @@ const QuizOverlay = ({ isVisible, onContinue, quizzes, onQuizChange }: QuizOverl
         }
     }, [isVisible]);
 
-    const handleAnswer = (selectedAnswerIndex: number) => {
+     const handleAnswer = (selectedAnswerIndex: number) => {
         const isCorrect = quizzes[currentQuestionIndex].correct_answer === quizzes[currentQuestionIndex].answers[selectedAnswerIndex];
         setSelectedAnswer(selectedAnswerIndex);
         setIsAnswerCorrect(isCorrect);
 
-        if (isCorrect) {
+        if (!isCorrect && userId) {
+            setLives(prevLives => {
+                const newLives = (prevLives != null && prevLives > 0) ? prevLives - 1 : 0;
+
+                if (newLives === 0) {
+                    // Уведомление пользователя о том, что все жизни истрачены
+                    Alert.alert(
+                        "Жизни закончились",
+                        "К сожалению, все ваши жизни истрачены. Дождитесь пополнения.",
+                        [
+                            {
+                                text: "OK",
+                                onPress: () => {
+                                    // Возвращение на предыдущий экран или на главный экран
+                                    navigation.goBack(); // или navigation.navigate('Home');
+                                }
+                            }
+                        ],
+                        { cancelable: false }
+                    );
+                }
+
+                return newLives;
+            });
+
+            loseLife(userId, {
+                onSuccess: () => {
+                    refetchLives();
+                },
+                onError: (error) => {
+                    console.error("Ошибка при уменьшении жизней:", error);
+                }
+            });
+        } else {
             setCorrectAnswersCount(correctAnswersCount + 1);
             setCorrectAnswerIds([...correctAnswerIds, quizzes[currentQuestionIndex].card_id]);
         }
-        // Don't automatically advance to the next question
     };
+
 
     const handleContinueQuiz = () => {
         if (currentQuestionIndex < quizzes.length - 1) {
@@ -133,7 +171,9 @@ const QuizOverlay = ({ isVisible, onContinue, quizzes, onQuizChange }: QuizOverl
             {loading ? (
                 <ActivityIndicator size="large" color={BLUE} />
             ) : (
+
                 <View style={styles.modalView}>
+                    <Text>Жизни: {livesData?.lives_remaining ?? "Загрузка..."}</Text>
                     {quizzes.length > 0 && currentQuestionIndex < quizzes.length && !quizCompleted ? (
                         <>
                             <View style={{ position: 'absolute', top: 10, right: 10 }}>

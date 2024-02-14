@@ -35,6 +35,10 @@ export interface Topic {
     title: string;
 }
 
+export interface LivesResponse {
+    lives_remaining: number;
+}
+
 
 export class UserApi {
     // Existing method
@@ -81,6 +85,24 @@ export class UserApi {
 
             const { data } = await API.get(`/api/users_filter/?${params.toString()}`);
             console.log('data', data);
+            return data;
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    static async loseLife(userId: number): Promise<{message: string, lives_remaining: number} | {error: string}> {
+        try {
+            const { data } = await API.post('/api/lose-life/', { user_id: userId });
+            return data;
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    static async getLives(userId: number | null): Promise<LivesResponse> {
+        try {
+            const { data } = await API.get(`/api/get-lives/?user_id=${userId}`);
             return data;
         } catch (error) {
             throw error;

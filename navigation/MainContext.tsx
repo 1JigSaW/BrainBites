@@ -7,6 +7,8 @@ interface MainContextProps {
     setCardCount: (count: number) => void;
     everyDayCards: number;
     setEveryDayCards: (count: number) => void;
+    lives: number;
+    setLives: (count: number) => void;
 }
 
 const MainContext = React.createContext<MainContextProps>({
@@ -16,6 +18,8 @@ const MainContext = React.createContext<MainContextProps>({
     setCardCount: () => {},
     everyDayCards: 0,
     setEveryDayCards: () => {},
+    lives: 0,
+    setLives: () => {},
 });
 
 export default MainContext;

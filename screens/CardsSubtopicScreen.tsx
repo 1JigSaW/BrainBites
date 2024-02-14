@@ -196,6 +196,7 @@ const CardsSubtopicScreen = ({ navigation, route }: Props) => {
                         quizzes={quizzes}
                         onContinue={handleContinueFromQuiz}
                         onQuizChange={handleQuizChange}
+                        navigation={navigation}
                     />
                 </View>
             )}

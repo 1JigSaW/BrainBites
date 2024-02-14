@@ -1,5 +1,5 @@
-import {useMutation, useQuery} from '@tanstack/react-query';
-import {CreateUserResponse, UserApi, UsernameCheckResponse, UserStatsResponse} from "../api/user.api";
+import {useMutation, useQuery, UseQueryResult} from '@tanstack/react-query';
+import {CreateUserResponse, LivesResponse, UserApi, UsernameCheckResponse, UserStatsResponse} from "../api/user.api";
 import {AxiosError} from "axios";
 
 export const USERNAME_UNIQUE_QUERY_KEY = 'username_check_unique';
@@ -89,3 +89,34 @@ export const useGetUsers = ({ sortBy, returnAll, userId }: UseGetUsersOptions) =
 };
 
 
+export const useLoseLife = () => {
+    return useMutation<{message: string, lives_remaining: number} | {error: string}, AxiosError, number>(
+        (userId: number) => UserApi.loseLife(userId),
+        {
+            onError: (error) => {
+                console.error('Error losing life:', error);
+            },
+            onSuccess: (data) => {
+                console.log('Life lost successfully:', data);
+            },
+        },
+    );
+};
+
+
+export const useGetLives = (userId: number | null): UseQueryResult<LivesResponse, AxiosError> => {
+    return useQuery<LivesResponse, AxiosError>(
+        ['get_lives', userId],
+        () => UserApi.getLives(userId),
+        {
+            enabled: !!userId, // Запрос активируется, только если userId предоставлен
+            refetchOnWindowFocus: false, // Отключаем автоматический повторный запрос при фокусировке окна
+            onError: (error) => {
+                console.error('Error fetching lives:', error);
+            },
+            onSuccess: (data) => {
+                console.log('Lives fetched successfully:', data);
+            },
+        },
+    );
+};

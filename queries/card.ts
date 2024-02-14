@@ -35,7 +35,7 @@ export const useMarkCardsAsTestPassed = (
             ...options, // Распространяем переданные опции, чтобы пользователь мог кастомизировать хук
             onSuccess: (data) => {
                 // Здесь можно добавить дополнительную логику в случае успеха
-                console.log(data.message);
+                console.log('123',data.message);
             },
             onError: (error) => {
                 // Здесь можно добавить обработку ошибок
