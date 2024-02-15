@@ -35,6 +35,7 @@ const CardsSubtopicScreen = ({ navigation, route }: Props) => {
     const { data: quizzes, error: quizError, isLoading: isQuizLoading } = useGetQuizzesByCardIds(swipedCardIds);
     const [timer, setTimer] = useState(15);
 
+
     const [currentQuizNumber, setCurrentQuizNumber] = useState(0);
     const markCardsAndViewQuizzes = useMarkCardsAsViewedAndUpdateQuizzes();
     const checkAchievements = useCheckUserAchievements(userId);

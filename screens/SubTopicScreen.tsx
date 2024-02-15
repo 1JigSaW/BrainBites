@@ -1,6 +1,6 @@
 import {StackScreenProps} from "@react-navigation/stack";
 import {CardsStackParamList} from "../navigation/CardsStack";
-import React, {useContext, useEffect, useLayoutEffect} from "react";
+import React, {useContext, useEffect, useLayoutEffect, useState} from "react";
 import MainContext from "../navigation/MainContext";
 import {useGetUserSubtitlesProgress, useGetUserTopicsProgress, usePurchaseSubtitle} from "../queries/topic";
 import {
@@ -19,14 +19,24 @@ import {useIsFocused} from "@react-navigation/native";
 import LockIcon from "../components/icons/LockIcon";
 import {Nunito_Bold, Nunito_Regular} from "../fonts";
 import { UserSubtitleProgressResponse } from "../api/topic.api";
+import {useGetLives} from "../queries/user";
 
 type Props = StackScreenProps<CardsStackParamList, 'SubTopicScreen'>;
 
 const SubTopicScreen = ({navigation, route}: Props) => {
-    const {userId, lives} = useContext(MainContext);
+    const {userId} = useContext(MainContext);
     const {topic_id, topic_name} = route.params;
+    const [lives, setLives] = useState<number | null>(null);
     const isFocused = useIsFocused();
     const {mutate: purchase, isLoading: isPurchasing} = usePurchaseSubtitle();
+    const { data: livesData, refetch: refetchLives } = useGetLives(userId);
+
+     useEffect(() => {
+        if (livesData && livesData.lives_remaining != null) {
+            setLives(livesData.lives_remaining);
+            console.log('lives',livesData.lives_remaining )
+        }
+    }, [livesData, userId]);
 
     // Хук для получения прогресса
     const {data: subtitlesProgress, isLoading, error, refetch} = useGetUserSubtitlesProgress(userId, topic_id);
@@ -44,7 +54,7 @@ const SubTopicScreen = ({navigation, route}: Props) => {
     }, [topic_name, navigation]);
 
     const handleSubtitlePress = (subtitle: UserSubtitleProgressResponse) => {
-        if (lives <= 0) {
+        if (lives && lives <= 0) {
             Alert.alert(
                 "Жизни закончились",
                 "К сожалению, у вас не осталось жизней. Дождитесь пополнения, чтобы продолжить.",
