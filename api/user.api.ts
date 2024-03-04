@@ -6,7 +6,7 @@ export interface UsernameCheckResponse {
 export interface CreateUserResponse {
     id: number;
     username: string;
-    topics: string[];
+    email: string;
     count_cards: number;
 }
 export interface UserStatsResponse {
@@ -52,14 +52,14 @@ export class UserApi {
     }
 
     // New method for creating a user
-    static async createUser(username: string, topicIds: number[], count_cards: number, avatarUrl: string): Promise<CreateUserResponse> {
+    static async createUser(username: string, count_cards: number, avatarUrl: string, email: string, password: string): Promise<CreateUserResponse> {
         try {
-            console.log('topicIds', topicIds)
             const { data } = await API.post('/api/create-user/', {
                 username: username,
-                topic_ids: topicIds,
                 cards_count: count_cards,
                 avatar_url: avatarUrl,
+                email: email,
+                password: password,
             });
             return data;
         } catch (error) {

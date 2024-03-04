@@ -31,6 +31,7 @@ const QuizOverlay = ({ isVisible, onContinue, quizzes, onQuizChange, navigation 
     const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
     const [isAnswerCorrect, setIsAnswerCorrect] = useState<boolean | null>(null);
     const [lives, setLives] = useState<number | null>(null);
+    const [timerIsActive, setTimerIsActive] = useState(true);
 
     console.log('onQuizChange', onQuizChange);
 
@@ -42,16 +43,25 @@ const QuizOverlay = ({ isVisible, onContinue, quizzes, onQuizChange, navigation 
 
 
     useEffect(() => {
-        if (isVisible && !quizCompleted && currentQuestionIndex < quizzes.length) {
-            setTimer(15);
+
+        console.log('selectedAnswer', selectedAnswer)
+    // Запускаем таймер только если викторина видима, не завершена, текущий вопрос существует, и ответ еще не выбран
+        if (isVisible && !quizCompleted && currentQuestionIndex < quizzes.length && !selectedAnswer) {
+            setTimer(15); // Устанавливаем таймер на начальное значение
 
             const interval = setInterval(() => {
-                setTimer(prevTimer => prevTimer > 0 ? prevTimer - 1 : 0);
+                setTimer(prevTimer => {
+                    // Если время не истекло, уменьшаем таймер. Иначе останавливаем.
+                    if (prevTimer > 0) return prevTimer - 1;
+                    // Действия при истечении времени, если нужно
+                    return 0;
+                });
             }, 1000);
 
+            // Очистка интервала при размонтировании компонента или изменении зависимостей
             return () => clearInterval(interval);
         }
-    }, [isVisible, quizCompleted, currentQuestionIndex, quizzes.length]);
+    }, [isVisible, quizCompleted, currentQuestionIndex, quizzes.length, selectedAnswer]); // Добавляем answerSelected в зависимости
 
     useEffect(() => {
         if (livesData && livesData.lives_remaining != null) {
@@ -66,7 +76,7 @@ const QuizOverlay = ({ isVisible, onContinue, quizzes, onQuizChange, navigation 
                 "Время вышло!",
                 "К сожалению, время на ответ истекло.",
                 [
-                    { text: "OK", onPress: () => handleAnswer(false) }
+                    { text: "OK", onPress: () => handleAnswer(null) }
                 ],
                 { cancelable: false }
             );
@@ -88,17 +98,23 @@ const QuizOverlay = ({ isVisible, onContinue, quizzes, onQuizChange, navigation 
         }
     }, [isVisible]);
 
-     const handleAnswer = (selectedAnswerIndex: number) => {
-        const isCorrect = quizzes[currentQuestionIndex].correct_answer === quizzes[currentQuestionIndex].answers[selectedAnswerIndex];
-        setSelectedAnswer(selectedAnswerIndex);
+     const handleAnswer = (selectedAnswerIndex: number | null) => {
+         setTimerIsActive(false);
+         setSelectedAnswer(selectedAnswerIndex);
+        let isCorrect = false; // По умолчанию ответ считаем неправильным
+        if (selectedAnswerIndex !== null) {
+            // Если индекс ответа не null, проверяем, правильный ли ответ
+            isCorrect = quizzes[currentQuestionIndex].correct_answer === quizzes[currentQuestionIndex].answers[selectedAnswerIndex];
+        }
         setIsAnswerCorrect(isCorrect);
 
         if (!isCorrect && userId) {
+            // Если ответ неправильный или время вышло, отнимаем жизнь
             setLives(prevLives => {
                 const newLives = (prevLives != null && prevLives > 0) ? prevLives - 1 : 0;
 
                 if (newLives === 0) {
-                    // Уведомление пользователя о том, что все жизни истрачены
+                    // Если жизней больше нет, показываем предупреждение
                     Alert.alert(
                         "Жизни закончились",
                         "К сожалению, все ваши жизни истрачены. Дождитесь пополнения.",
@@ -106,8 +122,7 @@ const QuizOverlay = ({ isVisible, onContinue, quizzes, onQuizChange, navigation 
                             {
                                 text: "OK",
                                 onPress: () => {
-                                    // Возвращение на предыдущий экран или на главный экран
-                                    navigation.goBack(); // или navigation.navigate('Home');
+                                    navigation.goBack();
                                 }
                             }
                         ],
@@ -126,11 +141,13 @@ const QuizOverlay = ({ isVisible, onContinue, quizzes, onQuizChange, navigation 
                     console.error("Ошибка при уменьшении жизней:", error);
                 }
             });
-        } else {
+        } else if (selectedAnswerIndex !== null) {
+            // Если ответ правильный, увеличиваем количество правильных ответов
             setCorrectAnswersCount(correctAnswersCount + 1);
             setCorrectAnswerIds([...correctAnswerIds, quizzes[currentQuestionIndex].card_id]);
         }
     };
+
 
 
     const handleContinueQuiz = () => {
@@ -139,7 +156,6 @@ const QuizOverlay = ({ isVisible, onContinue, quizzes, onQuizChange, navigation 
         } else {
             setQuizCompleted(true);
         }
-        // Reset for next question
         setSelectedAnswer(null);
         setIsAnswerCorrect(null);
          if (onQuizChange) {
@@ -160,7 +176,7 @@ const QuizOverlay = ({ isVisible, onContinue, quizzes, onQuizChange, navigation 
     };
     return (
         <Animatable.View
-            animation={isVisible ? 'slideInUp' : 'slideOutDown'} // Use appropriate animation names
+            animation={isVisible ? 'slideInUp' : 'slideOutDown'}
             duration={500}
             style={styles.overlay}
         >
@@ -177,7 +193,7 @@ const QuizOverlay = ({ isVisible, onContinue, quizzes, onQuizChange, navigation 
                     {quizzes.length > 0 && currentQuestionIndex < quizzes.length && !quizCompleted ? (
                         <>
                             <View style={{ position: 'absolute', top: 10, right: 10 }}>
-                                <CircularTimer seconds={timer} />
+                                <CircularTimer seconds={timer} isActive={timerIsActive}/>
                             </View>
                             <Text style={styles.questionText}>
                                 {quizzes[currentQuestionIndex].question}
@@ -307,12 +323,10 @@ const styles = StyleSheet.create({
     correctAnswer: {
         borderColor: 'green',
         borderWidth: 2,
-        // other styles remain the same
     },
     incorrectAnswer: {
         borderColor: 'red',
         borderWidth: 2,
-        // other styles remain the same
     },
 });
 

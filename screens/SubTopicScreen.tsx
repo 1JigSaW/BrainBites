@@ -44,8 +44,9 @@ const SubTopicScreen = ({navigation, route}: Props) => {
     useEffect(() => {
         if (isFocused) {
             refetch();
+            refetchLives();
         }
-    }, [userId, topic_id, refetch, isFocused]);
+    }, [userId, topic_id, refetch, isFocused, livesData]);
 
     useLayoutEffect(() => {
         if (topic_name) {
@@ -54,7 +55,8 @@ const SubTopicScreen = ({navigation, route}: Props) => {
     }, [topic_name, navigation]);
 
     const handleSubtitlePress = (subtitle: UserSubtitleProgressResponse) => {
-        if (lives && lives <= 0) {
+        console.log('lives11111111111', lives && (lives <= 0))
+        if (lives !== null && lives <= 0) {
             Alert.alert(
                 "Жизни закончились",
                 "К сожалению, у вас не осталось жизней. Дождитесь пополнения, чтобы продолжить.",

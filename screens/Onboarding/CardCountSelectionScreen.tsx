@@ -2,15 +2,16 @@ import React, {useContext, useState} from 'react';
 import {Platform, SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import { StackScreenProps } from "@react-navigation/stack";
 import { OnboardingStackParamList } from "../../navigation/OnboardingNavigator";
-import {BACKGROUND, BLACK, BLUE, GREEN} from "../../colors";
+import {BACKGROUND, BLACK, BLOCK_BUTTON, BLUE, GREEN, MAIN_SECOND, SECONDARY_SECOND, WHITE} from "../../colors";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import {EVERYDAY_CARDS, QuizState} from "../../constants";
 import MainContext from "../../navigation/MainContext";
-import {Nunito_Bold, Nunito_Regular, Nunito_Semibold} from "../../fonts";
+import {Nunito_Bold, Nunito_Regular, Nunito_Semibold, Quicksand_Bold, Quicksand_Regular} from "../../fonts";
 
 type Props = StackScreenProps<OnboardingStackParamList, 'CardCountSelectionScreen'>;
 
 const CardCountSelectionScreen = ({ navigation, route }: Props) => {
+    const { completeOnboarding } = useContext(MainContext);
     const {username} = route.params;
     const {setEveryDayCards} = useContext(MainContext);
     const [selectedCardCount, setSelectedCardCount] = useState<number | null>(null);
@@ -25,59 +26,60 @@ const CardCountSelectionScreen = ({ navigation, route }: Props) => {
         if (selectedCardCount !== null) {
             await AsyncStorage.setItem(EVERYDAY_CARDS, String(selectedCardCount));
             setEveryDayCards(Number(selectedCardCount));
-            navigation.navigate('TopicSelectionScreen', {username: username, count_cards: selectedCardCount})
+            completeOnboarding();
         }
     };
 
     return (
-        <ScrollView style={{ flex: 1, backgroundColor: BACKGROUND }} contentContainerStyle={{ flexGrow: 1 }}>
-            <SafeAreaView style={styles.safeContainer}>
-                <Text style={styles.question}>How many cards will you go through each day?</Text>
+    <SafeAreaView style={styles.safeContainer}>
+        <View style={styles.container}>
+            <ScrollView
+                contentContainerStyle={{flexGrow: 1, justifyContent: 'center', paddingHorizontal: 20,}}
+            >
+                <Text style={styles.question}>How many cards will you go through in a single session?</Text>
                 <View style={styles.selectionContainer}>
                     {cardCounts.map((count) => (
                         <TouchableOpacity
                             key={count}
                             style={[
                                 styles.cardCountButton,
-                                selectedCardCount === count && { backgroundColor: GREEN, borderWidth: 0 }
+                                selectedCardCount === count && {backgroundColor: '#FAD1C5', borderWidth: 0},
                             ]}
                             onPress={() => handleCardCountPress(count)}
                         >
                             <Text style={[
                                 styles.cardCountText,
-                                selectedCardCount === count && { color: 'white' }
                             ]}>
                                 {count} Cards
                             </Text>
                         </TouchableOpacity>
                     ))}
                 </View>
-                <TouchableOpacity
-                    style={[styles.continueButton, selectedCardCount === null && { backgroundColor: '#ccc' }]}
-                    onPress={handleContinuePress}
-                    disabled={selectedCardCount === null}
-                >
-                    <Text style={[styles.textButton, selectedCardCount === null && { opacity: 0.5 }]}>
-                        Continue
-                    </Text>
-                </TouchableOpacity>
-            </SafeAreaView>
-        </ScrollView>
-    );
+            </ScrollView>
+            <TouchableOpacity
+                style={[styles.continueButton, selectedCardCount === null && {backgroundColor: BLOCK_BUTTON}]}
+                onPress={handleContinuePress}
+                disabled={selectedCardCount === null}
+            >
+                <Text style={[styles.textButton, selectedCardCount === null && {opacity: 0.9}]}>
+                    Next
+                </Text>
+            </TouchableOpacity>
+        </View>
+    </SafeAreaView>
+);
 };
 
 const styles = StyleSheet.create({
     safeContainer: {
         flex: 1,
         backgroundColor: BACKGROUND,
-        paddingHorizontal: 23,
-        paddingVertical: 5,
-        justifyContent: 'center',
-        alignItems: 'center',
-        ...Platform.select({
-            ios: {
-                marginHorizontal: 10,
-            }})
+    },
+    container: {
+        flex: 1,
+        backgroundColor: MAIN_SECOND,
+        margin: 15,
+        borderRadius: 20,
     },
     selectionContainer: {
         marginBottom: 20,
@@ -91,32 +93,35 @@ const styles = StyleSheet.create({
         marginBottom: 12,
         width: '100%',
         alignItems: 'center',
-        borderWidth: 1,
     },
     cardCountText: {
-        fontSize: 24,
-        fontFamily: Nunito_Regular,
+        fontSize: 18,
+        fontFamily: Quicksand_Regular,
         color: BLACK,
     },
     continueButton: {
-        padding: 10,
-        backgroundColor: BLUE,
+        margin: 10,
+        marginBottom: 10,
         borderRadius: 20,
-        color: BACKGROUND,
-        width: '100%',
+        backgroundColor: SECONDARY_SECOND,
+        alignItems: 'center',
+        justifyContent: 'center',
+        paddingVertical: 15,
     },
     textButton: {
-        color: BACKGROUND,
-        fontSize: 20,
-        fontFamily: Nunito_Semibold,
+        fontSize: 18,
         textAlign: 'center',
+        fontFamily: Quicksand_Regular,
+        color: WHITE,
+        alignItems: 'center',
+        justifyContent: 'center',
     },
     question: {
-        fontFamily: Nunito_Bold,
         color: BLACK,
-        marginBottom: 20,
-        fontSize: 28,
+        fontSize: 24,
+        fontFamily: Quicksand_Bold,
         textAlign: 'center',
+        marginBottom: 15,
     }
 });
 

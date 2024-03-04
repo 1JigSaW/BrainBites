@@ -1,6 +1,11 @@
 export const BACKGROUND = '#FFFFFF';
+export const WHITE = '#FFFFFF';
 export const BLACK = '#000000';
 export const BLUE = '#0324FE';
 export const GREEN = '#008080';
 export const RED = 'red';
-export const PROGRESS_BACKGROUND = 'blue'
+export const PROGRESS_BACKGROUND = 'blue';
+export const BACKGROUND_SECOND = '#FFFFFF';
+export const MAIN_SECOND = '#C5F6F9';
+export const SECONDARY_SECOND = '#1B4D50';
+export const BLOCK_BUTTON = '#AFCECF';

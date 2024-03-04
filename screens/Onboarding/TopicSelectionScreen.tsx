@@ -56,12 +56,12 @@ const TopicSelectionScreen = ({ navigation, route }: Props) => {
         const avatarUrl = `https://api.dicebear.com/7.x/identicon/svg`;
 
         createUserMutation.mutate(
-            { username, topicIds, count_cards, avatarUrl },
+            { username, count_cards, avatarUrl },
             {
                 onSuccess: async (data) => {
                     try {
                         await AsyncStorage.setItem(user, JSON.stringify(data));
-                        await completeOnboarding(data.id);
+                        //await completeOnboarding(data.id);
                     } catch (error) {
                         console.error('Ошибка при сохранении данных пользователя:', error);
                     }

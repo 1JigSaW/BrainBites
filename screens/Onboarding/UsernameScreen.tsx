@@ -11,11 +11,9 @@ import {
 } from 'react-native';
 import { StackScreenProps } from "@react-navigation/stack";
 import { OnboardingStackParamList } from "../../navigation/OnboardingNavigator";
-import {BACKGROUND, BLACK, BLUE, RED} from "../../colors";
+import {BACKGROUND, BLACK, BLOCK_BUTTON, BLUE, MAIN_SECOND, RED, SECONDARY_SECOND, WHITE} from "../../colors";
 import {useCheckUsernameUnique} from "../../queries/user";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import {onboardingUsername} from "../../constants";
-import {Nunito_Bold, Nunito_Regular, Nunito_Semibold} from "../../fonts";
+import {Nunito_Bold, Nunito_Regular, Nunito_Semibold, Quicksand_Bold, Quicksand_Regular} from "../../fonts";
 
 type Props = StackScreenProps<OnboardingStackParamList, 'UsernameScreen'>;
 
@@ -32,11 +30,11 @@ const UsernameScreen = ({ navigation }: Props) => {
             return;
         }
 
-        setIsCheckingUsername(true);  // Включить индикатор загрузки
+        setIsCheckingUsername(true);
 
         usernameCheck.mutate(username, {
             onSuccess: (data) => {
-                setIsCheckingUsername(false);  // Выключить индикатор загрузки
+                setIsCheckingUsername(false);
                 if (data.isUnique) {
                     navigation.navigate('CardCountSelectionScreen', { username });
                 } else {
@@ -44,7 +42,7 @@ const UsernameScreen = ({ navigation }: Props) => {
                 }
             },
             onError: (error) => {
-                setIsCheckingUsername(false);  // Выключить индикатор загрузки в случае ошибки
+                setIsCheckingUsername(false);
             }
         });
     };
@@ -52,44 +50,42 @@ const UsernameScreen = ({ navigation }: Props) => {
     const handleTextChange = (text: string) => {
         setUsername(text);
         if (isUsernameTaken) {
-            setIsUsernameTaken(false);  // reset the error if user starts typing
+            setIsUsernameTaken(false);
         }
     };
 
     return (
-        <ScrollView style={{ flex: 1, backgroundColor: BACKGROUND }} contentContainerStyle={{ flexGrow: 1 }}>
-            <SafeAreaView style={styles.safeContainer}>
-                <Text style={styles.mainText}>Enter a unique name</Text>
-                <View style={styles.inputContainer}>
-                    <TextInput
-                        style={styles.input}
-                        placeholder="Enter unique username"
-                        value={username}
-                        onChangeText={handleTextChange} // Updated handler
-                    />
-                    {isUsernameTaken && <Text style={{
-                        color: RED,
-                        textAlign: 'center',
-                        width: '100%',
-                        fontFamily: Nunito_Regular,
-                        fontSize: 16,
-                    }}>Username is already taken</Text>}
-                </View>
+        <SafeAreaView style={{ flex: 1, backgroundColor: BACKGROUND }}>
+            <View style={styles.container}>
+                <ScrollView contentContainerStyle={styles.scrollViewContent}>
+                    <Text style={styles.mainText}>Enter a unique name</Text>
+                    <View style={styles.inputContainer}>
+                        <TextInput
+                            style={styles.input}
+                            placeholder="Username"
+                            value={username}
+                            onChangeText={handleTextChange}
+                        />
+                        {isUsernameTaken && (
+                            <Text style={styles.errorText}>Username is already taken</Text>
+                        )}
+                    </View>
+                </ScrollView>
                 <TouchableOpacity
-                    style={[styles.continueButton, (isUsernameTaken || username === '') && {backgroundColor: '#ccc'}]}
+                    style={[styles.continueButton, (isUsernameTaken || username === '') && { backgroundColor: BLOCK_BUTTON }]}
                     onPress={handleContinuePress}
                     disabled={isUsernameTaken || username === '' || isCheckingUsername}
                 >
                     {isCheckingUsername ? (
                         <ActivityIndicator color="#fff" />
                     ) : (
-                        <Text style={[styles.textButton, (isUsernameTaken || username === '') && {opacity: 0.5}]}>
-                            Continue
+                        <Text style={[styles.textButton, (isUsernameTaken || username === '') && { opacity: 0.9 }]}>
+                            Next
                         </Text>
                     )}
                 </TouchableOpacity>
-            </SafeAreaView>
-        </ScrollView>
+            </View>
+        </SafeAreaView>
     );
 };
 
@@ -98,14 +94,12 @@ const styles = StyleSheet.create({
     safeContainer: {
         flex: 1,
         backgroundColor: BACKGROUND,
-        paddingHorizontal: 23,
-        paddingVertical: 5,
-        justifyContent: 'center', // Center content vertically
-        alignItems: 'center', // Center content horizontally
-        ...Platform.select({
-                ios: {
-                    marginHorizontal: 10,
-                }})
+    },
+    container: {
+        flex: 1,
+        backgroundColor: MAIN_SECOND,
+        margin: 15,
+        borderRadius: 20,
     },
     inputContainer: {
         width: '100%',
@@ -115,34 +109,48 @@ const styles = StyleSheet.create({
         width: '100%',
         padding: 10,
         borderColor: BLACK,
-        borderWidth: 1,
+        backgroundColor: WHITE,
         borderRadius: 20,
-        fontSize: 24,
-        fontFamily: Nunito_Regular,
+        fontSize: 18,
+        fontFamily: Quicksand_Regular,
         paddingHorizontal: 15,
     },
     continueButton: {
-        padding: 10,
-        backgroundColor: BLUE,
+        margin: 10,
+        marginBottom: 10,
         borderRadius: 20,
-        color: BACKGROUND,
-        width: '100%'
+        backgroundColor: SECONDARY_SECOND,
+        alignItems: 'center',
+        justifyContent: 'center',
+        paddingVertical: 15,
     },
     textButton: {
-        color: BACKGROUND,
-        fontSize: 20,
-        fontFamily: Nunito_Semibold,
-        fontWeight: '600',
+        fontSize: 18,
         textAlign: 'center',
+        fontFamily: Quicksand_Regular,
+        color: WHITE,
+        alignItems: 'center',
+        justifyContent: 'center',
     },
     mainText: {
         color: BLACK,
-        fontSize: 32,
-        fontFamily: Nunito_Bold,
-        fontWeight: '600',
+        fontSize: 24,
+        fontFamily: Quicksand_Bold,
         textAlign: 'center',
-        marginBottom: 20,
-    }
+        marginBottom: 15,
+    },
+    scrollViewContent: {
+        flexGrow: 1,
+        justifyContent: 'center',
+        paddingHorizontal: 20,
+    },
+    errorText: {
+        color: RED,
+        textAlign: 'center',
+        width: '100%',
+        fontFamily: Quicksand_Regular,
+        fontSize: 16,
+    },
 });
 
 export default UsernameScreen;

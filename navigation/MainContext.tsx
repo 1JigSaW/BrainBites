@@ -2,7 +2,7 @@ import React, { createContext } from 'react';
 
 interface MainContextProps {
     userId: number | null;
-    completeOnboarding: (newUserId: number) => Promise<void>;
+    completeOnboarding: () => void;
     cardCount: number;
     setCardCount: (count: number) => void;
     everyDayCards: number;
