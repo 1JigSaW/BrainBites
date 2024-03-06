@@ -17,6 +17,14 @@ interface UseGetUsersOptions {
     userId?: number | null;
 }
 
+export interface AxiosErrorResponse {
+  response: {
+    data: {
+      error: string;
+    }
+  }
+}
+
 export const useCheckUsernameUnique = () => {
     return useMutation<UsernameCheckResponse, AxiosError, string>(
         (username: string) => UserApi.checkUsernameUnique(username),
@@ -123,3 +131,30 @@ export const useGetLives = (userId: number | null): UseQueryResult<LivesResponse
         },
     );
 };
+
+export const useLoginUser = () => {
+    return useMutation<
+        { user?: (user: any) => unknown; token: string },
+        AxiosError,
+        { email: string, password: string },
+        unknown
+    >(
+        ({ email, password }) => UserApi.loginUser(email, password).then(result => {
+            if ('error' in result) {
+                throw new Error(result.error);
+            }
+            // Assuming that the API will always return an object with a token string.
+            // The user property is not expected in the response, so we do not include it here.
+            return { token: result.token };
+        }),
+        {
+            onError: (error) => {
+                console.error('Error logging in:', error);
+            },
+            onSuccess: (data) => {
+                console.log('Logged in successfully:', data);
+            },
+        },
+    );
+};
+

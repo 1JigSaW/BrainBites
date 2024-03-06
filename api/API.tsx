@@ -1,8 +1,8 @@
 /* eslint-disable no-shadow */
 import axios, {AxiosRequestConfig, AxiosResponse} from 'axios';
 
-//const apiUrl = 'https://ba53-66-205-90-12.ngrok-free.app/';
-const apiUrl = 'https://50a2-66-205-90-12.ngrok-free.app/';
+// const apiUrl = 'https://sea-turtle-app-qjmw8.ondigitalocean.app/';
+const apiUrl = 'https://dd60-66-205-90-12.ngrok-free.app/';
 
 export class API {
     private static axios = axios.create({

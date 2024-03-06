@@ -23,6 +23,7 @@ export interface UserStatsResponse {
     user_rank: number;
     badges_count: number;
     avatar_url: string;
+    lives: number;
 }
 
 export interface Badge {
@@ -54,7 +55,7 @@ export class UserApi {
     // New method for creating a user
     static async createUser(username: string, count_cards: number, avatarUrl: string, email: string, password: string): Promise<CreateUserResponse> {
         try {
-            const { data } = await API.post('/api/create-user/', {
+            const { data } = await API.post('/api/register/', {
                 username: username,
                 cards_count: count_cards,
                 avatar_url: avatarUrl,
@@ -105,6 +106,18 @@ export class UserApi {
             const { data } = await API.get(`/api/get-lives/?user_id=${userId}`);
             return data;
         } catch (error) {
+            throw error;
+        }
+    }
+
+    static async loginUser(email: string, password: string): Promise<{token: string} | {error: string}> {
+        try {
+            const { data } = await API.post('/api/login/', {
+                email: email,
+                password: password,
+            });
+            return data;
+        } catch (error: any) {
             throw error;
         }
     }

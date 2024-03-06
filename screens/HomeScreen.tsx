@@ -16,10 +16,6 @@ import BrainXPIcon from "../components/icons/BrainXPIcon";
 import BadgesIcon from "../components/icons/BadgesIcon";
 import ArrowRightIcon from "../components/icons/ArrowRight";
 import {getButtonStyle, getButtonTextStyle} from "../components/functions/buttonHelpers";
-
-
-type Props = StackScreenProps<HomeStackParamList, 'HomeScreen'>;
-
 import MainContext from "../navigation/MainContext";
 import {useGetUsers, useGetUserStats} from "../queries/user";
 import {useIsFocused} from "@react-navigation/native";
@@ -27,6 +23,8 @@ import {useUpdateReadCardsCount} from "../queries/card";
 import {useGetUserBadgeProgress} from "../queries/badge";
 import {calculateProgressBarWidth} from "../utils";
 import {SvgUri} from "react-native-svg";
+
+type Props = StackScreenProps<HomeStackParamList, 'HomeScreen'>;
 
 const getFontSizeForName = (name: string) => {
     if (name.length <= 5) {
@@ -40,7 +38,7 @@ const getFontSizeForName = (name: string) => {
 
 const HomeScreen = ({ navigation, route }: Props) => {
     const [activeButton, setActiveButton] = useState<string>('read_cards');
-    const isFocused = useIsFocused(); // Этот хук возвращает true, когда экран в фокусе
+    const isFocused = useIsFocused();
     const { userId, cardCount } = useContext(MainContext);
     const shouldFetchBadgeProgress = userId != null;
     const { data: badgeProgress, isLoading, error, refetch: refetchBadge } = useGetUserBadgeProgress(userId, shouldFetchBadgeProgress, true);

@@ -14,11 +14,13 @@ import { OnboardingStackParamList } from "../../navigation/OnboardingNavigator";
 import {BACKGROUND, BLACK, BLOCK_BUTTON, BLUE, MAIN_SECOND, RED, SECONDARY_SECOND, WHITE} from "../../colors";
 import {useCheckUsernameUnique} from "../../queries/user";
 import {Nunito_Bold, Nunito_Regular, Nunito_Semibold, Quicksand_Bold, Quicksand_Regular} from "../../fonts";
+import MainContext from "../../navigation/MainContext";
 
 type Props = StackScreenProps<OnboardingStackParamList, 'UsernameScreen'>;
 
 const UsernameScreen = ({ navigation }: Props) => {
-    const [username, setUsername] = useState('');
+    const { setUsername } = useContext(MainContext);
+    const [usernameLocal, setUsernameLocal] = useState('');
     const [isUsernameTaken, setIsUsernameTaken] = useState(false);
 
     const usernameCheck = useCheckUsernameUnique();
@@ -26,17 +28,18 @@ const UsernameScreen = ({ navigation }: Props) => {
     const [isCheckingUsername, setIsCheckingUsername] = useState(false);
 
     const handleContinuePress = async () => {
-        if (!username) {
+        if (!usernameLocal) {
             return;
         }
 
         setIsCheckingUsername(true);
 
-        usernameCheck.mutate(username, {
+        usernameCheck.mutate(usernameLocal, {
             onSuccess: (data) => {
                 setIsCheckingUsername(false);
                 if (data.isUnique) {
-                    navigation.navigate('CardCountSelectionScreen', { username });
+                    setUsername(usernameLocal);
+                    navigation.navigate('CardCountSelectionScreen', { username: usernameLocal });
                 } else {
                     setIsUsernameTaken(true);
                 }
@@ -48,7 +51,7 @@ const UsernameScreen = ({ navigation }: Props) => {
     };
 
     const handleTextChange = (text: string) => {
-        setUsername(text);
+        setUsernameLocal(text);
         if (isUsernameTaken) {
             setIsUsernameTaken(false);
         }
@@ -63,7 +66,7 @@ const UsernameScreen = ({ navigation }: Props) => {
                         <TextInput
                             style={styles.input}
                             placeholder="Username"
-                            value={username}
+                            value={usernameLocal}
                             onChangeText={handleTextChange}
                         />
                         {isUsernameTaken && (
@@ -72,14 +75,14 @@ const UsernameScreen = ({ navigation }: Props) => {
                     </View>
                 </ScrollView>
                 <TouchableOpacity
-                    style={[styles.continueButton, (isUsernameTaken || username === '') && { backgroundColor: BLOCK_BUTTON }]}
+                    style={[styles.continueButton, (isUsernameTaken || usernameLocal === '') && { backgroundColor: BLOCK_BUTTON }]}
                     onPress={handleContinuePress}
-                    disabled={isUsernameTaken || username === '' || isCheckingUsername}
+                    disabled={isUsernameTaken || usernameLocal === '' || isCheckingUsername}
                 >
                     {isCheckingUsername ? (
                         <ActivityIndicator color="#fff" />
                     ) : (
-                        <Text style={[styles.textButton, (isUsernameTaken || username === '') && { opacity: 0.9 }]}>
+                        <Text style={[styles.textButton, (isUsernameTaken || usernameLocal === '') && { opacity: 0.9 }]}>
                             Next
                         </Text>
                     )}

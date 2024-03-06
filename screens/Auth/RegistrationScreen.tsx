@@ -1,29 +1,78 @@
 import {StackScreenProps} from "@react-navigation/stack";
 import {AuthStackParamList} from "../../navigation/AuthNavigator";
-import {useState} from "react";
+import React, {useContext, useState} from "react";
 import {BACKGROUND, BLACK, BLOCK_BUTTON, MAIN_SECOND, RED, SECONDARY_SECOND, WHITE} from "../../colors";
-import {SafeAreaView, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View} from "react-native";
+import {
+    ActivityIndicator,
+    SafeAreaView,
+    ScrollView,
+    StyleSheet,
+    Text,
+    TextInput,
+    TouchableOpacity,
+    View
+} from "react-native";
 import {Quicksand_Bold, Quicksand_Regular} from "../../fonts";
+import MainContext from "../../navigation/MainContext";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import {user} from "../../constants";
+import {useCreateUser} from "../../queries/user";
 
 type Props = StackScreenProps<AuthStackParamList, 'RegistrationScreen'>;
 
 const RegistrationScreen = ({ navigation, route }: Props) => {
-    const { username, count_cards } = route.params;
+    const {username, everyDayCards, completeAuth} = useContext(MainContext);
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
     const [errorMessage, setErrorMessage] = useState('');
-    console.log(username, count_cards)
+    const [isCreatingUser, setIsCreatingUser] = useState(false);
+
+    console.log(username, everyDayCards)
+
+    const createUserMutation = useCreateUser();
     const handleRegistration = async () => {
         if (!email || !password) {
             setErrorMessage('Please make sure all fields are filled correctly.');
             return;
         }
 
-        // Здесь должна быть логика для отправки данных на сервер
+        const emailValidationRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailValidationRegex.test(email)) {
+            setErrorMessage('Please enter a valid email address.');
+            setIsCreatingUser(false);
+            return;
+        }
 
-        // Предполагается, что после успешной регистрации происходит переход на другой экран
-        // navigation.navigate('NextScreenAfterRegistration');
+        if (password.length < 6) {
+            setErrorMessage('Password must be at least 6 characters long.');
+            setIsCreatingUser(false);
+            return;
+        }
+
+        setIsCreatingUser(true);
+
+        const avatarUrl = `https://api.dicebear.com/7.x/identicon/svg`;
+        if (username) {
+            createUserMutation.mutate(
+            { username, count_cards: everyDayCards, avatarUrl, email, password },
+            {
+                onSuccess: async (data) => {
+                    try {
+                        await AsyncStorage.setItem(user, JSON.stringify(data));
+                        completeAuth();
+                    } catch (error) {
+                        console.error('Ошибка при сохранении данных пользователя:', error);
+                    }
+                    setIsCreatingUser(false); // Выключить индикатор загрузки
+                },
+                onError: (error: any) => {
+                    setIsCreatingUser(false);
+                    setErrorMessage(error?.response?.data?.error || 'Error');
+                },
+            }
+        );
+        }
     };
 
     return (
@@ -54,7 +103,7 @@ const RegistrationScreen = ({ navigation, route }: Props) => {
                     <View style={styles.switchContainer}>
                         <Text style={styles.switchText}>Already have an account? </Text>
                         <TouchableOpacity
-                            //onPress={() => navigation.navigate('SignInScreen')}
+                            onPress={() => navigation.navigate('LoginScreen')}
                         >
                             <Text style={styles.switchButton}>Sign In</Text>
                         </TouchableOpacity>
@@ -63,11 +112,15 @@ const RegistrationScreen = ({ navigation, route }: Props) => {
                 <TouchableOpacity
                     style={[styles.continueButton, (!email || !password) && { backgroundColor: BLOCK_BUTTON }]}
                     onPress={handleRegistration}
-                    disabled={!email || !password}
+                    disabled={!email || !password || isCreatingUser}
                 >
-                    <Text style={styles.textButton}>
-                        Register
-                    </Text>
+                    {isCreatingUser ? (
+                        <ActivityIndicator size="large" color={BACKGROUND} />
+                    ) : (
+                        <Text style={styles.textButton}>
+                            Register
+                        </Text>
+                    )}
                 </TouchableOpacity>
             </View>
         </SafeAreaView>

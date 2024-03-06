@@ -9,3 +9,4 @@ export const BACKGROUND_SECOND = '#FFFFFF';
 export const MAIN_SECOND = '#C5F6F9';
 export const SECONDARY_SECOND = '#1B4D50';
 export const BLOCK_BUTTON = '#AFCECF';
+export const RED_SECOND = '#FF9292';

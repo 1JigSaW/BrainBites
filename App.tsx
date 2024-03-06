@@ -4,10 +4,11 @@ import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
 import MainNavigator from "./navigation/MainNavigator";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import OnboardingNavigator from "./navigation/OnboardingNavigator";
-import {authLaunch, CARDS_COUNT, EVERYDAY_CARDS, firstLaunchTest, LIVES, user} from "./constants";
+import {authLaunch, CARDS_COUNT, EVERYDAY_CARDS, firstLaunchTest, LIVES, user, USERNAME} from "./constants";
 import MainContext from './navigation/MainContext';
 import Toast from "react-native-toast-message";
 import AuthNavigator from "./navigation/AuthNavigator";
+import HomeStack from "./navigation/HomeStack";
 
 const queryClient = new QueryClient();
 
@@ -17,6 +18,7 @@ function App(): JSX.Element | null {
     const [isAuthLaunch, setIsAuthLaunch] = useState<boolean | null>(null);
     const [cardCount, setCardCount] = useState<number>(0);
     const [everyDayCards, setEveryDayCards] = useState<number>(0);
+    const [username, setUsername] = useState<string | null>(null);
     const [lives, setLives] = useState<number>(0);
 
     useEffect(() => {
@@ -50,7 +52,18 @@ function App(): JSX.Element | null {
                 setEveryDayCards(Number(value));
             }
         });
+        AsyncStorage.getItem(USERNAME).then(value => {
+            if (value !== null) {
+                setUsername(String(value));
+            }
+        });
     }, []);
+
+    const completeAuth = async () => {
+        //setUserId(newUserId);
+        await AsyncStorage.setItem(authLaunch, 'true');
+        setIsAuthLaunch(false);
+    };
 
     const completeOnboarding = async () => {
         //setUserId(newUserId);
@@ -62,7 +75,7 @@ function App(): JSX.Element | null {
         return null;
     }
 
-    let Navigator = MainNavigator;
+    let Navigator = HomeStack;
     if (isFirstLaunch) {
         Navigator = OnboardingNavigator;
     } else if (isAuthLaunch) {
@@ -74,12 +87,15 @@ function App(): JSX.Element | null {
       <MainContext.Provider value={{
           userId,
           completeOnboarding,
+          completeAuth,
           cardCount,
           setCardCount,
           everyDayCards,
           setEveryDayCards,
           lives,
           setLives,
+          username,
+          setUsername,
       }}>
           <QueryClientProvider client={queryClient}>
               <NavigationContainer>

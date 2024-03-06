@@ -8,9 +8,11 @@ import MyCardsScreen from "../screens/MyCardsScreen";
 import MyTopicsScreen from "../screens/MyTopicsScreen";
 import {Nunito_Semibold} from "../fonts";
 import {Platform} from "react-native";
+import MainScreen from "../screens/MainScreen";
 
 export type HomeStackParamList = {
     HomeScreen: undefined;
+    MainScreen: undefined;
     LeaderBoardScreen: undefined;
     AchievementsScreen: undefined;
     MyCardsScreen: undefined;
@@ -27,7 +29,7 @@ const Stack = createStackNavigator<HomeStackParamList>();
 const HomeStack = () => {
     return (
         <Stack.Navigator>
-            <Stack.Screen name="HomeScreen" component={HomeScreen} options={{headerShown: false}}/>
+            <Stack.Screen name="MainScreen" component={MainScreen} options={{headerShown: false}}/>
             <Stack.Screen
                 name="LeaderBoardScreen"
                 component={LeaderBoardScreen}
