@@ -2,7 +2,7 @@
 import axios, {AxiosRequestConfig, AxiosResponse} from 'axios';
 
 // const apiUrl = 'https://sea-turtle-app-qjmw8.ondigitalocean.app/';
-const apiUrl = 'https://dd60-66-205-90-12.ngrok-free.app/';
+const apiUrl = 'https://16f9-66-205-90-12.ngrok-free.app/';
 
 export class API {
     private static axios = axios.create({

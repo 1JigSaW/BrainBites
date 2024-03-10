@@ -1,37 +1,28 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
-import { Svg, Circle, Text as SvgText } from 'react-native-svg';
+import { View, Text, StyleSheet, Dimensions } from 'react-native';
+import { BLACK, BLOCK_BUTTON, MAIN_SECOND, WHITE } from "../colors";
+import { Quicksand_Regular } from "../fonts";
 
-const WeeklyProgressBar = ({ total, progress }) => {
+const screenWidth = Dimensions.get('window').width;
+
+const WeeklyProgressBar = ({ total, progress }: any) => {
   const days = ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN'];
-
-  // Create a style for each day based on the progress
-  const dailyProgressStyles = progress.map((completed) =>
-    completed ? styles.filledDay : styles.emptyDay
-  );
 
   return (
     <View style={styles.container}>
-      <Svg height="60" width="60" style={styles.circle}>
-        <Circle cx="30" cy="30" r="29" fill="white" stroke="black" strokeWidth="0.5"/>
-        <SvgText
-          x="30"
-          y="35"
-          textAnchor="middle"
-          fill="black"
-          fontSize="20"
-          fontWeight="bold"
-        >
-          {total}
-        </SvgText>
-      </Svg>
-      <View style={styles.progressBar}>
-        {days.map((day, index) => (
-          <View key={day} style={[styles.day, dailyProgressStyles[index]]}>
-            <Text style={styles.dayText}>{day}</Text>
-          </View>
-        ))}
+      <View style={styles.circle}>
+        <Text>100</Text>
       </View>
+      {days.map((day, index) => (
+        <View key={day} style={styles.dayContainer}>
+          <Text style={styles.dayText}>{day}</Text>
+          <View style={styles.dayCircleContainer}>
+            <View style={[styles.dayCircle, progress[index] ? styles.filledDay : styles.emptyDay]}>
+              {index !== 0 && <View style={[styles.line, {left: -42}, progress[index] ? styles.filledDay : styles.emptyDay]}></View>}
+            </View>
+          </View>
+        </View>
+      ))}
     </View>
   );
 };
@@ -39,34 +30,54 @@ const WeeklyProgressBar = ({ total, progress }) => {
 const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
-    alignItems: 'center',
+    justifyContent: 'space-around', // Обеспечивает равномерное распределение по ширине экрана
+    width: screenWidth,
+    padding: 10,
   },
   circle: {
-    marginRight: 8,
-  },
-  progressBar: {
-    flexDirection: 'row',
-    flex: 1,
-    height: 20,
-    backgroundColor: '#E0E0E0',
-    borderRadius: 10,
-  },
-  day: {
-    flex: 1,
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    backgroundColor: WHITE,
     justifyContent: 'center',
     alignItems: 'center',
-    marginHorizontal: 2,
+    borderWidth: 10,
+    borderColor: MAIN_SECOND,
+  },
+  dayContainer: {
+    alignItems: 'center',
+    flexDirection: 'column', // Элементы располагаются вертикально
+  },
+  dayCircleContainer: {
+    position: 'relative', // Для абсолютного позиционирования линии
+  },
+  dayCircle: {
+    width: 10,
+    height: 10,
     borderRadius: 5,
+    marginTop: 5,
   },
   filledDay: {
     backgroundColor: '#6200EE',
+    zIndex: 2,
   },
   emptyDay: {
-    backgroundColor: 'transparent',
+    backgroundColor: BLOCK_BUTTON,
   },
   dayText: {
     fontSize: 12,
-  }
+    fontFamily: Quicksand_Regular,
+    color: BLACK,
+    marginBottom: 5, // Отступ для разделения текста и круга
+  },
+  line: {
+    position: 'absolute',
+    height: 4,
+    width: 50,
+    backgroundColor: BLACK,
+    top: '34%',
+    zIndex: 1,
+  },
 });
 
 export default WeeklyProgressBar;

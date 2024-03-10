@@ -10,3 +10,6 @@ export const MAIN_SECOND = '#C5F6F9';
 export const SECONDARY_SECOND = '#1B4D50';
 export const BLOCK_BUTTON = '#AFCECF';
 export const RED_SECOND = '#FF9292';
+export const FIRST_PLACE = '#FFCD65';
+export const SECOND_PLACE = '#C0C0C0';
+export const THIRD_PLACE = '#AE8742';

@@ -12,6 +12,7 @@ export interface UserTopicProgressResponse {
     progress: number;
     viewed_cards: number;
     total_cards: number;
+    image: string;
 }
 
 export interface UserSubtitleProgressResponse {
