@@ -1,33 +1,34 @@
 import React, {useContext, useState} from "react";
-import {BACKGROUND, BLACK, BLUE} from "../colors";
+import {BACKGROUND, BLACK, BLUE, MAIN_SECOND, RED, SECONDARY_SECOND} from "../colors";
 import {Dimensions, Image, StyleSheet, Text, TouchableOpacity, View} from "react-native";
 import SaveIcon from "./icons/SaveIcon";
 import SaveEmptyIcon from "./icons/SaveEmptyIcon";
 import {useSaveCard} from "../queries/card";
 import MainContext from "../navigation/MainContext";
-import {Nunito_Bold, Nunito_Regular, Nunito_Semibold} from "../fonts";
+import {Nunito_Bold, Nunito_Regular, Nunito_Semibold, Quicksand_Bold, Quicksand_Regular} from "../fonts";
 
 
 const { height } = Dimensions.get('window');
 
-// Define a base screen height. This value should represent the height of the screen
-// for which the design was originally made.
-const baseScreenHeight = 667; // Example: iPhone 8 screen height in points
 
-// Calculate the font size based on the screen height relative to the base screen height
+
+const baseScreenHeight = 667;
+
+
 const calculateFontSize = (size: number) => {
-    const ratio = size / baseScreenHeight; // Get the ratio of the font size to the base screen height
+    const ratio = size / baseScreenHeight;
     const newSize = Math.round(ratio * height);
-    return newSize > size ? size : newSize; // Optional: Prevent the font size from scaling up too much
+    return newSize > size ? size : newSize;
 };
 
-const CardComponent = ({ card, myCards, handleRemoveCard }: any) => {
+const CardComponent = ({ card, myCards, handleRemoveCard, swipedCard, cards }: any) => {
     const { userId } = useContext(MainContext);
-    const [savedCards, setSavedCards] = useState(new Set()); // Use a Set to track saved card IDs
+    const [savedCards, setSavedCards] = useState(new Set());
     const { mutate: toggleSaveCard } = useSaveCard();
+    console.log(card)
 
-    const localIconSelected = savedCards.has(card.id); // Determine if the card is selected based on its ID
-    const localIconColor = localIconSelected ? BLUE : BACKGROUND; // Assuming BLUE and BACKGROUND are color constants
+    const localIconSelected = savedCards.has(card.id);
+    const localIconColor = localIconSelected ? BLUE : BACKGROUND;
 
     const handleSavePress = () => {
         if (myCards) {
@@ -50,7 +51,7 @@ const CardComponent = ({ card, myCards, handleRemoveCard }: any) => {
                 toggleSaveCard({ userId, cardId: card.id });
             } else {
                 newSavedCards.add(card.id);
-                // Call the mutation function when a card is being saved (not unsaved)
+
                 toggleSaveCard({ userId, cardId: card.id });
             }
             return newSavedCards;
@@ -66,22 +67,14 @@ const CardComponent = ({ card, myCards, handleRemoveCard }: any) => {
 
     return (
         <View style={[styles.card, myCards && {height: '90%'}]}>
+            <View style={styles.counterContainer}>
+                <Text style={styles.counter}>{`${swipedCard + 1}/${cards?.length}`}</Text>
+            </View>
             <View style={styles.titleContainer}>
                 <Text style={styles.title}>{card.title}</Text>
-                <TouchableOpacity
-                    style={styles.saveIcon}
-                    onPress={handleSavePress} // Use the handleSavePress function here
-                >
-                    {!localIconSelected ? (
-                        <SaveIcon size={20} color={localIconColor} />
-                    ) : (
-                        <SaveEmptyIcon size={20} color={localIconColor} />
-                    )}
-                </TouchableOpacity>
             </View>
+            <Image source={{ uri: card.image }} style={styles.image} />
             <Text style={styles.text}>{card.content}</Text>
-            <Text style={styles.source}>{card.source}</Text>
-            <Text style={styles.tag}>{card.topic}</Text>
         </View>
     );
 };
@@ -89,8 +82,8 @@ const CardComponent = ({ card, myCards, handleRemoveCard }: any) => {
 const styles = StyleSheet.create({
     card: {
         width: '100%',
-        height: '90%',
-        backgroundColor: BACKGROUND,
+        height: '95%',
+        backgroundColor: MAIN_SECOND,
         justifyContent: 'flex-start',
         borderRadius: 20,
         shadowColor: '#000',
@@ -99,21 +92,21 @@ const styles = StyleSheet.create({
         shadowRadius: 5,
         elevation: 5,
         marginTop: -50,
-        borderWidth: 1,
         padding: 10,
     },
     titleContainer: {
         flexDirection: 'row',
-        justifyContent: 'space-between',
+        justifyContent: 'center',
         alignItems: 'center',
         marginBottom: 10,
         width: '100%',
+        marginTop: 20,
     },
     title: {
         maxWidth: '90%',
-        fontSize: 28,
+        fontSize: 24,
         marginLeft: 10,
-        fontFamily: Nunito_Bold,
+        fontFamily: Quicksand_Bold,
         color: BLACK,
     },
     saveIcon: {
@@ -123,7 +116,7 @@ const styles = StyleSheet.create({
         marginTop: 30,
         marginLeft: 10,
         marginBottom: 10,
-        fontFamily: Nunito_Semibold,
+        fontFamily: Quicksand_Regular,
         fontSize: calculateFontSize(15),
         color: BLACK,
     },
@@ -157,8 +150,23 @@ const styles = StyleSheet.create({
         width: '90%',
         height: 200,
         borderRadius: 10,
-        alignSelf: 'center', // Center the image within the card
-        marginBottom: 0, // Ensure there's space between the image and the text below
+        alignSelf: 'center',
+        marginBottom: 0,
+    },
+    counter: {
+        fontFamily: Quicksand_Regular,
+        color: BLACK,
+        fontSize: 18
+    },
+    counterContainer: {
+        position: 'absolute',
+        shadowColor: BACKGROUND,
+        shadowOpacity: 0,
+    shadowRadius: 0,
+    elevation: 0,
+        backgroundColor: BACKGROUND,
+        padding: 5,
+        borderBottomEndRadius: 20
     },
 });
 

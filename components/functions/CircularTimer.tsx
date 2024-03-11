@@ -1,29 +1,30 @@
 import React, { useEffect, useState } from 'react';
 import { AnimatedCircularProgress } from 'react-native-circular-progress';
-import {Text} from "react-native";
+import {StyleSheet, Text} from "react-native";
+import {BACKGROUND, BLACK, BLOCK_BUTTON, MAIN_SECOND, SECONDARY_SECOND} from "../../colors";
+import {Quicksand_Regular} from "../../fonts";
 
 const CircularTimer = ({ seconds, initialSeconds = 15, isActive = true }: any) => {
   const [progress, setProgress] = useState(100);
 
   useEffect(() => {
-    if (!isActive) return; // Если таймер не активен, прекращаем обновление
+    if (!isActive) return;
 
-    // Рассчитываем прогресс исходя из текущего значения seconds
     const newProgress = seconds / initialSeconds * 100;
     setProgress(newProgress);
-  }, [seconds, initialSeconds, isActive]); // Добавляем isActive в зависимости
+  }, [seconds, initialSeconds, isActive]);
 
   return (
     <AnimatedCircularProgress
-      size={30}
-      width={3}
+      size={105}
+      width={25}
       fill={progress}
-      tintColor="#00e0ff"
+      tintColor={MAIN_SECOND}
       onAnimationComplete={() => console.log('onAnimationComplete')}
-      backgroundColor="#3d5875">
+      backgroundColor={BLOCK_BUTTON}>
       {
         (fill) => (
-          <Text>
+          <Text style={styles.number}>
             {seconds > 0 ? seconds : 0}
           </Text>
         )
@@ -31,5 +32,14 @@ const CircularTimer = ({ seconds, initialSeconds = 15, isActive = true }: any) =
     </AnimatedCircularProgress>
   );
 };
+
+const styles = StyleSheet.create({
+  number: {
+    fontFamily: Quicksand_Regular,
+    color: BLACK,
+    fontSize: 24,
+    marginBottom: 5,
+  }
+})
 
 export default CircularTimer;

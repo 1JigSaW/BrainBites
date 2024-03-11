@@ -12,7 +12,17 @@ import {
     SECONDARY_SECOND, THIRD_PLACE,
     WHITE
 } from "../colors";
-import {ActivityIndicator, Dimensions, FlatList, Image, SafeAreaView, StyleSheet, Text, View} from "react-native";
+import {
+    ActivityIndicator,
+    Dimensions,
+    FlatList,
+    Image,
+    SafeAreaView,
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    View
+} from "react-native";
 import {Nunito_Bold, Nunito_Regular, Quicksand_Bold, Quicksand_Regular} from "../fonts";
 import {useGetUsers, useGetUserStats} from "../queries/user";
 import React, {useContext, useEffect, useState} from "react";
@@ -124,11 +134,14 @@ const MainScreen = ({ navigation, route }: Props) => {
                     horizontal
                     showsHorizontalScrollIndicator={false}
                     renderItem={({ item }) => (
-                      <View style={styles.topicContainer}>
+                      <TouchableOpacity style={styles.topicContainer} onPress={() => navigation.navigate('SubTopicScreen', {
+                                topic_id: item.topic_id,
+                                topic_name: item.topic_name,
+                            })}>
                           <Image source={{ uri: item.image }} style={styles.topicImage} />
                           <View style={styles.overlay} />
                           <Text style={styles.topicTitle}>{item.topic_name}</Text>
-                      </View>
+                      </TouchableOpacity>
                     )}
                     keyExtractor={(item, index) => index.toString()}
                     snapToInterval={width * 0.75}

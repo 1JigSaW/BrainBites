@@ -1,8 +1,7 @@
 import {StackScreenProps} from "@react-navigation/stack";
-import {HomeStackParamList} from "../navigation/HomeStack";
 import React, {useContext, useEffect, useLayoutEffect, useRef, useState} from "react";
 import {ActivityIndicator, Alert, SafeAreaView, StyleSheet, Text, TouchableOpacity, View} from "react-native";
-import {BACKGROUND, BLACK, BLUE} from "../colors";
+import {BACKGROUND, BLACK, BLUE, MAIN_SECOND} from "../colors";
 import CardComponent from "../components/CardComponent";
 import Swiper from "react-native-deck-swiper";
 import {CardsStackParamList} from "../navigation/CardsStack";
@@ -13,10 +12,11 @@ import QuizModal from "../components/QuizModal";
 import {useIsFocused} from "@react-navigation/native";
 import {useCheckUserAchievements} from "../queries/badge";
 import Toast from "react-native-toast-message";
-import ArrowBackIcon from "../components/icons/ArrowBackIcon";
-import {Nunito_Semibold} from "../fonts";
+import {Quicksand_Bold} from "../fonts";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import {CARDS_COUNT, CARDS_INDEX_KEY, CARDS_KEY} from "../constants";
+import BackIcon from "../components/icons/BackIcon";
+import ProgressBarCard from "../components/ProgressBarCard";
 
 type Props = StackScreenProps<CardsStackParamList, 'CardsSubtopicScreen'>;
 
@@ -69,22 +69,28 @@ const CardsSubtopicScreen = ({ navigation, route }: Props) => {
     }, [isQueryLoading]);
 
     useLayoutEffect(() => {
-        navigation.setOptions({
-            headerBackTitleVisible: false,
-            headerTitleAlign: 'center',
-            headerTitleStyle: {
-                fontFamily: Nunito_Semibold,
-                fontSize: 28,
-            },
-            title: isQuizVisible ? `Quiz: ${currentQuizNumber + 1} / ${cards?.length}`  :
-                (isQueryLoading ? 'Loading...' : `Card ${swipedCardCount  + 1} / ${cards?.length}`),
-            headerLeft: () => (
-                <TouchableOpacity onPress={handleExitPress} style={{ marginLeft: 20, marginTop: 5 }}>
-                    <ArrowBackIcon color={BLACK} size={25} />
-                </TouchableOpacity>
-            )
-        });
-    }, [isQuizVisible, currentQuizNumber, swipedCardCount, cards?.length, navigation]);
+      const progress = isQuizVisible
+        ? (currentQuizNumber + 1) / (quizzes?.length || 1)
+        : (swipedCardCount + 1) / (cards?.length || 1);
+
+      navigation.setOptions({
+      header: () => (
+        <View style={styles.customHeader}>
+          <TouchableOpacity onPress={handleExitPress} style={styles.exitButton}>
+            <BackIcon color={BLACK} size={100} />
+          </TouchableOpacity>
+          <View style={styles.progressBarContainer}>
+            <ProgressBarCard progress={progress} />
+          </View>
+          {/*<Text style={styles.counterText}>*/}
+          {/*  {isQuizVisible ? `Quiz: ${currentQuizNumber + 1} / ${quizzes?.length}` :*/}
+          {/*  `Card ${swipedCardCount + 1} / ${cards?.length}`}*/}
+          {/*</Text>*/}
+        </View>
+      ),
+    });
+    }, [isQuizVisible, currentQuizNumber, swipedCardCount, quizzes, cards, navigation]);
+
 
     const handleSwiped = (index: number) => {
         if (cards && index < cards.length && cards[index].id != null) {
@@ -124,7 +130,7 @@ const CardsSubtopicScreen = ({ navigation, route }: Props) => {
                 console.error('AsyncStorage error:', error);
             });
         await handleCheckAchievements();
-        navigation.goBack(); // Navigate the user back to the previous screen
+        navigation.goBack();
     };
 
 
@@ -154,12 +160,6 @@ const CardsSubtopicScreen = ({ navigation, route }: Props) => {
 
     return (
         <SafeAreaView style={styles.fullScreen}>
-            {/*<View>*/}
-            {/*    <TouchableOpacity style={styles.exitButton} onPress={handleExitPress} hitSlop={{ top: 20, bottom: 20, left: 20, right: 20  }}>*/}
-            {/*        <Text style={{fontSize: 20, color: BLACK}}>✕</Text>*/}
-            {/*    </TouchableOpacity>*/}
-            {/*    <Text style={styles.counterText}>{isQuizVisible ? `Quiz: ${currentQuizNumber}` : `Card ${swipedCardCount}`} / {cards?.length}</Text>*/}
-            {/*</View>*/}
             {isQueryLoading ? (
                 <ActivityIndicator size="large" color={BLUE} />
             ) : (cards && cards.length > 0 ? (
@@ -167,10 +167,10 @@ const CardsSubtopicScreen = ({ navigation, route }: Props) => {
                     <Swiper
                         ref={swiperRef}
                         cards={cards}
-                        renderCard={(card) => <CardComponent card={card} />}
+                        renderCard={(card) => <CardComponent card={card} swipedCard={swipedCardCount} cards={cards} />}
                         onSwiped={handleSwiped}
                         onSwipedAll={handleTest}
-                        backgroundColor="#f0f0f0"
+                        backgroundColor={MAIN_SECOND}
                         stackSize={everyDayCards}
                         stackScale={5}
                         stackSeparation={30}
@@ -178,10 +178,10 @@ const CardsSubtopicScreen = ({ navigation, route }: Props) => {
                 </View>
             ) : (
                 <View style={{
-                    flex: 1, // Take up all available space
-                    justifyContent: 'center', // Center vertically
-                    alignItems: 'center', // Center horizontally
-                    width: '100%', // Ensure it takes the full width
+                    flex: 1,
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    width: '100%',
                     paddingHorizontal: 10,
                 }}>
                     <Text style={{color: BLACK, fontSize: 20}}>You completed all the cards in this topic</Text>
@@ -215,7 +215,7 @@ const styles = StyleSheet.create({
     },
     timerText: {
         fontSize: 18,
-        color: '#ff0000', // Пример цвета для таймера
+        color: '#ff0000',
         textAlign: 'center',
         margin: 10,
     },
@@ -225,10 +225,8 @@ const styles = StyleSheet.create({
         height: 50,
     },
     exitButton: {
-        position: 'absolute',
-        top: 10,
-        zIndex: 10,
         color: BLACK,
+        marginLeft: 5,
     },
     counterText: {
         position: 'absolute',
@@ -251,10 +249,10 @@ const styles = StyleSheet.create({
 
     },
     quizModalWrapper: {
-        flex: 1, // Take up all available space
-        justifyContent: 'center', // Center vertically
-        alignItems: 'center', // Center horizontally
-        width: '100%', // Ensure it takes the full width
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        width: '100%',
     },
     buttonText: {
         color: BACKGROUND,
@@ -269,6 +267,17 @@ const styles = StyleSheet.create({
         alignSelf: 'center',
         backgroundColor: BLUE,
         marginTop: 20,
+    },
+    customHeader: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        padding: 10,
+    },
+    progressBarContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        paddingHorizontal: 15,
     },
 });
 

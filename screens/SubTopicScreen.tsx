@@ -14,12 +14,13 @@ import {
     View
 } from "react-native";
 import ArrowRightIcon from "../components/icons/ArrowRight";
-import {BACKGROUND, BLACK, BLUE, PROGRESS_BACKGROUND} from "../colors";
+import {BACKGROUND, BLACK, BLUE, MAIN_SECOND, PROGRESS_BACKGROUND, WHITE} from "../colors";
 import {useIsFocused} from "@react-navigation/native";
 import LockIcon from "../components/icons/LockIcon";
-import {Nunito_Bold, Nunito_Regular} from "../fonts";
+import {Nunito_Bold, Nunito_Regular, Quicksand_Bold, Quicksand_Regular} from "../fonts";
 import { UserSubtitleProgressResponse } from "../api/topic.api";
 import {useGetLives} from "../queries/user";
+import MainScreen from "./MainScreen";
 
 type Props = StackScreenProps<CardsStackParamList, 'SubTopicScreen'>;
 
@@ -38,7 +39,6 @@ const SubTopicScreen = ({navigation, route}: Props) => {
         }
     }, [livesData, userId]);
 
-    // Хук для получения прогресса
     const {data: subtitlesProgress, isLoading, error, refetch} = useGetUserSubtitlesProgress(userId, topic_id);
 
     useEffect(() => {
@@ -58,8 +58,8 @@ const SubTopicScreen = ({navigation, route}: Props) => {
         console.log('lives11111111111', lives && (lives <= 0))
         if (lives !== null && lives <= 0) {
             Alert.alert(
-                "Жизни закончились",
-                "К сожалению, у вас не осталось жизней. Дождитесь пополнения, чтобы продолжить.",
+                "Out of Lives",
+                "Unfortunately, you've run out of lives. Wait for them to replenish to continue.",
                 [{ text: "OK", style: "cancel" }]
             );
             return;
@@ -71,11 +71,11 @@ const SubTopicScreen = ({navigation, route}: Props) => {
             });
         } else {
             Alert.alert(
-                "Покупка подтопика",
-                `Вы действительно хотите купить этот подтопик за ${subtitle.cost} XP?`,
+                "Purchase Subtopic",
+                `Do you really want to purchase this subtopic for ${subtitle.cost} XP?`,
                 [
                     {
-                        text: "Отмена",
+                        text: "Cancel",
                         style: "cancel"
                     },
                     {
@@ -87,12 +87,13 @@ const SubTopicScreen = ({navigation, route}: Props) => {
         }
     };
 
+
     const purchaseSubtitle = (subtitleId: number) => {
         purchase({ user_id: userId, subtitle_id: subtitleId });
     };
 
     if (error) return <Text>Error loading topics</Text>;
-    console.log('subtitlesProgress', subtitlesProgress)
+
     return (
         <SafeAreaView style={styles.scrollView}>
             <ScrollView style={styles.safeContainer}>
@@ -115,10 +116,12 @@ const SubTopicScreen = ({navigation, route}: Props) => {
                                 {
                                     subtitle.is_purchased ||
                                     subtitle.is_free ? (
-                                    <ArrowRightIcon size={40} color={BLACK} />
+                                    <View>
+                                        <Text style={{opacity: 1}}></Text>
+                                    </View>
                                 ) : (
                                     <View>
-                                        <Text style={{opacity: 1}}>{subtitle.cost} XP</Text>
+                                        <Text style={{opacity: 1, fontFamily: Quicksand_Regular}}>{subtitle.cost} XP</Text>
                                     </View>
                                 )}
                             </View>
@@ -133,42 +136,44 @@ const SubTopicScreen = ({navigation, route}: Props) => {
 const styles = StyleSheet.create({
     safeContainer: {
         flex: 1,
-        backgroundColor: BACKGROUND,
+        backgroundColor: MAIN_SECOND,
         paddingHorizontal: 10,
-        paddingVertical: 5,
-        marginBottom: 40,
+        paddingVertical: 10,
+        borderRadius: 20,
+        marginHorizontal: 10,
+        marginBottom: 10,
+        marginTop: 10,
     },
     scrollView: {
         flex: 1,
         backgroundColor: BACKGROUND,
+        overflow: 'hidden',
     },
     roundedContainer: {
-        backgroundColor: 'white',
-        borderRadius: 15,
+        backgroundColor: WHITE,
+        borderRadius: 20,
         marginBottom: 10,
         paddingHorizontal: 20,
         paddingVertical: 10,
-        elevation: 3,
         shadowColor: "#000",
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.1,
         shadowRadius: 2,
-        borderWidth: 1,
         position: 'relative',
-        overflow: 'hidden',  // Ensure the overlay doesn't spill out of the container
+        overflow: 'hidden',
     },
     progressOverlay: {
         position: 'absolute',
         left: 0,
         top: 0,
         bottom: 0,
-        backgroundColor: PROGRESS_BACKGROUND,  // Choose a color that indicates progress
+        backgroundColor: PROGRESS_BACKGROUND,
     },
     infoContainer: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        zIndex: 1,  // Ensure text and icons appear above the progress overlay
+        zIndex: 1,
     },
     mainContainer: {
         backgroundColor: BACKGROUND,
@@ -176,17 +181,16 @@ const styles = StyleSheet.create({
         width: '80%',
     },
     mainText: {
-        color: '#000',
-        fontFamily: Nunito_Bold,
-        fontSize: 20,
+        color: BLACK,
+        fontFamily: Quicksand_Bold,
+        fontSize: 18,
         fontStyle: 'normal',
         paddingHorizontal: 10,
     },
-
     subText: {
-        color: '#000',
-        fontFamily: Nunito_Regular,
-        fontSize: 16,
+        color: BLACK,
+        fontFamily: Quicksand_Bold,
+        fontSize: 18,
         fontStyle: 'normal',
     },
 });

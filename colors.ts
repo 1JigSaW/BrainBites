@@ -13,3 +13,5 @@ export const RED_SECOND = '#FF9292';
 export const FIRST_PLACE = '#FFCD65';
 export const SECOND_PLACE = '#C0C0C0';
 export const THIRD_PLACE = '#AE8742';
+export const CORRECT_ANSWER = '#63F0D4';
+export const INCORRECT_ANSWER = '#FF9292';

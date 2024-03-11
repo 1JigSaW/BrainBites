@@ -43,7 +43,7 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'space-between',
         backgroundColor: MAIN_SECOND,
-        margin: 15,
+        margin: 10,
         borderRadius: 20,
     },
     scrollViewContainer: {

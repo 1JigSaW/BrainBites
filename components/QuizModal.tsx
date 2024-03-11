@@ -1,15 +1,36 @@
 import React, {useState, useEffect, useContext, useRef} from 'react';
-import {View, Text, Modal, StyleSheet, Button, TouchableOpacity, ActivityIndicator, Alert} from 'react-native';
+import {
+    View,
+    Text,
+    Modal,
+    StyleSheet,
+    Button,
+    TouchableOpacity,
+    ActivityIndicator,
+    Alert,
+    ScrollView
+} from 'react-native';
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import {QuizState} from "../constants";
 import {Quiz} from "../api/quiz.api";
 import {useUpdateUserXp} from "../queries/card";
 import MainContext from "../navigation/MainContext";
-import {BACKGROUND, BLACK, BLUE} from "../colors";
+import {
+    BACKGROUND,
+    BLACK, BLOCK_BUTTON,
+    BLUE,
+    CORRECT_ANSWER,
+    INCORRECT_ANSWER,
+    MAIN_SECOND,
+    RED_SECOND,
+    SECONDARY_SECOND,
+    WHITE
+} from "../colors";
 import * as Animatable from 'react-native-animatable';
-import {Nunito_Regular, Nunito_Semibold} from "../fonts";
+import {Nunito_Regular, Nunito_Semibold, Quicksand_Regular} from "../fonts";
 import CircularTimer from "./functions/CircularTimer";
 import {useGetLives, useLoseLife} from "../queries/user";
+import HeartIcon from "./icons/HeartIcon";
 
 interface QuizOverlayProps {
     isVisible: boolean;
@@ -26,7 +47,7 @@ const QuizOverlay = ({ isVisible, onContinue, quizzes, onQuizChange, navigation 
     const { userId } = useContext(MainContext);
     const [loading, setLoading] = useState(false);
     const [correctAnswerIds, setCorrectAnswerIds] = useState<number[]>([]);
-    const [timer, setTimer] = useState(15);
+    const [timer, setTimer] = useState(100000000000);
     const [showTimeoutWarning, setShowTimeoutWarning] = useState(false);
     const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
     const [isAnswerCorrect, setIsAnswerCorrect] = useState<boolean | null>(null);
@@ -45,23 +66,19 @@ const QuizOverlay = ({ isVisible, onContinue, quizzes, onQuizChange, navigation 
     useEffect(() => {
 
         console.log('selectedAnswer', selectedAnswer)
-    // Запускаем таймер только если викторина видима, не завершена, текущий вопрос существует, и ответ еще не выбран
         if (isVisible && !quizCompleted && currentQuestionIndex < quizzes.length && !selectedAnswer) {
-            setTimer(15); // Устанавливаем таймер на начальное значение
+            setTimer(15);
 
             const interval = setInterval(() => {
                 setTimer(prevTimer => {
-                    // Если время не истекло, уменьшаем таймер. Иначе останавливаем.
                     if (prevTimer > 0) return prevTimer - 1;
-                    // Действия при истечении времени, если нужно
                     return 0;
                 });
             }, 1000);
 
-            // Очистка интервала при размонтировании компонента или изменении зависимостей
             return () => clearInterval(interval);
         }
-    }, [isVisible, quizCompleted, currentQuestionIndex, quizzes.length, selectedAnswer]); // Добавляем answerSelected в зависимости
+    }, [isVisible, quizCompleted, currentQuestionIndex, quizzes.length, selectedAnswer]);
 
     useEffect(() => {
         if (livesData && livesData.lives_remaining != null) {
@@ -90,7 +107,6 @@ const QuizOverlay = ({ isVisible, onContinue, quizzes, onQuizChange, navigation 
     }, [currentQuestionIndex]);
 
     useEffect(() => {
-        // Сброс состояния при появлении теста
         if (isVisible) {
             setCurrentQuestionIndex(0);
             setCorrectAnswersCount(0);
@@ -101,20 +117,17 @@ const QuizOverlay = ({ isVisible, onContinue, quizzes, onQuizChange, navigation 
      const handleAnswer = (selectedAnswerIndex: number | null) => {
          setTimerIsActive(false);
          setSelectedAnswer(selectedAnswerIndex);
-        let isCorrect = false; // По умолчанию ответ считаем неправильным
+        let isCorrect = false;
         if (selectedAnswerIndex !== null) {
-            // Если индекс ответа не null, проверяем, правильный ли ответ
             isCorrect = quizzes[currentQuestionIndex].correct_answer === quizzes[currentQuestionIndex].answers[selectedAnswerIndex];
         }
         setIsAnswerCorrect(isCorrect);
 
         if (!isCorrect && userId) {
-            // Если ответ неправильный или время вышло, отнимаем жизнь
             setLives(prevLives => {
                 const newLives = (prevLives != null && prevLives > 0) ? prevLives - 1 : 0;
 
                 if (newLives === 0) {
-                    // Если жизней больше нет, показываем предупреждение
                     Alert.alert(
                         "Жизни закончились",
                         "К сожалению, все ваши жизни истрачены. Дождитесь пополнения.",
@@ -142,7 +155,6 @@ const QuizOverlay = ({ isVisible, onContinue, quizzes, onQuizChange, navigation 
                 }
             });
         } else if (selectedAnswerIndex !== null) {
-            // Если ответ правильный, увеличиваем количество правильных ответов
             setCorrectAnswersCount(correctAnswersCount + 1);
             setCorrectAnswerIds([...correctAnswerIds, quizzes[currentQuestionIndex].card_id]);
         }
@@ -178,62 +190,69 @@ const QuizOverlay = ({ isVisible, onContinue, quizzes, onQuizChange, navigation 
         <Animatable.View
             animation={isVisible ? 'slideInUp' : 'slideOutDown'}
             duration={500}
-            style={styles.overlay}
+            style={[styles.overlay, {flex: 1}]}
         >
             <Animatable.View
                 ref={animatableRef}
-                style={{ width: '100%' }}
+                style={{ width: '100%', flex: 1 }}
             >
             {loading ? (
                 <ActivityIndicator size="large" color={BLUE} />
             ) : (
 
                 <View style={styles.modalView}>
-                    <Text>Жизни: {livesData?.lives_remaining ?? "Загрузка..."}</Text>
-                    {quizzes.length > 0 && currentQuestionIndex < quizzes.length && !quizCompleted ? (
-                        <>
-                            <View style={{ position: 'absolute', top: 10, right: 10 }}>
-                                <CircularTimer seconds={timer} isActive={timerIsActive}/>
-                            </View>
-                            <Text style={styles.questionText}>
-                                {quizzes[currentQuestionIndex].question}
-                            </Text>
-                            {quizzes[currentQuestionIndex].answers.map((answer, index) => (
-                                <Animatable.View
-                                    key={index}
-                                    animation="fadeIn"
-                                    duration={500}>
-                                    <TouchableOpacity
-                                        onPress={() => selectedAnswer === null && handleAnswer(index)}
-                                        style={[
-                                            styles.quizAnswer,
-                                            selectedAnswer === index ? (isAnswerCorrect ? styles.correctAnswer : styles.incorrectAnswer) : {}
-                                        ]}
-                                    >
-                                        <Text style={styles.answerText}>{answer}</Text>
-                                    </TouchableOpacity>
-                                </Animatable.View>
-                            ))}
-                            {selectedAnswer !== null && (
-                                <Animatable.View animation="fadeIn" duration={500}>
-                                    <TouchableOpacity style={styles.button} onPress={handleContinueQuiz}>
-                                        <Text style={styles.buttonText}>Continue</Text>
-                                    </TouchableOpacity>
-                                </Animatable.View>
-                            )}
-                        </>
-                    ) : quizCompleted ? (
-                        <Animatable.View style={{ justifyContent: 'center', alignItems: 'center' }}>
-                            <Text style={{fontSize: 25, textAlign: 'center', color: BLACK}}>You have completed the quiz!</Text>
-                            <Text style={{ fontSize: 20, textAlign: 'center', color: BLACK, marginTop: 10 }}>Correct answers: {correctAnswersCount} out of {quizzes.length}</Text>
-                            <TouchableOpacity style={styles.button} onPress={handleContinue} >
-                                <Text style={styles.buttonText}>Continue</Text>
-                            </TouchableOpacity>
-                        </Animatable.View>
+                    <View style={styles.timerWrapper}>
+                        <CircularTimer seconds={timer} isActive={timerIsActive}/>
+                    </View>
+                    <ScrollView>
+                        <View style={styles.counterQuiz}>
+                            <Text style={styles.quizTextCounter}>{`${currentQuestionIndex + 1}/${quizzes?.length}`}</Text>
+                        </View>
+                        <View style={styles.lives}>
+                            <Text style={styles.livesText}>{livesData?.lives_remaining}</Text>
+                            <HeartIcon size={100} color={RED_SECOND} style={{marginRight: 10, marginTop: 3}} />
+                        </View>
+                        <View style={{paddingHorizontal: 15, marginTop: 70}}>
+                        {quizzes.length > 0 && currentQuestionIndex < quizzes.length && !quizCompleted ? (
+                            <>
+                                <Text style={styles.questionText}>
+                                    {quizzes[currentQuestionIndex].question}
+                                </Text>
+                                {quizzes[currentQuestionIndex].answers.map((answer, index) => (
+                                    <Animatable.View
+                                        key={index}
+                                        animation="fadeIn"
+                                        duration={500}>
+                                        <TouchableOpacity
+                                            onPress={() => selectedAnswer === null && handleAnswer(index)}
+                                            style={[
+                                                styles.quizAnswer,
+                                                selectedAnswer === index ? (isAnswerCorrect ? styles.correctAnswer : styles.incorrectAnswer) : {}
+                                            ]}
+                                        >
+                                            <Text style={styles.answerText}>{answer}</Text>
+                                        </TouchableOpacity>
+                                    </Animatable.View>
+                                ))}
+                            </>
+                        ) : quizCompleted ? (
+                            <Animatable.View style={{ justifyContent: 'center', alignItems: 'center' }}>
+                                <Text style={{fontSize: 25, textAlign: 'center', color: BLACK}}>You have completed the quiz!</Text>
+                                <Text style={{ fontSize: 20, textAlign: 'center', color: BLACK, marginTop: 10 }}>Correct answers: {correctAnswersCount} out of {quizzes.length}</Text>
+                                <TouchableOpacity style={styles.button} onPress={handleContinueQuiz} >
+                                    <Text style={styles.buttonText}>Continue</Text>
+                                </TouchableOpacity>
+                            </Animatable.View>
 
-                    ) : (
-                        <Text>Loading quizzes or no quiz available...</Text>
-                    )}
+                        ) : (
+                            <Text>Loading quizzes or no quiz available...</Text>
+                        )}
+                        </View>
+
+                    </ScrollView>
+                        <TouchableOpacity style={[styles.button, !selectedAnswer && {backgroundColor: BLOCK_BUTTON}]} onPress={handleContinueQuiz} disabled={!selectedAnswer}>
+                            <Text style={styles.buttonText}>Continue</Text>
+                        </TouchableOpacity>
                 </View>
             )}
             </Animatable.View>
@@ -244,26 +263,19 @@ const QuizOverlay = ({ isVisible, onContinue, quizzes, onQuizChange, navigation 
 
 const styles = StyleSheet.create({
     overlay: {
-
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
     },
     modalView: {
-        margin: 20,
-        backgroundColor: BACKGROUND,
+        flex: 1,
+        backgroundColor: MAIN_SECOND,
         borderRadius: 20,
-        padding: 35,
-        paddingBottom: 10,
         alignItems: "center",
-        shadowColor: "#000",
-        shadowOffset: {
-            width: 2,
-            height: 2
-        },
-        shadowOpacity: 0.25,
-        shadowRadius: 3.84,
-        elevation: 5,
         textAlign: 'center',
-        justifyContent: 'center',
-        borderWidth: 1,
+        marginHorizontal: 10,
+        marginBottom: 10,
+        marginTop: 100,
     },
     questionText: {
         marginBottom: 15,
@@ -273,31 +285,36 @@ const styles = StyleSheet.create({
         fontSize: 20,
     },
     quizAnswer: {
-        borderWidth: 1,
-        borderRadius: 20,
+        backgroundColor: BACKGROUND,
+        borderRadius: 5,
         width: '100%',
         padding: 10,
         marginVertical: 5,
+        elevation: 5,
     },
     answerText: {
         textAlign: 'center',
         color: BLACK,
-        fontFamily: Nunito_Regular,
-        fontSize: 16
+        fontFamily: Quicksand_Regular,
+        fontSize: 18
     },
     button: {
-        padding: 10,
-        borderRadius: 20,
-        alignItems: 'center',
-        width: '100%',
+        margin: 10,
         marginBottom: 10,
-        alignSelf: 'center',
-        backgroundColor: BLUE,
-        marginTop: 20,
+        borderRadius: 20,
+        backgroundColor: SECONDARY_SECOND,
+        alignItems: 'center',
+        justifyContent: 'center',
+        paddingVertical: 15,
+        width: '100%'
     },
     buttonText: {
-        color: BACKGROUND,
-        fontSize: 20,
+        fontSize: 18,
+        textAlign: 'center',
+        fontFamily: Quicksand_Regular,
+        color: WHITE,
+        alignItems: 'center',
+        justifyContent: 'center',
     },
     centeredView: {
         flex: 1,
@@ -321,12 +338,52 @@ const styles = StyleSheet.create({
         textAlign: "center"
     },
     correctAnswer: {
-        borderColor: 'green',
-        borderWidth: 2,
+        backgroundColor: CORRECT_ANSWER,
     },
     incorrectAnswer: {
-        borderColor: 'red',
-        borderWidth: 2,
+        backgroundColor: INCORRECT_ANSWER,
+    },
+    timerWrapper: {
+        position: 'absolute',
+        top: -50,
+        alignSelf: 'center',
+        backgroundColor: 'white',
+        borderRadius: 55,
+        width: 105,
+        height: 105,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    counterQuiz: {
+        position: 'absolute',
+        shadowColor: BACKGROUND,
+        shadowOpacity: 0,
+        shadowRadius: 0,
+        elevation: 0,
+        backgroundColor: BACKGROUND,
+        padding: 5,
+        borderBottomEndRadius: 20,
+    },
+    quizTextCounter: {
+        fontFamily: Quicksand_Regular,
+        color: BLACK,
+        fontSize: 18
+    },
+    lives: {
+        position: 'absolute',
+        flexDirection: "row",
+        alignItems: "center",
+        right: 0,
+        elevation: 0,
+        padding: 5,
+        borderBottomEndRadius: 20,
+        marginTop: 5
+    },
+    livesText: {
+        fontSize: 24,
+        fontFamily: Quicksand_Regular,
+        color: BLACK,
+        marginRight: 5,
     },
 });
 
