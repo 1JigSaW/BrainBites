@@ -13,6 +13,8 @@ import SubTopicScreen from "../screens/SubTopicScreen";
 import {BACKGROUND, BLACK, MAIN_SECOND} from "../colors";
 import CardsSubtopicScreen from "../screens/CardsSubtopicScreen";
 import BackIcon from "../components/icons/BackIcon";
+import Launch1Screen from "../screens/Onboarding/Launch1Screen";
+import QuizCompletedScreen from "../screens/QuizCompletedScreen";
 
 export type HomeStackParamList = {
     HomeScreen: undefined;
@@ -20,6 +22,9 @@ export type HomeStackParamList = {
     SubTopicScreen: {
         topic_id: number,
         topic_name: string,
+    };
+    QuizCompletedScreen: {
+        subtopic_id: number
     };
     LeaderBoardScreen: undefined;
     AchievementsScreen: undefined;
@@ -71,6 +76,7 @@ const HomeStack = () => {
                               cardStyle: { backgroundColor: BACKGROUND },
                           }}
             />
+            <Stack.Screen name="QuizCompletedScreen" component={QuizCompletedScreen} options={{headerShown: false}}/>
             <Stack.Screen
                 name="LeaderBoardScreen"
                 component={LeaderBoardScreen}

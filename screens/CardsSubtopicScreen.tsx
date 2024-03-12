@@ -70,8 +70,8 @@ const CardsSubtopicScreen = ({ navigation, route }: Props) => {
 
     useLayoutEffect(() => {
       const progress = isQuizVisible
-        ? (currentQuizNumber + 1) / (quizzes?.length || 1)
-        : (swipedCardCount + 1) / (cards?.length || 1);
+        ? (currentQuizNumber) / (quizzes?.length || 1)
+        : (swipedCardCount) / (cards?.length || 1);
 
       navigation.setOptions({
       header: () => (

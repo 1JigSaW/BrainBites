@@ -54,31 +54,27 @@ const QuizOverlay = ({ isVisible, onContinue, quizzes, onQuizChange, navigation 
     const [lives, setLives] = useState<number | null>(null);
     const [timerIsActive, setTimerIsActive] = useState(true);
 
-    console.log('onQuizChange', onQuizChange);
-
     const { mutate: updateUserXp } = useUpdateUserXp()
     const { data: livesData, refetch: refetchLives } = useGetLives(userId);
     const { mutate: loseLife } = useLoseLife();
-    console.log('livesData', livesData)
     const animatableRef = useRef<Animatable.View & View>(null);
 
+    console.log('selectedAnswer', selectedAnswer)
 
     useEffect(() => {
+        let intervalId: string | number | NodeJS.Timeout | undefined;
+        if (timerIsActive && isVisible && !quizCompleted && currentQuestionIndex < quizzes.length) {
+            setTimer(15); // Перезапуск таймера для нового вопроса
 
-        console.log('selectedAnswer', selectedAnswer)
-        if (isVisible && !quizCompleted && currentQuestionIndex < quizzes.length && !selectedAnswer) {
-            setTimer(15);
-
-            const interval = setInterval(() => {
-                setTimer(prevTimer => {
-                    if (prevTimer > 0) return prevTimer - 1;
-                    return 0;
-                });
+            intervalId = setInterval(() => {
+                setTimer(prevTimer => prevTimer > 0 ? prevTimer - 1 : 0);
             }, 1000);
-
-            return () => clearInterval(interval);
         }
-    }, [isVisible, quizCompleted, currentQuestionIndex, quizzes.length, selectedAnswer]);
+
+        return () => clearInterval(intervalId); // Очистка интервала при деактивации компонента или остановке таймера
+    }, [timerIsActive, isVisible, quizCompleted, currentQuestionIndex, quizzes.length]);
+
+
 
     useEffect(() => {
         if (livesData && livesData.lives_remaining != null) {
@@ -93,7 +89,7 @@ const QuizOverlay = ({ isVisible, onContinue, quizzes, onQuizChange, navigation 
                 "Время вышло!",
                 "К сожалению, время на ответ истекло.",
                 [
-                    { text: "OK", onPress: () => handleAnswer(null) }
+                    { text: "OK", onPress: () => handleContinueQuiz() }
                 ],
                 { cancelable: false }
             );
@@ -117,13 +113,15 @@ const QuizOverlay = ({ isVisible, onContinue, quizzes, onQuizChange, navigation 
      const handleAnswer = (selectedAnswerIndex: number | null) => {
          setTimerIsActive(false);
          setSelectedAnswer(selectedAnswerIndex);
-        let isCorrect = false;
-        if (selectedAnswerIndex !== null) {
-            isCorrect = quizzes[currentQuestionIndex].correct_answer === quizzes[currentQuestionIndex].answers[selectedAnswerIndex];
-        }
-        setIsAnswerCorrect(isCorrect);
+         console.log('setSelectedAnswer(selectedAnswerIndex);', selectedAnswer)
+         let isCorrect = false;
+         if (selectedAnswerIndex !== null) {
+             isCorrect = quizzes[currentQuestionIndex].correct_answer === quizzes[currentQuestionIndex].answers[selectedAnswerIndex];
+         }
+         console.log('CORRECT', isCorrect)
+         setIsAnswerCorrect(isCorrect);
 
-        if (!isCorrect && userId) {
+         if (!isCorrect && userId) {
             setLives(prevLives => {
                 const newLives = (prevLives != null && prevLives > 0) ? prevLives - 1 : 0;
 
@@ -170,7 +168,8 @@ const QuizOverlay = ({ isVisible, onContinue, quizzes, onQuizChange, navigation 
         }
         setSelectedAnswer(null);
         setIsAnswerCorrect(null);
-         if (onQuizChange) {
+        setTimerIsActive(true);
+        if (onQuizChange) {
             onQuizChange(currentQuestionIndex + 1);
         }
     };
@@ -190,7 +189,7 @@ const QuizOverlay = ({ isVisible, onContinue, quizzes, onQuizChange, navigation 
         <Animatable.View
             animation={isVisible ? 'slideInUp' : 'slideOutDown'}
             duration={500}
-            style={[styles.overlay, {flex: 1}]}
+            style={[styles.overlay, {flex: 1, width: '100%'}]}
         >
             <Animatable.View
                 ref={animatableRef}
@@ -204,12 +203,12 @@ const QuizOverlay = ({ isVisible, onContinue, quizzes, onQuizChange, navigation 
                     <View style={styles.timerWrapper}>
                         <CircularTimer seconds={timer} isActive={timerIsActive}/>
                     </View>
-                    <ScrollView>
+                    <ScrollView style={{flex: 1, width: '100%'}}>
                         <View style={styles.counterQuiz}>
                             <Text style={styles.quizTextCounter}>{`${currentQuestionIndex + 1}/${quizzes?.length}`}</Text>
                         </View>
                         <View style={styles.lives}>
-                            <Text style={styles.livesText}>{livesData?.lives_remaining}</Text>
+                            <Text style={styles.livesText}>{lives}</Text>
                             <HeartIcon size={100} color={RED_SECOND} style={{marginRight: 10, marginTop: 3}} />
                         </View>
                         <View style={{paddingHorizontal: 15, marginTop: 70}}>
@@ -306,7 +305,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
         paddingVertical: 15,
-        width: '100%'
+        width: '90%'
     },
     buttonText: {
         fontSize: 18,
@@ -357,9 +356,6 @@ const styles = StyleSheet.create({
     counterQuiz: {
         position: 'absolute',
         shadowColor: BACKGROUND,
-        shadowOpacity: 0,
-        shadowRadius: 0,
-        elevation: 0,
         backgroundColor: BACKGROUND,
         padding: 5,
         borderBottomEndRadius: 20,
