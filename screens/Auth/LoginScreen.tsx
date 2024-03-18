@@ -21,15 +21,17 @@ import {user} from "../../constants"; // Путь к вашему хуку useLo
 type Props = StackScreenProps<AuthStackParamList, 'LoginScreen'>;
 
 const LoginScreen = ({ navigation }: Props) => {
-    const {completeAuth} = useContext(MainContext);
+    const {completeAuth, setUsername, setEveryDayCards, setLives} = useContext(MainContext);
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const { mutate: loginUser, isLoading, isError, error } = useLoginUser();
     const handleLogin = () => {
         loginUser({ email, password }, {
-            onSuccess: async (data) => {
+            onSuccess: async (data: any) => {
                 try {
                     console.log(data.user)
+                    setUsername(data.user?.username);
+                    setLives(data.user?.lives);
                     await AsyncStorage.setItem(user, JSON.stringify(data.user));
                     completeAuth();
                 } catch (error) {

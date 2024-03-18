@@ -61,6 +61,7 @@ const MainScreen = ({ navigation, route }: Props) => {
         isLoading: isLoadingUsers,
         isError: isErrorUsers
     } = useGetUsers({ sortBy, returnAll, userId });
+    console.log('users', users)
 
     const {
         data: userStats,
@@ -86,9 +87,7 @@ const MainScreen = ({ navigation, route }: Props) => {
     console.log(userStats)
 
     const calculateProgress = (streakCount: number) => {
-        // Create an array with false values for each day of the week
         const progressArray = new Array(days.length).fill(false);
-        // Based on the streak count, set the corresponding days to true
         for (let i = 0; i < streakCount && i < progressArray.length; i++) {
             progressArray[i] = true;
         }
@@ -101,7 +100,7 @@ const MainScreen = ({ navigation, route }: Props) => {
 
     return (
         <SafeAreaView style={{ flex: 1, backgroundColor: BACKGROUND }}>
-            <View style={styles.header}>
+            <TouchableOpacity style={styles.header} onPress={() => navigation.navigate('ProfileScreen')}>
                 <View style={styles.headerLine1}>
                     <View style={styles.centerRow}>
                         <View style={styles.circleImageView}>
@@ -127,7 +126,7 @@ const MainScreen = ({ navigation, route }: Props) => {
                     </View>
                 </View>
                 <WeeklyProgressBar total={currentStreak} progress={progressArray} />
-            </View>
+            </TouchableOpacity>
             <View>
                 <FlatList
                     data={topicsProgress}
@@ -156,7 +155,7 @@ const MainScreen = ({ navigation, route }: Props) => {
                     }}
                 />
             </View>
-            <View style={styles.leaderboardContainer}>
+            <TouchableOpacity style={styles.leaderboardContainer} onPress={() => navigation.navigate('LeaderBoardScreen')}>
                 <Text style={styles.titleLeaderboard}>Leaderboard</Text>
                 <View style={styles.blockNum}>
                     {isLoadingUsers ? (
@@ -186,7 +185,7 @@ const MainScreen = ({ navigation, route }: Props) => {
                         ))
                     )}
                 </View>
-            </View>
+            </TouchableOpacity>
         </SafeAreaView>
     )
 }
@@ -297,7 +296,7 @@ const styles = StyleSheet.create({
     },
     listNumber: {
         color: '#000',
-        fontFamily: Nunito_Regular,
+        fontFamily: Quicksand_Regular,
         fontSize: 14,
         fontStyle: 'normal',
         marginRight: 5,

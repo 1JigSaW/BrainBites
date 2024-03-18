@@ -1,7 +1,8 @@
 import React from 'react';
 import { View, Text, StyleSheet, Dimensions } from 'react-native';
-import { BLACK, BLOCK_BUTTON, MAIN_SECOND, WHITE } from "../colors";
-import { Quicksand_Regular } from "../fonts";
+import {BLACK, BLOCK_BUTTON, MAIN_SECOND, RED, WHITE} from "../colors";
+import {Quicksand_Bold, Quicksand_Regular} from "../fonts";
+import FireIcon from "./icons/FireIcon";
 
 const screenWidth = Dimensions.get('window').width;
 
@@ -11,7 +12,7 @@ const WeeklyProgressBar = ({ total, progress }: any) => {
   return (
     <View style={styles.container}>
       <View style={styles.circle}>
-        <Text>100</Text>
+        <Text style={{fontFamily: Quicksand_Bold, color: BLACK, fontSize: 16}}>100</Text>
       </View>
       {days.map((day, index) => (
         <View key={day} style={styles.dayContainer}>

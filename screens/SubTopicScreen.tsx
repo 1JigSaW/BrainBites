@@ -21,8 +21,9 @@ import {Nunito_Bold, Nunito_Regular, Quicksand_Bold, Quicksand_Regular} from "..
 import { UserSubtitleProgressResponse } from "../api/topic.api";
 import {useGetLives} from "../queries/user";
 import MainScreen from "./MainScreen";
+import {HomeStackParamList} from "../navigation/HomeStack";
 
-type Props = StackScreenProps<CardsStackParamList, 'SubTopicScreen'>;
+type Props = StackScreenProps<HomeStackParamList, 'SubTopicScreen'>;
 
 const SubTopicScreen = ({navigation, route}: Props) => {
     const {userId} = useContext(MainContext);
@@ -68,6 +69,8 @@ const SubTopicScreen = ({navigation, route}: Props) => {
         if (subtitle.is_purchased || subtitle.is_free) {
             navigation.navigate('CardsSubtopicScreen', {
                 subtopic_id: subtitle.subtitle_id,
+                topic_id: topic_id,
+                topic_name: topic_name,
             });
         } else {
             Alert.alert(

@@ -7,13 +7,13 @@ import {
 } from 'react-native';
 import {HomeStackParamList} from "../navigation/HomeStack";
 import {StackScreenProps} from "@react-navigation/stack";
-import {BACKGROUND, BLACK, BLUE} from "../colors";
+import {BACKGROUND, BLACK, BLUE, MAIN_SECOND, SECONDARY_SECOND, WHITE} from "../colors";
 import {useGetUserBadgeProgress} from "../queries/badge";
 import MainContext from "../navigation/MainContext";
 import ArrowRightIcon from "../components/icons/ArrowRight";
 import {Criteria} from "../api/badge.api";
 import {calculateProgressBarWidth} from "../utils";
-import {Nunito_Bold, Nunito_Regular} from "../fonts";
+import {Nunito_Bold, Nunito_Regular, Quicksand_Bold, Quicksand_Regular} from "../fonts";
 
 type Props = StackScreenProps<HomeStackParamList, 'AchievementsScreen'>;
 
@@ -37,21 +37,27 @@ const AchievementsScreen = ({ navigation }: Props) => {
     return (
         <SafeAreaView style={{ flex: 1, backgroundColor: BACKGROUND }}>
             <ScrollView style={styles.safeContainer}>
-                {badgeProgress?.map((badge, index) => (
-                    <View key={index} style={styles.roundedContainer}>
-                        <View style={styles.infoContainer}>
-                            <View style={{width: '85%'}}>
-                                <Text style={styles.mainText}>{badge.name}</Text>
-                                <Text style={styles.subText}>{badge.description}</Text>
-                            </View>
-                            <Image source={{ uri: badge.image }} width={50} height={40}/>
-                        </View>
+                <View style={{marginBottom: 20}}>
+                        {isLoading ? (
+                            <ActivityIndicator size="large" color={BLUE} />
+                        ) : (
+                            badgeProgress?.map((badge, index) => (
+                                <View key={index} style={styles.roundedContainer}>
+                                    <View style={styles.infoContainer}>
+                                        <Image source={{ uri: badge.image }} width={50} height={45}/>
+                                        <View style={{width: '85%', marginLeft: 10}}>
+                                            <Text style={styles.mainText}>{badge.name}</Text>
+                                            <Text style={styles.subText}>{badge.description}</Text>
+                                        </View>
+                                    </View>
 
-                        <View style={styles.progressBarBackground}>
-                            <View style={[styles.progressBarFill, { width: calculateProgressBarWidth(badge.progress_number, badge.criteria) as any }]} />
-                        </View>
+                                    <View style={styles.progressBarBackground}>
+                                        <View style={[styles.progressBarFill, { width: calculateProgressBarWidth(badge.progress_number, badge.criteria) as any }]} />
+                                    </View>
+                                </View>
+                            ))
+                        )}
                     </View>
-                ))}
             </ScrollView>
         </SafeAreaView>
     );
@@ -60,23 +66,18 @@ const AchievementsScreen = ({ navigation }: Props) => {
 const styles = StyleSheet.create({
     safeContainer: {
         flex: 1,
-        backgroundColor: BACKGROUND,
-        paddingHorizontal: 23,
-        paddingVertical: 5,
-        marginBottom: 50,
+        backgroundColor: MAIN_SECOND,
+        margin: 10,
+        borderRadius: 20,
+        marginTop: 10,
+        padding: 10,
     },
     roundedContainer: {
-        backgroundColor: 'white',
+        backgroundColor: WHITE,
         borderRadius: 15,
         marginBottom: 10,
         paddingHorizontal: 20,
         paddingVertical: 10,
-        elevation: 3,
-        shadowColor: "#000",
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.1,
-        shadowRadius: 2,
-        borderWidth: 1,
     },
 
     infoContainer: {
@@ -86,31 +87,33 @@ const styles = StyleSheet.create({
     },
 
     mainText: {
-        color: '#000',
-        fontFamily: Nunito_Bold,
-        fontSize: 20,
+        color: BLACK,
+        fontFamily: Quicksand_Bold,
+        fontSize: 18,
         fontStyle: 'normal',
     },
+
     subText: {
-        color: '#000',
-        fontFamily: Nunito_Regular,
-        fontSize: 16,
+        color: BLACK,
+        fontFamily: Quicksand_Regular,
+        fontSize: 14,
         fontStyle: 'normal',
     },
 
     progressBarBackground: {
-        height: 15,
+        height: 20,
         borderRadius: 10,
-        backgroundColor: '#fff', // Цвет фона
+        backgroundColor: '#fff',
         marginTop: 10,
-        borderWidth: 1,
+        borderWidth: 5,
+        borderColor: MAIN_SECOND
     },
 
     progressBarFill: {
         height: '100%',
         width: '50%',
         borderRadius: 10,
-        backgroundColor: BLUE,
+        backgroundColor: SECONDARY_SECOND,
     },
 });
 

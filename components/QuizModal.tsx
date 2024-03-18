@@ -38,9 +38,12 @@ interface QuizOverlayProps {
     quizzes: Quiz[];
     onQuizChange?: (currentQuizIndex: number) => void;
     navigation: any;
+    subtopic_id: number;
+    topic_id: number,
+    topic_name: string,
 }
 
-const QuizOverlay = ({ isVisible, onContinue, quizzes, onQuizChange, navigation }: QuizOverlayProps) => {
+const QuizOverlay = ({ isVisible, onContinue, quizzes, onQuizChange, navigation, subtopic_id, topic_id, topic_name }: QuizOverlayProps) => {
     const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
     const [correctAnswersCount, setCorrectAnswersCount] = useState(0);
     const [quizCompleted, setQuizCompleted] = useState(false);
@@ -64,14 +67,14 @@ const QuizOverlay = ({ isVisible, onContinue, quizzes, onQuizChange, navigation 
     useEffect(() => {
         let intervalId: string | number | NodeJS.Timeout | undefined;
         if (timerIsActive && isVisible && !quizCompleted && currentQuestionIndex < quizzes.length) {
-            setTimer(15); // Перезапуск таймера для нового вопроса
+            setTimer(15);
 
             intervalId = setInterval(() => {
                 setTimer(prevTimer => prevTimer > 0 ? prevTimer - 1 : 0);
             }, 1000);
         }
 
-        return () => clearInterval(intervalId); // Очистка интервала при деактивации компонента или остановке таймера
+        return () => clearInterval(intervalId);
     }, [timerIsActive, isVisible, quizCompleted, currentQuestionIndex, quizzes.length]);
 
 
@@ -165,6 +168,14 @@ const QuizOverlay = ({ isVisible, onContinue, quizzes, onQuizChange, navigation 
             setCurrentQuestionIndex(currentQuestionIndex + 1);
         } else {
             setQuizCompleted(true);
+            navigation.navigate('QuizCompletedScreen', {
+                subtopic_id: subtopic_id,
+                correct_answers: correctAnswersCount,
+                quiz_length: quizzes.length,
+                topic_id: topic_id,
+                topic_name: topic_name,
+            }
+            );
         }
         setSelectedAnswer(null);
         setIsAnswerCorrect(null);
@@ -249,7 +260,9 @@ const QuizOverlay = ({ isVisible, onContinue, quizzes, onQuizChange, navigation 
                         </View>
 
                     </ScrollView>
-                        <TouchableOpacity style={[styles.button, !selectedAnswer && {backgroundColor: BLOCK_BUTTON}]} onPress={handleContinueQuiz} disabled={!selectedAnswer}>
+                        <TouchableOpacity style={[styles.button, selectedAnswer === null && {backgroundColor: BLOCK_BUTTON}]}
+                                          onPress={handleContinueQuiz}
+                                          disabled={selectedAnswer === null}>
                             <Text style={styles.buttonText}>Continue</Text>
                         </TouchableOpacity>
                 </View>

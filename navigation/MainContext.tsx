@@ -12,6 +12,8 @@ interface MainContextProps {
     setLives: (count: number) => void;
     username: string| null;
     setUsername: (username: string) => void;
+    setIsFirstLaunch: (username: boolean) => void;
+    setIsAuthLaunch: (username: boolean) => void;
 }
 
 const MainContext = React.createContext<MainContextProps>({
@@ -26,6 +28,8 @@ const MainContext = React.createContext<MainContextProps>({
     setLives: () => {},
     username: null,
     setUsername: () => {},
+    setIsFirstLaunch: () => {},
+    setIsAuthLaunch: () => {},
 });
 
 export default MainContext;

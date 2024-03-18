@@ -15,6 +15,7 @@ import CardsSubtopicScreen from "../screens/CardsSubtopicScreen";
 import BackIcon from "../components/icons/BackIcon";
 import Launch1Screen from "../screens/Onboarding/Launch1Screen";
 import QuizCompletedScreen from "../screens/QuizCompletedScreen";
+import ProfileScreen from "../screens/ProfileScreen";
 
 export type HomeStackParamList = {
     HomeScreen: undefined;
@@ -24,10 +25,15 @@ export type HomeStackParamList = {
         topic_name: string,
     };
     QuizCompletedScreen: {
-        subtopic_id: number
+        subtopic_id: number,
+        correct_answers: number,
+        quiz_length: number,
+        topic_id: number,
+        topic_name: string,
     };
     LeaderBoardScreen: undefined;
     AchievementsScreen: undefined;
+    ProfileScreen: undefined;
     MyCardsScreen: undefined;
     MyTopicsScreen: {
         topics: {
@@ -36,7 +42,9 @@ export type HomeStackParamList = {
         }[];
     };
     CardsSubtopicScreen: {
-        subtopic_id: number
+        subtopic_id: number,
+        topic_id: number,
+        topic_name: string,
     };
 };
 
@@ -61,6 +69,7 @@ const HomeStack = () => {
                           backgroundColor: MAIN_SECOND,
                           borderBottomStartRadius: 20,
                           borderBottomEndRadius: 20,
+                          elevation: 0,
                     },
                       cardStyle: { backgroundColor: BACKGROUND },
                 }}
@@ -85,12 +94,18 @@ const HomeStack = () => {
                     headerTitle: 'Leaderboard',
                     headerTitleAlign: 'center',
                     headerBackImage: ({ tintColor }) => (
-                        <ArrowBackIcon color={Platform.OS === 'ios' ? 'black': tintColor} size={25} style={{marginLeft: 10, marginTop: 5}} />
+                        <BackIcon color={Platform.OS === 'ios' ? 'black': tintColor} size={100} style={{marginLeft: 5, marginTop: 5}} />
                     ),
                     headerTitleStyle: {
-                        fontFamily: Nunito_Semibold,
+                        fontFamily: Quicksand_Bold,
                         fontSize: 28,
                     },
+                      headerStyle: {
+                          backgroundColor: MAIN_SECOND,
+                          borderBottomStartRadius: 20,
+                          borderBottomEndRadius: 20,
+                    },
+                      cardStyle: { backgroundColor: BACKGROUND },
                 }}
 
             />
@@ -102,14 +117,41 @@ const HomeStack = () => {
                     headerTitle: 'Achievements',
                     headerTitleAlign: 'center',
                     headerBackImage: ({ tintColor }) => (
-                        <ArrowBackIcon color={Platform.OS === 'ios' ? 'black': tintColor} size={25} style={{marginLeft: 10, marginTop: 5}} />
+                        <BackIcon color={Platform.OS === 'ios' ? 'black': tintColor} size={100} style={{marginLeft: 5, marginTop: 5}} />
                     ),
                     headerTitleStyle: {
-                        fontFamily: Nunito_Semibold,
+                        fontFamily: Quicksand_Bold,
                         fontSize: 28,
                     },
+                      headerStyle: {
+                          backgroundColor: MAIN_SECOND,
+                          borderBottomStartRadius: 20,
+                          borderBottomEndRadius: 20,
+                    },
+                      cardStyle: { backgroundColor: BACKGROUND },
                 }}
 
+            />
+            <Stack.Screen name="ProfileScreen"
+                          component={ProfileScreen}
+                          options={{
+                                headerBackTitleVisible: false,
+                                headerTitle: 'Account',
+                                headerTitleAlign: 'center',
+                                headerBackImage: ({ tintColor }) => (
+                                    <BackIcon color={Platform.OS === 'ios' ? 'black': tintColor} size={100} style={{marginLeft: 5, marginTop: 5}} />
+                                ),
+                                headerTitleStyle: {
+                                    fontFamily: Quicksand_Bold,
+                                    fontSize: 28,
+                                },
+                                  headerStyle: {
+                                      backgroundColor: MAIN_SECOND,
+                                      borderBottomStartRadius: 20,
+                                      borderBottomEndRadius: 20,
+                                },
+                                  cardStyle: { backgroundColor: BACKGROUND },
+                            }}
             />
             <Stack.Screen
                 name="MyCardsScreen"

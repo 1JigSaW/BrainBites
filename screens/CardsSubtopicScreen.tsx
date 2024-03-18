@@ -17,11 +17,12 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import {CARDS_COUNT, CARDS_INDEX_KEY, CARDS_KEY} from "../constants";
 import BackIcon from "../components/icons/BackIcon";
 import ProgressBarCard from "../components/ProgressBarCard";
+import {HomeStackParamList} from "../navigation/HomeStack";
 
-type Props = StackScreenProps<CardsStackParamList, 'CardsSubtopicScreen'>;
+type Props = StackScreenProps<HomeStackParamList, 'CardsSubtopicScreen'>;
 
 const CardsSubtopicScreen = ({ navigation, route }: Props) => {
-    const {subtopic_id} = route.params;
+    const {subtopic_id, topic_id, topic_name} = route.params;
     const swiperRef = useRef<Swiper<any>>(null);
     const isFocused = useIsFocused();
     const { userId, everyDayCards,setCardCount } = useContext(MainContext);
@@ -198,6 +199,9 @@ const CardsSubtopicScreen = ({ navigation, route }: Props) => {
                         onContinue={handleContinueFromQuiz}
                         onQuizChange={handleQuizChange}
                         navigation={navigation}
+                        subtopic_id={subtopic_id}
+                        topic_id={topic_id}
+                        topic_name={topic_name}
                     />
                 </View>
             )}

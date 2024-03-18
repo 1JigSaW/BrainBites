@@ -8,16 +8,21 @@ import {
 } from 'react-native';
 import {HomeStackParamList} from "../navigation/HomeStack";
 import {StackScreenProps} from "@react-navigation/stack";
-import {BACKGROUND, BLACK, BLUE} from "../colors";
+import {BACKGROUND, BLACK, BLUE, FIRST_PLACE, MAIN_SECOND, SECOND_PLACE, THIRD_PLACE, WHITE} from "../colors";
 import {getButtonStyle, getButtonTextStyle} from "../components/functions/buttonHelpers";
 import {useGetUsers} from "../queries/user";
 import {SvgUri} from "react-native-svg";
-import {Nunito_Bold, Nunito_Regular, Nunito_Semibold} from "../fonts";
+import {Nunito_Bold, Nunito_Regular, Nunito_Semibold, Quicksand_Bold, Quicksand_Regular} from "../fonts";
+import FirstPlaceIcon from "../components/icons/FirstPlaceIcon";
+import SecondPlaceIcon from "../components/icons/SecondPlaceIcon";
+import ThirdPlaceIcon from "../components/icons/ThirdPlaceIcon";
+import MainContext from "../navigation/MainContext";
 
 type Props = StackScreenProps<HomeStackParamList, 'LeaderBoardScreen'>;
 
 const LeaderBoardScreen = ({navigation}: Props) => {
-    const [activeButton, setActiveButton] = useState<string>('read_cards');
+    const { userId, cardCount } = useContext(MainContext);
+    const [activeButton, setActiveButton] = useState<string>('xp');
     const sortBy = activeButton;
     const returnAll = true
 
@@ -26,56 +31,39 @@ const LeaderBoardScreen = ({navigation}: Props) => {
         data: users,
         isLoading: isLoadingUsers,
         isError: isErrorUsers
-    } = useGetUsers({ sortBy, returnAll });;
+    } = useGetUsers({ sortBy, returnAll, userId });
+    console.log('users111', users)
 
     return (
         <SafeAreaView style={{ flex: 1, backgroundColor: BACKGROUND }}>
             <ScrollView style={styles.safeContainer}>
-                <View>
-                    <View style={styles.buttonContainer}>
-                        <TouchableOpacity
-                            style={getButtonStyle('read_cards', activeButton, styles)}
-                            onPress={() => setActiveButton('read_cards')}
-                        >
-                            <Text style={getButtonTextStyle('read_cards', activeButton, styles)}>Cards</Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity
-                            style={getButtonStyle('xp', activeButton, styles)}
-                            onPress={() => setActiveButton('xp')}
-                        >
-                            <Text style={getButtonTextStyle('xp', activeButton, styles)}>XP</Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity
-                            style={getButtonStyle('badges', activeButton, styles)}
-                            onPress={() => setActiveButton('badges')}
-                        >
-                            <Text style={getButtonTextStyle('badges', activeButton, styles)}>Badges</Text>
-                        </TouchableOpacity>
-                    </View>
-                    <View>
-                        {isLoadingUsers ? (
-                            <ActivityIndicator size="large" color={BLUE} />
-                        ) : (
-                            users && users.map((user, index) => (
-                                <React.Fragment key={user.id}>
-                                    <View style={styles.listItemContainer}>
-                                        <Text style={styles.listNumber}>#{index+1}</Text>
+                <View style={{marginBottom: 20}}>
+                    {isLoadingUsers ? (
+                        <ActivityIndicator size="large" color={BLUE} />
+                    ) : (
+                        users && users.map((user, index) => (
+                            <React.Fragment key={user.id}>
+                                <View style={styles.listItemContainer}>
+                                     {index === 0 ? <FirstPlaceIcon size={100} color={FIRST_PLACE} style={{marginRight: 19, marginLeft: 7}}/> :
+                                        index === 1 ? <SecondPlaceIcon size={100} color={SECOND_PLACE} style={{marginRight: 19, marginLeft: 7}}/> :
+                                            index === 2 ? <ThirdPlaceIcon size={100} color={THIRD_PLACE} style={{marginRight: 19, marginLeft: 7}}/> :
+                                        <Text style={styles.listNumber}>#{index}</Text>}
+                                    <View style={styles.circleImageLeaderboard}>
                                         <SvgUri
                                             style={styles.listImage}
                                             uri={`https://api.dicebear.com/7.x/shapes/svg?seed=${user.username}`}
                                         />
-                                        <Text style={styles.listText}>{user.username}</Text>
-                                        <Text style={styles.listEndNumber}>
-                                            {sortBy === 'xp' ? user.xp :
-                                                sortBy === 'read_cards' ? user.read_cards :
-                                                    sortBy === 'badges' ? user.badges_count : ''}
-                                        </Text>
                                     </View>
-                                    {users.indexOf(user) < users.length - 1 && <View style={styles.listSeparator} />}
-                                </React.Fragment>
-                            ))
-                        )}
-                    </View>
+                                    <Text style={styles.listText}>{user.username}</Text>
+                                    <Text style={styles.listEndNumber}>
+                                        {sortBy === 'xp' ? user.xp :
+                                            sortBy === 'read_cards' ? user.read_cards :
+                                                sortBy === 'badges' ? user.badges_count : ''}
+                                    </Text>
+                                </View>
+                            </React.Fragment>
+                        ))
+                    )}
                 </View>
             </ScrollView>
         </SafeAreaView>
@@ -85,10 +73,11 @@ const LeaderBoardScreen = ({navigation}: Props) => {
 const styles = StyleSheet.create({
     safeContainer: {
         flex: 1,
-        backgroundColor: BACKGROUND,
-        paddingHorizontal: 23,
-        paddingVertical: 5,
-        marginBottom: 50,
+        backgroundColor: MAIN_SECOND,
+        margin: 10,
+        borderRadius: 20,
+        marginTop: 10,
+        padding: 10,
     },
     buttonContainer: {
         flexDirection: 'row',
@@ -114,38 +103,40 @@ const styles = StyleSheet.create({
     listItemContainer: {
         flexDirection: 'row',
         alignItems: 'center',
-        paddingTop: 15,
+        paddingTop: 5,
         paddingBottom: 5,
         paddingHorizontal: 10,
+        backgroundColor: WHITE,
+        marginHorizontal: 10,
+        borderRadius: 20,
+        marginBottom: 5,
     },
 
     listNumber: {
         color: '#000',
-        fontFamily: Nunito_Regular,
-        fontSize: 16,
+        fontFamily: Quicksand_Regular,
+        fontSize: 14,
         fontStyle: 'normal',
-        marginRight: 15,
-        width: 35
+        marginRight: 5,
+        width: 35,
     },
 
     listImage: {
-        width: 28,
-        height: 28,
-        borderRadius: 20,
-        marginRight: 15,
+        width: '100%',
+        height: '100%',
     },
 
     listText: {
         flex: 1,
-        color: '#000',
-        fontFamily: Nunito_Regular,
-        fontSize: 16,
+        color: BLACK,
+        fontFamily: Quicksand_Regular,
+        fontSize: 12,
         fontStyle: 'normal',
     },
 
     listEndNumber: {
-        color: '#000',
-        fontFamily: Nunito_Bold,
+         color: '#000',
+        fontFamily: Quicksand_Bold,
         fontSize: 18,
         fontStyle: 'normal',
         marginLeft: 15,
@@ -164,6 +155,15 @@ const styles = StyleSheet.create({
     activeButtonText: {
         color: BACKGROUND,
     },
+    circleImageLeaderboard: {
+        width: 24,
+        height: 24,
+        borderRadius: 35,
+        overflow: 'hidden',
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginRight: 10,
+    }
 });
 
 export default LeaderBoardScreen;

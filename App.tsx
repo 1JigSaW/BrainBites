@@ -96,6 +96,8 @@ function App(): JSX.Element | null {
           setLives,
           username,
           setUsername,
+          setIsFirstLaunch,
+          setIsAuthLaunch
       }}>
           <QueryClientProvider client={queryClient}>
               <NavigationContainer>
