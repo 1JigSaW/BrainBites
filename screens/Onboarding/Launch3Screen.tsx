@@ -10,7 +10,7 @@ const Launch3Screen = ({ navigation }: Props) => {
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: BACKGROUND }}>
       <OnboardingScreenLaunch
-        imageUri="https://your-image-url.com/image1.jpg"
+        imageUri="https://d3vnk4nlqgkldn.cloudfront.net/onboarding/3.webp"
         title="Personalize your learning path"
         text="Choose the topics and categories that interest you the most and create a personalized learning path"
         onNext={() => navigation.navigate('UsernameScreen')}

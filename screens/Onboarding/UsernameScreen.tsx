@@ -15,6 +15,8 @@ import {BACKGROUND, BLACK, BLOCK_BUTTON, BLUE, MAIN_SECOND, RED, SECONDARY_SECON
 import {useCheckUsernameUnique} from "../../queries/user";
 import {Nunito_Bold, Nunito_Regular, Nunito_Semibold, Quicksand_Bold, Quicksand_Regular} from "../../fonts";
 import MainContext from "../../navigation/MainContext";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import {EVERYDAY_CARDS, USERNAME} from "../../constants";
 
 type Props = StackScreenProps<OnboardingStackParamList, 'UsernameScreen'>;
 
@@ -35,11 +37,12 @@ const UsernameScreen = ({ navigation }: Props) => {
         setIsCheckingUsername(true);
 
         usernameCheck.mutate(usernameLocal, {
-            onSuccess: (data) => {
+            onSuccess: async (data) => {
                 setIsCheckingUsername(false);
                 if (data.isUnique) {
                     setUsername(usernameLocal);
-                    navigation.navigate('CardCountSelectionScreen', { username: usernameLocal });
+                    await AsyncStorage.setItem(USERNAME, String(usernameLocal));
+                    navigation.navigate('CardCountSelectionScreen', {username: usernameLocal});
                 } else {
                     setIsUsernameTaken(true);
                 }

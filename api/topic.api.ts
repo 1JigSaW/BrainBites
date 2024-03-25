@@ -16,6 +16,7 @@ export interface UserTopicProgressResponse {
 }
 
 export interface UserSubtitleProgressResponse {
+    image: string | undefined;
     cost: ReactNode;
     subtitle_id: number;
     subtitle_name: string;

@@ -158,3 +158,28 @@ export const useLoginUser = () => {
     );
 };
 
+
+export const useGoogleSignIn = () => {
+    return useMutation<
+        { token: string },
+        AxiosError,
+        { idToken: string },
+        unknown
+    >(
+        ({ idToken }) => UserApi.googleSignIn(idToken).then(result => {
+            if ('error' in result) {
+                throw new Error(result.error);
+            }
+            return { token: result.token };
+        }),
+        {
+            onError: (error) => {
+                console.error('Error during Google sign in:', error);
+            },
+            onSuccess: (data) => {
+                console.log('Google sign in successful:', data);
+                // Здесь вы можете, например, сохранить токен в localStorage или в состояние приложения
+            },
+        },
+    );
+};

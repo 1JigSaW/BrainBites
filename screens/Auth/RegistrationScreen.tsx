@@ -16,7 +16,9 @@ import {Quicksand_Bold, Quicksand_Regular} from "../../fonts";
 import MainContext from "../../navigation/MainContext";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import {user} from "../../constants";
-import {useCreateUser} from "../../queries/user";
+import {useCreateUser, useGoogleSignIn} from "../../queries/user";
+import {GoogleSignin, GoogleSigninButton} from "@react-native-google-signin/google-signin";
+import Toast from "react-native-toast-message";
 
 type Props = StackScreenProps<AuthStackParamList, 'RegistrationScreen'>;
 
@@ -27,6 +29,8 @@ const RegistrationScreen = ({ navigation, route }: Props) => {
     const [confirmPassword, setConfirmPassword] = useState('');
     const [errorMessage, setErrorMessage] = useState('');
     const [isCreatingUser, setIsCreatingUser] = useState(false);
+
+    const { mutate: googleSignInMutate } = useGoogleSignIn();
 
     console.log(username, everyDayCards)
 
@@ -72,7 +76,47 @@ const RegistrationScreen = ({ navigation, route }: Props) => {
                 },
             }
         );
+        } else {
+            setIsCreatingUser(false);
         }
+    };
+
+    const google_signIn = () => {
+        GoogleSignin.configure({
+            webClientId: '534979316884-dhc3g928q1nun7m6kdf6itacfdqad370.apps.googleusercontent.com',
+            iosClientId: '534979316884-6m9hcnm32nmn5sff14sfkmm05nna7m47.apps.googleusercontent.com',
+            offlineAccess: true,
+            forceCodeForRefreshToken: true,
+        });
+        GoogleSignin.hasPlayServices().then((hasPlayService) => {
+                if (hasPlayService) {
+                     GoogleSignin.signIn().then((userInfo) => {
+                         console.log(userInfo);
+                        const idToken = userInfo.user.id;
+                        console.log(userInfo)
+                        if (idToken) {
+                            console.log(2)
+                            googleSignInMutate({ idToken });
+                            handleRegistration();
+                        }
+                        console.log(3)
+                     }).catch((e) => {
+                        console.log("ERROR IS: " + JSON.stringify(e));
+                        Toast.show({
+                            type: 'error',
+                            text1: 'Error',
+                            text2: 'Something went wrong'
+                        });
+                     })
+                }
+            }).catch((e) => {
+                console.log("ERROR IS: " + JSON.stringify(e));
+                Toast.show({
+                    type: 'error',
+                    text1: 'Error',
+                    text2: 'Something went wrong'
+                });
+            })
     };
 
     return (
@@ -107,6 +151,13 @@ const RegistrationScreen = ({ navigation, route }: Props) => {
                         >
                             <Text style={styles.switchButton}>Sign In</Text>
                         </TouchableOpacity>
+                    </View>
+                    <View style={styles.centerRow}>
+                        <GoogleSigninButton
+                          size={GoogleSigninButton.Size.Icon}
+                          color={GoogleSigninButton.Color.Light}
+                          onPress={google_signIn}
+                        />
                     </View>
                 </ScrollView>
                 <TouchableOpacity
@@ -203,6 +254,11 @@ const styles = StyleSheet.create({
         fontSize: 16,
         color: SECONDARY_SECOND, // Используйте цвет, который выделяется и указывает на интерактивность
         fontFamily: Quicksand_Bold,
+    },
+    centerRow: {
+          flexDirection: 'row',
+        justifyContent: 'center',
+        alignItems: 'center',
     },
 });
 

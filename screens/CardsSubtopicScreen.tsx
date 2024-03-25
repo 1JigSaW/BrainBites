@@ -118,7 +118,7 @@ const CardsSubtopicScreen = ({ navigation, route }: Props) => {
 
 
     const handleContinueFromQuiz = async  (correctAnswerIds: number[]) => {
-        setQuizVisible(false); // Hide the quiz
+        setQuizVisible(false);
         if (swipedCardIds.length > 0 && userId) {
             try {
                 const result = await markCardsAndViewQuizzes.mutateAsync({ userId, cardIds: swipedCardIds, correctAnswerIds });
@@ -202,6 +202,7 @@ const CardsSubtopicScreen = ({ navigation, route }: Props) => {
                         subtopic_id={subtopic_id}
                         topic_id={topic_id}
                         topic_name={topic_name}
+                        swipedCardIds={swipedCardIds}
                     />
                 </View>
             )}

@@ -33,7 +33,7 @@ import Brain2Icon from "../components/icons/Brain2Icon";
 import HeartIcon from "../components/icons/HeartIcon";
 import PlusIcon from "../components/icons/PlusIcon";
 import WeeklyProgressBar from "../components/WeeklyProgressBar";
-import {useGetCurrentStreak} from "../queries/streak";
+import {useGetCurrentStreak, useUpdateStreak} from "../queries/streak";
 import {useGetUserTopicsProgress} from "../queries/topic";
 import FirstPlaceIcon from "../components/icons/FirstPlaceIcon";
 import SecondPlaceIcon from "../components/icons/SecondPlaceIcon";
@@ -43,16 +43,33 @@ type Props = StackScreenProps<HomeStackParamList, 'MainScreen'>;
 
 const { width } = Dimensions.get('window');
 
+const getCurrentWeekProgress = (streakStartDay: any, currentStreakCount: number) => {
+  const currentDayIndex = new Date().getDay();
+  const currentDayAdjustedIndex = (currentDayIndex === 0 ? 6 : currentDayIndex - 1); // Преобразовываем в формат, где 0 - это понедельник, 6 - воскресенье
+
+  const progress = Array(7).fill(false);
+
+  for (let i = streakStartDay, count = 0; count < currentStreakCount; i = (i + 1) % 7, count++) {
+    if (i <= currentDayAdjustedIndex) {
+      progress[i] = true;
+    }
+  }
+
+  return progress;
+};
+
 const MainScreen = ({ navigation, route }: Props) => {
     const [activeButton, setActiveButton] = useState<string>('xp');
     const days = ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN'];
 
     const { userId, cardCount } = useContext(MainContext);
+    const { mutate: updateStreak } = useUpdateStreak(userId);
+
     const [centralIndex, setCentralIndex] = useState(0);
     console.log('userId', userId)
     const isFocused = useIsFocused();
     const { data: topicsProgress, isLoading, error, refetch: topicRefetch } = useGetUserTopicsProgress(userId);
-
+    console.log('topicsProgress', topicsProgress);
     const sortBy = activeButton;
     const returnAll = false;
 
@@ -77,6 +94,8 @@ const MainScreen = ({ navigation, route }: Props) => {
         refetch: refetchStreak,
     } = useGetCurrentStreak(userId);
 
+    console.log('streak', streakData);
+
     useEffect(() => {
         if (isFocused && userId) {
             refetch();
@@ -94,7 +113,7 @@ const MainScreen = ({ navigation, route }: Props) => {
         return progressArray;
     };
 
-    const progressArray = calculateProgress(streakData?.current_streak ?? 2);
+    const progress = getCurrentWeekProgress(streakData?.last_streak_date, streakData?.currentStreak);
 
     const currentStreak = streakData?.current_streak ?? 0;
 
@@ -125,7 +144,7 @@ const MainScreen = ({ navigation, route }: Props) => {
                         </View>
                     </View>
                 </View>
-                <WeeklyProgressBar total={currentStreak} progress={progressArray} />
+                <WeeklyProgressBar total={currentStreak} progress={progress} />
             </TouchableOpacity>
             <View>
                 <FlatList
@@ -143,7 +162,7 @@ const MainScreen = ({ navigation, route }: Props) => {
                       </TouchableOpacity>
                     )}
                     keyExtractor={(item, index) => index.toString()}
-                    snapToInterval={width * 0.75}
+                    snapToInterval={width * 0.5}
                     decelerationRate={"fast"}
                     snapToAlignment={"start"}
                     contentInset={{
@@ -254,7 +273,7 @@ const styles = StyleSheet.create({
     },
     topicImage: {
         width: '100%',
-        height: width * 0.5,
+        height: width * 0.55,
         borderRadius: 10,
     },
     topicTitle: {

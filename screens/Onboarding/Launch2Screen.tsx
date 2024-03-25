@@ -10,7 +10,7 @@ const Launch2Screen = ({ navigation }: Props) => {
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: BACKGROUND }}>
       <OnboardingScreenLaunch
-        imageUri="https://your-image-url.com/image1.jpg"
+        imageUri="https://d3vnk4nlqgkldn.cloudfront.net/onboarding/2.webp"
         title="Challenge yourself with exciting quizzes"
         text="Test your knowledge and skills with our interactive quizzes"
         onNext={() => navigation.navigate('Launch3Screen')}

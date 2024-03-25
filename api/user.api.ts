@@ -122,17 +122,19 @@ export class UserApi {
         }
     }
 
-    static async logoutUser(token: string): Promise<{success: string} | {error: string}> {
-        try {
-            const { data } = await API.post('/api/logout/', {}, {
-                headers: {
-                    'Authorization': `Token ${token}`
-                }
-            });
-            return data;
-        } catch (error: any) {
-            throw error;
-        }
+    static async googleSignIn(idToken: string): Promise<{token: string} | {error: string}> {
+    try {
+        const { data } = await API.post('/api/auth/google/', {
+            id_token: idToken,
+        });
+        return data;
+    } catch (error: any) {
+        throw error;
+    }
 }
+
+
+
+
 
 }

@@ -144,4 +144,24 @@ export class CardApi {
         }
     }
 
+    static async updateQuizStreak(userId: number, streakCount: number, allCardsCorrect: boolean) {
+        try {
+            const response = await API.post(`api/update-quiz-streak/`, {
+                user_id: userId,
+                streak_count: streakCount,
+                all_cards_bool: allCardsCorrect
+            });
+
+            if (response.status === 200) {
+                console.log('response.data', response.data);
+                return response.data;
+            }
+            throw new Error(`Error: ${response.statusText}`);
+        } catch (error) {
+            console.error('Error updating quiz streak:', error);
+            throw error;
+        }
+}
+
+
 }

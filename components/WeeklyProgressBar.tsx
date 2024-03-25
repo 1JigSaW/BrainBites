@@ -2,7 +2,6 @@ import React from 'react';
 import { View, Text, StyleSheet, Dimensions } from 'react-native';
 import {BLACK, BLOCK_BUTTON, MAIN_SECOND, RED, WHITE} from "../colors";
 import {Quicksand_Bold, Quicksand_Regular} from "../fonts";
-import FireIcon from "./icons/FireIcon";
 
 const screenWidth = Dimensions.get('window').width;
 

@@ -1,11 +1,10 @@
 import {StackScreenProps} from "@react-navigation/stack";
-import {CardsStackParamList} from "../navigation/CardsStack";
 import React, {useContext, useEffect, useLayoutEffect, useState} from "react";
 import MainContext from "../navigation/MainContext";
-import {useGetUserSubtitlesProgress, useGetUserTopicsProgress, usePurchaseSubtitle} from "../queries/topic";
+import {useGetUserSubtitlesProgress, usePurchaseSubtitle} from "../queries/topic";
 import {
     ActivityIndicator,
-    Alert,
+    Alert, Image,
     SafeAreaView,
     ScrollView,
     StyleSheet,
@@ -13,14 +12,12 @@ import {
     TouchableOpacity,
     View
 } from "react-native";
-import ArrowRightIcon from "../components/icons/ArrowRight";
-import {BACKGROUND, BLACK, BLUE, MAIN_SECOND, PROGRESS_BACKGROUND, WHITE} from "../colors";
+import {BACKGROUND, BLACK, BLUE, CORRECT_ANSWER, MAIN_SECOND, RED, WHITE} from "../colors";
 import {useIsFocused} from "@react-navigation/native";
 import LockIcon from "../components/icons/LockIcon";
-import {Nunito_Bold, Nunito_Regular, Quicksand_Bold, Quicksand_Regular} from "../fonts";
+import {Quicksand_Bold, Quicksand_Regular} from "../fonts";
 import { UserSubtitleProgressResponse } from "../api/topic.api";
 import {useGetLives} from "../queries/user";
-import MainScreen from "./MainScreen";
 import {HomeStackParamList} from "../navigation/HomeStack";
 
 type Props = StackScreenProps<HomeStackParamList, 'SubTopicScreen'>;
@@ -42,6 +39,7 @@ const SubTopicScreen = ({navigation, route}: Props) => {
 
     const {data: subtitlesProgress, isLoading, error, refetch} = useGetUserSubtitlesProgress(userId, topic_id);
 
+    console.log('subtitlesProgress', subtitlesProgress)
     useEffect(() => {
         if (isFocused) {
             refetch();
@@ -114,6 +112,7 @@ const SubTopicScreen = ({navigation, route}: Props) => {
                                 {!(subtitle.is_purchased || subtitle.is_free) && <LockIcon size={2} color={BLACK} style={{opacity: 0.5}}/>}
 
                                 <View style={styles.mainContainer}>
+                                    <Image source={{ uri: subtitle.image }} height={30} width={30} style={[!(subtitle.is_purchased || subtitle.is_free) && {opacity: 0.2}]}/>
                                     <Text style={[styles.mainText, !(subtitle.is_purchased || subtitle.is_free) && {opacity: 0.2}]}>{subtitle.subtitle_name}</Text>
                                 </View>
                                 {
@@ -170,7 +169,7 @@ const styles = StyleSheet.create({
         left: 0,
         top: 0,
         bottom: 0,
-        backgroundColor: PROGRESS_BACKGROUND,
+        backgroundColor: CORRECT_ANSWER,
     },
     infoContainer: {
         flexDirection: 'row',
@@ -181,7 +180,9 @@ const styles = StyleSheet.create({
     mainContainer: {
         backgroundColor: BACKGROUND,
         borderRadius: 20,
-        width: '80%',
+        width: '70%',
+        flexDirection: "row",
+        alignItems: "center",
     },
     mainText: {
         color: BLACK,

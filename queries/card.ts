@@ -146,3 +146,21 @@ export const useMarkCardsAsViewedAndUpdateQuizzes = (
         }
     );
 };
+
+
+export const useUpdateQuizStreak = (
+    options?: UseMutationOptions<{ message: string }, AxiosError, { userId: number, streakCount: number, allCardsCorrect: boolean }>
+) => {
+    return useMutation<{ message: string }, AxiosError, { userId: number, streakCount: number, allCardsCorrect: boolean }>(
+        ({ userId, streakCount, allCardsCorrect }) => CardApi.updateQuizStreak(userId, streakCount, allCardsCorrect),
+        {
+            ...options,
+            onSuccess: (data) => {
+                console.log('Quiz streak updated:', data.message);
+            },
+            onError: (error) => {
+                console.error('Error updating quiz streak:', error.message);
+            }
+        }
+    );
+};

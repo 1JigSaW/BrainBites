@@ -8,12 +8,12 @@ import {
     TouchableOpacity,
     ActivityIndicator,
     Alert,
-    ScrollView
+    ScrollView, BackHandler
 } from 'react-native';
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import {QuizState} from "../constants";
 import {Quiz} from "../api/quiz.api";
-import {useUpdateUserXp} from "../queries/card";
+import {useUpdateQuizStreak, useUpdateUserXp} from "../queries/card";
 import MainContext from "../navigation/MainContext";
 import {
     BACKGROUND,
@@ -41,9 +41,10 @@ interface QuizOverlayProps {
     subtopic_id: number;
     topic_id: number,
     topic_name: string,
+    swipedCardIds: number[],
 }
 
-const QuizOverlay = ({ isVisible, onContinue, quizzes, onQuizChange, navigation, subtopic_id, topic_id, topic_name }: QuizOverlayProps) => {
+const QuizOverlay = ({ isVisible, onContinue, quizzes, onQuizChange, navigation, subtopic_id, topic_id, topic_name, swipedCardIds }: QuizOverlayProps) => {
     const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
     const [correctAnswersCount, setCorrectAnswersCount] = useState(0);
     const [quizCompleted, setQuizCompleted] = useState(false);
@@ -56,10 +57,14 @@ const QuizOverlay = ({ isVisible, onContinue, quizzes, onQuizChange, navigation,
     const [isAnswerCorrect, setIsAnswerCorrect] = useState<boolean | null>(null);
     const [lives, setLives] = useState<number | null>(null);
     const [timerIsActive, setTimerIsActive] = useState(true);
+    const [currentStreak, setCurrentStreak] = useState(0);
+    const [maxStreak, setMaxStreak] = useState(0);
+
 
     const { mutate: updateUserXp } = useUpdateUserXp()
     const { data: livesData, refetch: refetchLives } = useGetLives(userId);
     const { mutate: loseLife } = useLoseLife();
+    const { mutate: updateQuizStreak } = useUpdateQuizStreak();
     const animatableRef = useRef<Animatable.View & View>(null);
 
     console.log('selectedAnswer', selectedAnswer)
@@ -77,6 +82,16 @@ const QuizOverlay = ({ isVisible, onContinue, quizzes, onQuizChange, navigation,
         return () => clearInterval(intervalId);
     }, [timerIsActive, isVisible, quizCompleted, currentQuestionIndex, quizzes.length]);
 
+    useEffect(() => {
+        const backAction = () => {
+            return true;
+        };
+
+        const backHandler = BackHandler.addEventListener('hardwareBackPress', backAction);
+
+        return () => backHandler.remove();
+    }, []);
+
 
 
     useEffect(() => {
@@ -89,14 +104,15 @@ const QuizOverlay = ({ isVisible, onContinue, quizzes, onQuizChange, navigation,
     useEffect(() => {
         if (timer === 0) {
             Alert.alert(
-                "Время вышло!",
-                "К сожалению, время на ответ истекло.",
+                "Time's Up!",
+                "Unfortunately, your time to answer has expired.",
                 [
                     { text: "OK", onPress: () => handleContinueQuiz() }
                 ],
                 { cancelable: false }
             );
         }
+
     }, [timer]);
 
     useEffect(() => {
@@ -125,13 +141,14 @@ const QuizOverlay = ({ isVisible, onContinue, quizzes, onQuizChange, navigation,
          setIsAnswerCorrect(isCorrect);
 
          if (!isCorrect && userId) {
-            setLives(prevLives => {
+             setCurrentStreak(0);
+             setLives(prevLives => {
                 const newLives = (prevLives != null && prevLives > 0) ? prevLives - 1 : 0;
 
                 if (newLives === 0) {
                     Alert.alert(
-                        "Жизни закончились",
-                        "К сожалению, все ваши жизни истрачены. Дождитесь пополнения.",
+                        "Lives depleted",
+                        "Unfortunately, all your lives are spent. Wait for them to be replenished.",
                         [
                             {
                                 text: "OK",
@@ -143,6 +160,7 @@ const QuizOverlay = ({ isVisible, onContinue, quizzes, onQuizChange, navigation,
                         { cancelable: false }
                     );
                 }
+
 
                 return newLives;
             });
@@ -157,6 +175,8 @@ const QuizOverlay = ({ isVisible, onContinue, quizzes, onQuizChange, navigation,
             });
         } else if (selectedAnswerIndex !== null) {
             setCorrectAnswersCount(correctAnswersCount + 1);
+            setCurrentStreak(currentStreak + 1);
+            setMaxStreak(Math.max(maxStreak, currentStreak + 1));
             setCorrectAnswerIds([...correctAnswerIds, quizzes[currentQuestionIndex].card_id]);
         }
     };
@@ -168,12 +188,28 @@ const QuizOverlay = ({ isVisible, onContinue, quizzes, onQuizChange, navigation,
             setCurrentQuestionIndex(currentQuestionIndex + 1);
         } else {
             setQuizCompleted(true);
+            if (userId) {
+                updateQuizStreak({
+                    userId,
+                    streakCount: maxStreak,
+                    allCardsCorrect: correctAnswersCount === quizzes.length
+            }, {
+                onSuccess: () => {
+                    console.log('Streak data updated successfully');
+                },
+                onError: (error: any) => {
+                    console.error('Error updating streak data:', error);
+                }
+            });
+            }
             navigation.navigate('QuizCompletedScreen', {
                 subtopic_id: subtopic_id,
                 correct_answers: correctAnswersCount,
                 quiz_length: quizzes.length,
                 topic_id: topic_id,
                 topic_name: topic_name,
+                correctAnswerIds: correctAnswerIds,
+                swipedCardIds: swipedCardIds,
             }
             );
         }

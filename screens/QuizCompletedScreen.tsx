@@ -1,5 +1,15 @@
 import {StackScreenProps} from "@react-navigation/stack";
-import {Dimensions, Image, SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View} from "react-native";
+import {
+    Alert,
+    Dimensions,
+    Image,
+    SafeAreaView,
+    ScrollView,
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    View
+} from "react-native";
 import {HomeStackParamList} from "../navigation/HomeStack";
 import {
     BACKGROUND,
@@ -12,19 +22,76 @@ import {
     SECONDARY_SECOND,
     WHITE
 } from "../colors";
-import React from "react";
+import React, {useContext, useEffect} from "react";
 import {Quicksand_Bold, Quicksand_Regular} from "../fonts";
 import LottieView from "lottie-react-native";
+import {useGetCurrentStreak} from "../queries/streak";
+import MainContext from "../navigation/MainContext";
+import {useMarkCardsAsTestPassed, useMarkCardsAsViewedAndUpdateQuizzes, useUpdateUserXp} from "../queries/card";
+import {useCheckUserAchievements} from "../queries/badge";
+import Toast from "react-native-toast-message";
 
 type Props = StackScreenProps<HomeStackParamList, 'QuizCompletedScreen'>;
 
 const { width, height } = Dimensions.get('window');
 const QuizCompletedScreen = ({ navigation, route }: Props) => {
-    const {subtopic_id, correct_answers, quiz_length, topic_id, topic_name} = route.params
+    const { userId } = useContext(MainContext);
+    const {subtopic_id, correct_answers, quiz_length, topic_id, topic_name, correctAnswerIds, swipedCardIds} = route.params
+    const { mutate: updateUserXp } = useUpdateUserXp()
+    const checkAchievements = useCheckUserAchievements(userId);
+    const markAsPassedMutation = useMarkCardsAsTestPassed(userId);
+    const markCardsAndViewQuizzes = useMarkCardsAsViewedAndUpdateQuizzes();
+
+    const handleCheckAchievements = async () => {
+        try {
+            const badges = await checkAchievements.refetch();
+            if (badges.data?.length > 0) {
+                Toast.show({
+                    type: 'success',
+                    text1: 'You get a new badge',
+                });
+            }
+        } catch (error) {
+            console.error('Error checking achievements:', error);
+        }
+    };
+
+   useEffect(() => {
+    async function fetchDataAndCheckAchievements() {
+        await markCardsAndViewQuizzes.mutateAsync({ userId, cardIds: swipedCardIds, correctAnswerIds });
+        handleCheckAchievements();
+    }
+
+    fetchDataAndCheckAchievements();
+}, []);
+
+
+    const {
+        data: streakData,
+        isLoading: isLoadingStreak,
+        isError: isErrorStreak,
+        refetch: refetchStreak,
+    } = useGetCurrentStreak(userId);
 
     const handleContinue = () => {
+        if (streakData?.current_streak > 0) {
+            Alert.alert("Keep Going!", `You're on a ${streakData.current_streak}-day streak!`);
+        } else {
+            Alert.alert("Oops!", "You've missed your streak. Start a new one today!");
+        }
+        updateUserXp({ userId: userId, correctAnswersCount: correct_answers });
         navigation.navigate('SubTopicScreen', {topic_id: topic_id, topic_name: topic_name})
     };
+
+    const scorePercentage = (correct_answers / quiz_length) * 100;
+
+    let animationSource;
+    if (scorePercentage >= 50) {
+        animationSource = require('../animations/quiz_good.json');
+    } else {
+        animationSource = require('../animations/quiz_bad.json');
+    }
+
 
     return (
         <SafeAreaView style={{ flex: 1, backgroundColor: BACKGROUND }}>
@@ -32,15 +99,15 @@ const QuizCompletedScreen = ({ navigation, route }: Props) => {
                 <ScrollView contentContainerStyle={styles.scrollViewContainer}>
                     <View style={styles.lottieContainer}>
                         <LottieView
-                            source={require('../animations/quiz_complete.json')}
+                            source={animationSource}
                             autoPlay
-                            loop
+                            loop={false}
                             style={{flex: 1}}
                         />
                     </View>
                     <Text style={styles.text}>Good job!</Text>
                     <View style={styles.scoreContainer}>
-                        <Text style={styles.scoreText}>100</Text>
+                        <Text style={styles.scoreText}>{10 * correct_answers}</Text>
                         <Text style={styles.scoreTextWord}>score</Text>
                     </View>
                     <View style={styles.answers}>
@@ -115,6 +182,7 @@ const styles = StyleSheet.create({
     lottieContainer: {
         width: 200,
         height: 200,
+        borderRadius: 0,
     },
     scoreText: {
         fontSize: 48,

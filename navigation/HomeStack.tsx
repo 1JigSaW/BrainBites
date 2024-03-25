@@ -30,6 +30,8 @@ export type HomeStackParamList = {
         quiz_length: number,
         topic_id: number,
         topic_name: string,
+        correctAnswerIds: number[],
+        swipedCardIds: number[],
     };
     LeaderBoardScreen: undefined;
     AchievementsScreen: undefined;

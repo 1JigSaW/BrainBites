@@ -1,22 +1,28 @@
 import React, { useState, useContext } from 'react';
 import {
-  SafeAreaView,
-  View,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  StyleSheet,
-  ActivityIndicator,
-  ScrollView,
+    SafeAreaView,
+    View,
+    Text,
+    TextInput,
+    TouchableOpacity,
+    StyleSheet,
+    ActivityIndicator,
+    ScrollView, Button,
 } from 'react-native';
-import {AxiosErrorResponse, useLoginUser} from '../../queries/user';
+import {AxiosErrorResponse, useGoogleSignIn, useLoginUser} from '../../queries/user';
 import {StackScreenProps} from "@react-navigation/stack";
 import {AuthStackParamList} from "../../navigation/AuthNavigator";
 import MainContext from "../../navigation/MainContext";
 import {BACKGROUND, BLACK, MAIN_SECOND, RED, SECONDARY_SECOND, WHITE} from "../../colors";
 import {Quicksand_Bold, Quicksand_Regular} from "../../fonts";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import {user} from "../../constants"; // Путь к вашему хуку useLoginUser
+import {user} from "../../constants";
+import {
+    GoogleSignin, GoogleSigninButton,
+    statusCodes,
+} from '@react-native-google-signin/google-signin';
+import Config from "react-native-config";
+import Toast from "react-native-toast-message";
 
 type Props = StackScreenProps<AuthStackParamList, 'LoginScreen'>;
 
@@ -25,6 +31,7 @@ const LoginScreen = ({ navigation }: Props) => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const { mutate: loginUser, isLoading, isError, error } = useLoginUser();
+    const { mutate: googleSignInMutate } = useGoogleSignIn();
     const handleLogin = () => {
         loginUser({ email, password }, {
             onSuccess: async (data: any) => {
@@ -39,6 +46,44 @@ const LoginScreen = ({ navigation }: Props) => {
                 }
             },
         });
+    };
+
+    const google_signIn = () => {
+        GoogleSignin.configure({
+            webClientId: '534979316884-dhc3g928q1nun7m6kdf6itacfdqad370.apps.googleusercontent.com',
+            iosClientId: '534979316884-6m9hcnm32nmn5sff14sfkmm05nna7m47.apps.googleusercontent.com',
+            offlineAccess: true,
+            forceCodeForRefreshToken: true,
+        });
+        GoogleSignin.hasPlayServices().then((hasPlayService) => {
+                if (hasPlayService) {
+                     GoogleSignin.signIn().then((userInfo) => {
+                         console.log(userInfo);
+                        const idToken = userInfo.user.id;
+                        console.log(userInfo)
+                        if (idToken) {
+                            console.log(2)
+                            googleSignInMutate({ idToken });
+                            handleLogin();
+                        }
+                        console.log(3)
+                     }).catch((e) => {
+                        console.log("ERROR IS: " + JSON.stringify(e));
+                        Toast.show({
+                            type: 'error',
+                            text1: 'Error',
+                            text2: 'Something went wrong'
+                        });
+                     })
+                }
+            }).catch((e) => {
+                console.log("ERROR IS: " + JSON.stringify(e));
+                Toast.show({
+                    type: 'error',
+                    text1: 'Error',
+                    text2: 'Something went wrong'
+                });
+            })
     };
 
     return (
@@ -74,6 +119,13 @@ const LoginScreen = ({ navigation }: Props) => {
                         <TouchableOpacity onPress={() => navigation.navigate('RegistrationScreen')}>
                             <Text style={styles.switchButton}>Sign Up</Text>
                         </TouchableOpacity>
+                    </View>
+                    <View style={styles.centerRow}>
+                        <GoogleSigninButton
+                          size={GoogleSigninButton.Size.Icon}
+                          color={GoogleSigninButton.Color.Light}
+                          onPress={google_signIn}
+                        />
                     </View>
                 </ScrollView>
                     <TouchableOpacity
@@ -170,6 +222,11 @@ const styles = StyleSheet.create({
         fontSize: 16,
         color: SECONDARY_SECOND,
         fontFamily: Quicksand_Bold,
+    },
+    centerRow: {
+          flexDirection: 'row',
+        justifyContent: 'center',
+        alignItems: 'center',
     },
 });
 

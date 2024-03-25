@@ -117,7 +117,7 @@ const styles = StyleSheet.create({
         marginLeft: 10,
         marginBottom: 10,
         fontFamily: Quicksand_Regular,
-        fontSize: calculateFontSize(15),
+        fontSize: calculateFontSize(16),
         color: BLACK,
     },
     source: {
@@ -147,7 +147,7 @@ const styles = StyleSheet.create({
         padding: 5,
     },
     image: {
-        width: '90%',
+        width: '95%',
         height: 200,
         borderRadius: 10,
         alignSelf: 'center',
