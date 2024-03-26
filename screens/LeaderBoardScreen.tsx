@@ -32,7 +32,6 @@ const LeaderBoardScreen = ({navigation}: Props) => {
         isLoading: isLoadingUsers,
         isError: isErrorUsers
     } = useGetUsers({ sortBy, returnAll, userId });
-    console.log('users111', users)
 
     return (
         <SafeAreaView style={{ flex: 1, backgroundColor: BACKGROUND }}>

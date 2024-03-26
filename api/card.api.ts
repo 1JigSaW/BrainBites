@@ -18,7 +18,6 @@ export class CardApi {
             const response = await API.get(`api/cards/${userId}`, {
                 params: { limit }
             });
-            console.log('response.data', response.data);
             return response.data;
             throw new Error(`Error: ${response.statusText}`);
         } catch (error) {
@@ -29,11 +28,8 @@ export class CardApi {
 
     static async markCardsAsTestPassed(userId: number | null): Promise<{ message: string }> {
         try {
-            // Отправляем POST запрос на маркировку карт
             const response = await API.post(`api/mark-cards-passed/${userId}/`);
             if (response.status === 200) {
-                // В случае успеха возвращаем сообщение из ответа
-                console.log('response.data', response.data);
                 return response.data;
             }
             throw new Error(`Error: ${response.statusText}`);
@@ -50,7 +46,6 @@ export class CardApi {
             });
 
             if (response.status === 200) {
-                console.log('response.data', response.data);
                 return response.data;
             }
 
@@ -69,8 +64,6 @@ export class CardApi {
             });
 
             if (response.status === 200) {
-                // If the request is successful, return the response message.
-                console.log('response.data', response.data);
                 return response.data;
             }
 
@@ -84,7 +77,6 @@ export class CardApi {
     static async getSavedCards(userId: number | null): Promise<Card[]> {
         try {
             const response = await API.get(`api/saved-cards/${userId}/`);
-            console.log('response.data', response.data);
             return response.data;
         } catch (error) {
             console.error('Error fetching saved cards:', error);
@@ -100,7 +92,6 @@ export class CardApi {
             });
 
             if (response.status === 200) {
-                console.log('response.data', response.data);
                 return response.data;
             }
 
@@ -114,7 +105,6 @@ export class CardApi {
     static async getUnseenCardsBySubtitle(subtitleId: number, userId: number | null, limit: number): Promise<Card[]> {
         try {
             const response = await API.get(`api/cards_subtitle/${subtitleId}/${userId}/${limit}`);
-            console.log('response.data', response.data);
             return response.data;
         } catch (error) {
             console.error('Error fetching unseen cards:', error);
@@ -133,7 +123,6 @@ export class CardApi {
             });
 
             if (response.status === 200) {
-                console.log('response.data', response.data);
                 return response.data;
             }
 
@@ -153,7 +142,6 @@ export class CardApi {
             });
 
             if (response.status === 200) {
-                console.log('response.data', response.data);
                 return response.data;
             }
             throw new Error(`Error: ${response.statusText}`);

@@ -23,6 +23,7 @@ import {useUpdateReadCardsCount} from "../queries/card";
 import {useGetUserBadgeProgress} from "../queries/badge";
 import {calculateProgressBarWidth} from "../utils";
 import {SvgUri} from "react-native-svg";
+import {useGetUserTopicsProgress} from "../queries/topic";
 
 type Props = StackScreenProps<HomeStackParamList, 'HomeScreen'>;
 
@@ -49,8 +50,13 @@ const HomeScreen = ({ navigation, route }: Props) => {
         refetch,
     } = useGetUserStats(userId);
 
-    console.log('userStats', userStats)
-    console.log('userStats', userStats)
+    const {
+        data: topicsProgress,
+        isLoading: isLoadingTopics,
+        error: errorTopics,
+        refetch: refetchTopics
+    } = useGetUserTopicsProgress(userId);
+
 
     const sortBy = activeButton;
     const returnAll = false;
@@ -75,7 +81,6 @@ const HomeScreen = ({ navigation, route }: Props) => {
         }
     }, [isFocused, userId, refetch, cardCount, updateReadCardsCount]);
 
-    console.log(1)
     return (
         <SafeAreaView style={styles.safeContainer}>
         <ScrollView style={{
@@ -89,7 +94,6 @@ const HomeScreen = ({ navigation, route }: Props) => {
                     <TouchableOpacity
                         style={styles.iconContainer}
                         onPress={() => {
-                            // Make sure userStats is defined and has a 'topics' property before navigating
                             if (userStats?.topics) {
                                 navigation.navigate('MyTopicsScreen', { topics: userStats.topics });
                             } else {

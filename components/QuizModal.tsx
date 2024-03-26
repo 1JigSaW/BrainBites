@@ -67,8 +67,6 @@ const QuizOverlay = ({ isVisible, onContinue, quizzes, onQuizChange, navigation,
     const { mutate: updateQuizStreak } = useUpdateQuizStreak();
     const animatableRef = useRef<Animatable.View & View>(null);
 
-    console.log('selectedAnswer', selectedAnswer)
-
     useEffect(() => {
         let intervalId: string | number | NodeJS.Timeout | undefined;
         if (timerIsActive && isVisible && !quizCompleted && currentQuestionIndex < quizzes.length) {
@@ -132,12 +130,10 @@ const QuizOverlay = ({ isVisible, onContinue, quizzes, onQuizChange, navigation,
      const handleAnswer = (selectedAnswerIndex: number | null) => {
          setTimerIsActive(false);
          setSelectedAnswer(selectedAnswerIndex);
-         console.log('setSelectedAnswer(selectedAnswerIndex);', selectedAnswer)
          let isCorrect = false;
          if (selectedAnswerIndex !== null) {
              isCorrect = quizzes[currentQuestionIndex].correct_answer === quizzes[currentQuestionIndex].answers[selectedAnswerIndex];
          }
-         console.log('CORRECT', isCorrect)
          setIsAnswerCorrect(isCorrect);
 
          if (!isCorrect && userId) {

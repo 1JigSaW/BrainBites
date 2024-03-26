@@ -100,7 +100,6 @@ const CardsScreen = ({ navigation }: Props) => {
 
     // Функция для обработки свайпа карточки
     const handleSwiped = (cardIndex: number) => {
-        console.log(111)
         saveProgress(cardIndex + 1);
         // Update the card count state and AsyncStorage simultaneously
         setCardCount(prevCardCount => {
@@ -140,7 +139,6 @@ const CardsScreen = ({ navigation }: Props) => {
         saveTestState(false); // Обнуляем состояние теста
         markAsPassedMutation.mutate(undefined, {
             onSuccess: async () => {
-                // Может быть, здесь не нужно вызывать refetchCards, так как изменение fetchEnabled вызовет запрос
                 console.log('All cards have been marked as passed.');
                 setFetchEnabled(true);
                 if (cardsData) {

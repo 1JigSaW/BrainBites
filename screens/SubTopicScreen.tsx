@@ -19,6 +19,7 @@ import {Quicksand_Bold, Quicksand_Regular} from "../fonts";
 import { UserSubtitleProgressResponse } from "../api/topic.api";
 import {useGetLives} from "../queries/user";
 import {HomeStackParamList} from "../navigation/HomeStack";
+import Toast from "react-native-toast-message";
 
 type Props = StackScreenProps<HomeStackParamList, 'SubTopicScreen'>;
 
@@ -33,13 +34,11 @@ const SubTopicScreen = ({navigation, route}: Props) => {
      useEffect(() => {
         if (livesData && livesData.lives_remaining != null) {
             setLives(livesData.lives_remaining);
-            console.log('lives',livesData.lives_remaining )
         }
     }, [livesData, userId]);
 
     const {data: subtitlesProgress, isLoading, error, refetch} = useGetUserSubtitlesProgress(userId, topic_id);
 
-    console.log('subtitlesProgress', subtitlesProgress)
     useEffect(() => {
         if (isFocused) {
             refetch();
@@ -54,7 +53,6 @@ const SubTopicScreen = ({navigation, route}: Props) => {
     }, [topic_name, navigation]);
 
     const handleSubtitlePress = (subtitle: UserSubtitleProgressResponse) => {
-        console.log('lives11111111111', lives && (lives <= 0))
         if (lives !== null && lives <= 0) {
             Alert.alert(
                 "Out of Lives",
@@ -63,6 +61,15 @@ const SubTopicScreen = ({navigation, route}: Props) => {
             );
             return;
         }
+        if (subtitle.progress === 1) {
+            Toast.show({
+                type: 'info',
+                text1: 'You have already completed this subtopic',
+                text2: 'Please purchase another one to continue.'
+            });
+            return;
+        }
+
 
         if (subtitle.is_purchased || subtitle.is_free) {
             navigation.navigate('CardsSubtopicScreen', {
@@ -88,7 +95,7 @@ const SubTopicScreen = ({navigation, route}: Props) => {
         }
     };
 
-
+    console.log('subtitlesProgress', subtitlesProgress)
     const purchaseSubtitle = (subtitleId: number) => {
         purchase({ user_id: userId, subtitle_id: subtitleId });
     };
@@ -107,12 +114,12 @@ const SubTopicScreen = ({navigation, route}: Props) => {
                             style={styles.roundedContainer}
                             onPress={() => handleSubtitlePress(subtitle)}
                         >
-                            <View style={[styles.progressOverlay, { width: `${subtitle.progress*1.2 * 100}%` }]} />
+                            <View style={[styles.progressOverlay, { width: `${subtitle.progress*1.15 * 100}%` }]} />
                             <View style={[styles.infoContainer]}>
                                 {!(subtitle.is_purchased || subtitle.is_free) && <LockIcon size={2} color={BLACK} style={{opacity: 0.5}}/>}
 
-                                <View style={styles.mainContainer}>
-                                    <Image source={{ uri: subtitle.image }} height={30} width={30} style={[!(subtitle.is_purchased || subtitle.is_free) && {opacity: 0.2}]}/>
+                                <View style={[styles.mainContainer, (subtitle.is_purchased || subtitle.is_free) && {width: '100%', paddingVertical: 3}]}>
+                                    {/*<Image source={{ uri: subtitle.image }} height={30} width={30} style={[!(subtitle.is_purchased || subtitle.is_free) && {opacity: 0.2}]}/>*/}
                                     <Text style={[styles.mainText, !(subtitle.is_purchased || subtitle.is_free) && {opacity: 0.2}]}>{subtitle.subtitle_name}</Text>
                                 </View>
                                 {

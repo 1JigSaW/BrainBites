@@ -32,8 +32,6 @@ const RegistrationScreen = ({ navigation, route }: Props) => {
 
     const { mutate: googleSignInMutate } = useGoogleSignIn();
 
-    console.log(username, everyDayCards)
-
     const createUserMutation = useCreateUser();
     const handleRegistration = async () => {
         if (!email || !password) {
@@ -91,15 +89,11 @@ const RegistrationScreen = ({ navigation, route }: Props) => {
         GoogleSignin.hasPlayServices().then((hasPlayService) => {
                 if (hasPlayService) {
                      GoogleSignin.signIn().then((userInfo) => {
-                         console.log(userInfo);
                         const idToken = userInfo.user.id;
-                        console.log(userInfo)
                         if (idToken) {
-                            console.log(2)
                             googleSignInMutate({ idToken });
                             handleRegistration();
                         }
-                        console.log(3)
                      }).catch((e) => {
                         console.log("ERROR IS: " + JSON.stringify(e));
                         Toast.show({

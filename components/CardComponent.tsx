@@ -25,7 +25,6 @@ const CardComponent = ({ card, myCards, handleRemoveCard, swipedCard, cards }: a
     const { userId } = useContext(MainContext);
     const [savedCards, setSavedCards] = useState(new Set());
     const { mutate: toggleSaveCard } = useSaveCard();
-    console.log(card)
 
     const localIconSelected = savedCards.has(card.id);
     const localIconColor = localIconSelected ? BLUE : BACKGROUND;
@@ -62,8 +61,6 @@ const CardComponent = ({ card, myCards, handleRemoveCard, swipedCard, cards }: a
         console.error('CardComponent was given undefined data');
         return <Text>Error: Card data is not available.</Text>;
     }
-
-    console.log('Card ID:', card.id, 'Saved:', localIconSelected);
 
     return (
         <View style={[styles.card, myCards && {height: '90%'}]}>

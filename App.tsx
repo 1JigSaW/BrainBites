@@ -82,7 +82,6 @@ function App(): JSX.Element | null {
         Navigator = AuthNavigator;
     }
 
-    console.log('userId', userId);
   return (
       <MainContext.Provider value={{
           userId,

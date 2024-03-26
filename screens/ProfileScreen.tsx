@@ -41,6 +41,7 @@ import {useGetUserBadgeProgress} from "../queries/badge";
 import {calculateProgressBarWidth} from "../utils";
 import PieChart from "react-native-pie-chart";
 import {VictoryPie} from "victory-native";
+import {useUserStatsFull} from "../queries/stats";
 
 type Props = StackScreenProps<HomeStackParamList, 'ProfileScreen'>;
 
@@ -53,12 +54,8 @@ const data = [
 
 const ProfileScreen = ({ navigation, route }: Props) => {
     const { setIsAuthLaunch, setUsername, setIsFirstLaunch, setLives, setEveryDayCards, setCardCount } = useContext(MainContext);
-    const widthAndHeight = 250
-    const series = [123, 321, 123, 789, 537]
-    const sliceColor = ['#fbd203', '#ffb300', '#ff9100', '#ff6c00', '#ff3c00']
 
-
-    const { userId, cardCount } = useContext(MainContext);
+    const { userId } = useContext(MainContext);
     const [isEditing, setIsEditing] = useState(false);
     const [usernameEdit, setUsernameEdit] = useState('');
     const {
@@ -68,6 +65,13 @@ const ProfileScreen = ({ navigation, route }: Props) => {
         refetch,
     } = useGetUserStats(userId);
 
+    const {
+        data: userStatsFull,
+        isLoading: isLoadingStatsFull,
+        isError: isErrorStats,
+        refetch: refetchStats,
+    } = useUserStatsFull(userId);
+    
     const shouldFetchBadgeProgress = userId != null;
 
     const { data: badgeProgress, isLoading, error } = useGetUserBadgeProgress(userId, shouldFetchBadgeProgress, true);
@@ -172,11 +176,12 @@ const ProfileScreen = ({ navigation, route }: Props) => {
                     <Text style={styles.titleAchievement}>Stats</Text>
                     <View style={styles.statBlock}>
                         <Text style={styles.statTitle}>Answers</Text>
+
                         <View style={styles.chartContainer}>
                             <View>
                                 <View style={{flexDirection: 'row', alignItems: 'center'}}>
                                     <View style={{
-                                         width: 10,
+                                        width: 10,
                                         height: 10,
                                         borderRadius: 5,
                                         backgroundColor: INCORRECT_ANSWER,
@@ -186,7 +191,7 @@ const ProfileScreen = ({ navigation, route }: Props) => {
                                     </View>
                                     <Text style={{fontSize: 12, fontFamily: Quicksand_Bold, color: BLACK}}>Incorrect</Text>
                                 </View>
-                                <Text style={{fontSize: 24, fontFamily: Quicksand_Bold, color: BLACK, marginLeft: 20, marginTop: -5}}>24</Text>
+                                <Text style={{fontSize: 24, fontFamily: Quicksand_Bold, color: BLACK, marginLeft: 20, marginTop: -5}}>{userStatsFull?.user_quiz_statistics[0].incorrect_attempts}</Text>
                             </View>
                             <VictoryPie
                                 width={100}
@@ -204,8 +209,8 @@ const ProfileScreen = ({ navigation, route }: Props) => {
                                 padAngle={({ datum }) => datum.y > 30 ? 2 : 0}
 
                                 data={[
-                                    { x: "Cats", y: 45 },
-                                    { x: "Dogs", y: 10 },
+                                    { x: "Incorrect", y: userStatsFull?.user_quiz_statistics[0].incorrect_attempts },
+                                    { x: "Correct", y: userStatsFull?.user_quiz_statistics[0].correct_attempts },
                                 ]}
                             />
                             <View>
@@ -221,7 +226,7 @@ const ProfileScreen = ({ navigation, route }: Props) => {
                                     </View>
                                     <Text style={{fontSize: 12, fontFamily: Quicksand_Bold, color: BLACK}}>Correct</Text>
                                 </View>
-                                <Text style={{fontSize: 24, fontFamily: Quicksand_Bold, color: BLACK, marginLeft: 20,  marginTop: -5}}>24</Text>
+                                <Text style={{fontSize: 24, fontFamily: Quicksand_Bold, color: BLACK, marginLeft: 20,  marginTop: -5}}>{userStatsFull?.user_quiz_statistics[0].correct_attempts}</Text>
                             </View>
                         </View>
                         <Text style={styles.statTotal}>Total</Text>
@@ -231,18 +236,18 @@ const ProfileScreen = ({ navigation, route }: Props) => {
                             fontFamily: Quicksand_Bold,
                             textAlign: 'center',
                             marginTop: -5
-                        }}>24</Text>
+                        }}>{userStatsFull?.user_quiz_statistics[0].total_attempts}</Text>
                     </View>
                     <View style={styles.statBlock}>
                         <Text style={styles.statTitle}>Streak without mistakes</Text>
                         <View style={styles.streakCircle}>
-                            <Text style={styles.streakNumber}>23</Text>
+                            <Text style={styles.streakNumber}>{userStatsFull?.correct_streak[0].max_streak}</Text>
                         </View>
                     </View>
                     <View style={styles.statBlock}>
                         <Text style={styles.statTitle}>Maximum cards in a day</Text>
                         <View style={styles.maxCardsCircle}>
-                            <Text style={styles.maxCardsNumber}>23</Text>
+                            <Text style={styles.maxCardsNumber}>{userStatsFull?.daily_read_cards[0].cards_read}</Text>
                         </View>
                     </View>
                 </View>

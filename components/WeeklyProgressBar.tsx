@@ -11,7 +11,7 @@ const WeeklyProgressBar = ({ total, progress }: any) => {
   return (
     <View style={styles.container}>
       <View style={styles.circle}>
-        <Text style={{fontFamily: Quicksand_Bold, color: BLACK, fontSize: 16}}>100</Text>
+        <Text style={{fontFamily: Quicksand_Bold, color: BLACK, fontSize: 16}}>{total}</Text>
       </View>
       {days.map((day, index) => (
         <View key={day} style={styles.dayContainer}>

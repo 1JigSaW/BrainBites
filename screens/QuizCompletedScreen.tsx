@@ -25,7 +25,7 @@ import {
 import React, {useContext, useEffect} from "react";
 import {Quicksand_Bold, Quicksand_Regular} from "../fonts";
 import LottieView from "lottie-react-native";
-import {useGetCurrentStreak} from "../queries/streak";
+import {useGetCurrentStreak, useUpdateStreak} from "../queries/streak";
 import MainContext from "../navigation/MainContext";
 import {useMarkCardsAsTestPassed, useMarkCardsAsViewedAndUpdateQuizzes, useUpdateUserXp} from "../queries/card";
 import {useCheckUserAchievements} from "../queries/badge";
@@ -41,6 +41,7 @@ const QuizCompletedScreen = ({ navigation, route }: Props) => {
     const checkAchievements = useCheckUserAchievements(userId);
     const markAsPassedMutation = useMarkCardsAsTestPassed(userId);
     const markCardsAndViewQuizzes = useMarkCardsAsViewedAndUpdateQuizzes();
+    const { mutate: updateStreak } = useUpdateStreak(userId);
 
     const handleCheckAchievements = async () => {
         try {
@@ -57,12 +58,15 @@ const QuizCompletedScreen = ({ navigation, route }: Props) => {
     };
 
    useEffect(() => {
-    async function fetchDataAndCheckAchievements() {
-        await markCardsAndViewQuizzes.mutateAsync({ userId, cardIds: swipedCardIds, correctAnswerIds });
-        handleCheckAchievements();
-    }
+       if (userId) {
+           updateStreak(userId);
+       }
+        async function fetchDataAndCheckAchievements() {
+            await markCardsAndViewQuizzes.mutateAsync({ userId, cardIds: swipedCardIds, correctAnswerIds });
+            handleCheckAchievements();
+        }
 
-    fetchDataAndCheckAchievements();
+        fetchDataAndCheckAchievements();
 }, []);
 
 
@@ -73,15 +77,27 @@ const QuizCompletedScreen = ({ navigation, route }: Props) => {
         refetch: refetchStreak,
     } = useGetCurrentStreak(userId);
 
-    const handleContinue = () => {
-        if (streakData?.current_streak > 0) {
-            Alert.alert("Keep Going!", `You're on a ${streakData.current_streak}-day streak!`);
-        } else {
-            Alert.alert("Oops!", "You've missed your streak. Start a new one today!");
-        }
-        updateUserXp({ userId: userId, correctAnswersCount: correct_answers });
-        navigation.navigate('SubTopicScreen', {topic_id: topic_id, topic_name: topic_name})
-    };
+   const handleContinue = () => {
+    const today = new Date().toISOString().slice(0, 10);
+    const lastStreakDate = streakData?.last_streak_date;
+
+    if (streakData?.current_streak > 0 && lastStreakDate !== today) {
+        Toast.show({
+            type: 'success',
+            text1: "Keep Going!",
+            text2: `You're on a ${streakData.current_streak}-day streak!`
+        });
+    } else if (!lastStreakDate || lastStreakDate !== today) {
+        Toast.show({
+            type: 'error',
+            text1: "Oops!",
+            text2: "You've missed your streak. Start a new one today!"
+        });
+    }
+    updateUserXp({ userId: userId, correctAnswersCount: correct_answers });
+    navigation.navigate('SubTopicScreen', {topic_id: topic_id, topic_name: topic_name});
+};
+
 
     const scorePercentage = (correct_answers / quiz_length) * 100;
 

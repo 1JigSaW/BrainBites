@@ -60,13 +60,10 @@ const LoginScreen = ({ navigation }: Props) => {
                      GoogleSignin.signIn().then((userInfo) => {
                          console.log(userInfo);
                         const idToken = userInfo.user.id;
-                        console.log(userInfo)
                         if (idToken) {
-                            console.log(2)
                             googleSignInMutate({ idToken });
                             handleLogin();
                         }
-                        console.log(3)
                      }).catch((e) => {
                         console.log("ERROR IS: " + JSON.stringify(e));
                         Toast.show({

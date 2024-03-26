@@ -20,7 +20,6 @@ type Props = StackScreenProps<HomeStackParamList, 'AchievementsScreen'>;
 const AchievementsScreen = ({ navigation }: Props) => {
     const { userId } = useContext(MainContext);
     const { data: badgeProgress, isLoading, error } = useGetUserBadgeProgress(userId, true, false);
-    console.log('badgeProgress', badgeProgress);
     if (isLoading) {
         return (
             <SafeAreaView style={styles.safeContainer}>

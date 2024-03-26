@@ -5,7 +5,7 @@ import {
     BLACK,
     BLUE,
     FIRST_PLACE,
-    MAIN_SECOND,
+    MAIN_SECOND, PROGRESS_BACKGROUND,
     RED,
     RED_SECOND,
     SECOND_PLACE,
@@ -66,10 +66,8 @@ const MainScreen = ({ navigation, route }: Props) => {
     const { mutate: updateStreak } = useUpdateStreak(userId);
 
     const [centralIndex, setCentralIndex] = useState(0);
-    console.log('userId', userId)
     const isFocused = useIsFocused();
     const { data: topicsProgress, isLoading, error, refetch: topicRefetch } = useGetUserTopicsProgress(userId);
-    console.log('topicsProgress', topicsProgress);
     const sortBy = activeButton;
     const returnAll = false;
 
@@ -78,7 +76,6 @@ const MainScreen = ({ navigation, route }: Props) => {
         isLoading: isLoadingUsers,
         isError: isErrorUsers
     } = useGetUsers({ sortBy, returnAll, userId });
-    console.log('users', users)
 
     const {
         data: userStats,
@@ -94,16 +91,12 @@ const MainScreen = ({ navigation, route }: Props) => {
         refetch: refetchStreak,
     } = useGetCurrentStreak(userId);
 
-    console.log('streak', streakData);
-
     useEffect(() => {
         if (isFocused && userId) {
             refetch();
             refetchStreak();
         }
     }, [isFocused, userId, refetch, cardCount]);
-
-    console.log(userStats)
 
     const calculateProgress = (streakCount: number) => {
         const progressArray = new Array(days.length).fill(false);
@@ -157,6 +150,7 @@ const MainScreen = ({ navigation, route }: Props) => {
                                 topic_name: item.topic_name,
                             })}>
                           <Image source={{ uri: item.image }} style={styles.topicImage} />
+                          <View style={[styles.progressOverlay, { width: `${item.progress * 100}%`, height: width * 0.55 }]} />
                           <View style={styles.overlay} />
                           <Text style={styles.topicTitle}>{item.topic_name}</Text>
                       </TouchableOpacity>
@@ -356,7 +350,14 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         marginRight: 10,
-    }
+    },
+    progressOverlay: {
+        position: 'absolute',
+        left: 0,
+        top: 0,
+        bottom: 0,
+        opacity: 0.0,
+    },
 });
 
 export default MainScreen;

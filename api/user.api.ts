@@ -85,7 +85,6 @@ export class UserApi {
             if (userId !== null) params.append('user_id', userId.toString());
 
             const { data } = await API.get(`/api/users_filter/?${params.toString()}`);
-            console.log('data', data);
             return data;
         } catch (error) {
             throw error;

@@ -54,7 +54,6 @@ const CardsSubtopicScreen = ({ navigation, route }: Props) => {
     }, [swipedCardCount, cards]);
 
     const handleTest = async () => {
-        console.log('All cards swiped');
         if (quizzes && quizzes.length > 0) {
             setQuizVisible(true); // Show the quiz
         } else {

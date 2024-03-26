@@ -20,7 +20,6 @@ export class UserBadgeProgressApi {
             const response = await API.get(`api/user-badge-progress/`, {
                 params: { user_id: userId, top_three: topThree }
             });
-            console.log('response.data', response.data);
             if (response.status === 200) {
                 return response.data.badge_progress;
             }
@@ -37,7 +36,6 @@ export class UserBadgeProgressApi {
             const response = await API.get(`api/check-achievements/`, {
                 params: { user_id: userId }
             });
-            console.log('Achievements Response:', response.data);
             if (response.status === 200) {
                 return response.data.earned_badges;
             }
