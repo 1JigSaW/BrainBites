@@ -1,28 +1,47 @@
 import React from 'react';
 import { View, Text, StyleSheet, Dimensions } from 'react-native';
-import {BLACK, BLOCK_BUTTON, MAIN_SECOND, RED, WHITE} from "../colors";
+import {BLACK, BLOCK_BUTTON, INCORRECT_ANSWER, MAIN_SECOND, RED, WHITE} from "../colors";
 import {Quicksand_Bold, Quicksand_Regular} from "../fonts";
+import LottieView from "lottie-react-native";
+import FireIcon from "./icons/FireIcon";
 
 const screenWidth = Dimensions.get('window').width;
 
 const WeeklyProgressBar = ({ total, progress }: any) => {
-  const days = ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN'];
+  const days = ['1', '2', '3', '4', '5', '6', '7'];
+  console.log('progress', progress);
+
+  // Если progress больше 7, начинаем счет заново
+  const normalizedProgress = progress % 7;
 
   return (
     <View style={styles.container}>
       <View style={styles.circle}>
-        <Text style={{fontFamily: Quicksand_Bold, color: BLACK, fontSize: 16}}>{total}</Text>
+        {/*<FireIcon size={100} style={{ overflow: 'hidden', position: 'absolute', left: 1, }} />*/}
+        <Text style={{ fontFamily: 'Quicksand_Bold', fontSize: 24, color: INCORRECT_ANSWER, fontWeight: 'bold' }}>{total}</Text>
       </View>
-      {days.map((day, index) => (
-        <View key={day} style={styles.dayContainer}>
-          <Text style={styles.dayText}>{day}</Text>
-          <View style={styles.dayCircleContainer}>
-            <View style={[styles.dayCircle, progress[index] ? styles.filledDay : styles.emptyDay]}>
-              {index !== 0 && <View style={[styles.line, {left: -42}, progress[index] ? styles.filledDay : styles.emptyDay]}></View>}
+      {days.map((day, index) => {
+        const fill = normalizedProgress >= 0 ? index < normalizedProgress : index < 7;
+        return (
+          <View key={day} style={styles.dayContainer}>
+            <Text style={styles.dayText}>{day}</Text>
+            <View style={styles.dayCircleContainer}>
+              <View style={[
+                styles.dayCircle,
+                fill ? styles.filledDay : styles.emptyDay
+              ]}>
+                {index !== 0 && (
+                  <View style={[
+                    styles.line,
+                    { left: -38 },
+                    fill ? styles.filledDay : styles.emptyDay
+                  ]}/>
+                )}
+              </View>
             </View>
           </View>
-        </View>
-      ))}
+        );
+      })}
     </View>
   );
 };
@@ -35,14 +54,15 @@ const styles = StyleSheet.create({
     padding: 10,
   },
   circle: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
+    width: 80,
+    height:  80,
+    borderRadius: 50,
     backgroundColor: WHITE,
     justifyContent: 'center',
     alignItems: 'center',
-    borderWidth: 10,
+    borderWidth: 11,
     borderColor: MAIN_SECOND,
+    bottom: 10,
   },
   dayContainer: {
     alignItems: 'center',
@@ -55,10 +75,10 @@ const styles = StyleSheet.create({
     width: 10,
     height: 10,
     borderRadius: 5,
-    marginTop: 5,
+    marginTop: 3,
   },
   filledDay: {
-    backgroundColor: '#6200EE',
+    backgroundColor: INCORRECT_ANSWER,
     zIndex: 2,
   },
   emptyDay: {
@@ -68,12 +88,12 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontFamily: Quicksand_Regular,
     color: BLACK,
-    marginBottom: 5, // Отступ для разделения текста и круга
+    marginBottom: 5,
   },
   line: {
     position: 'absolute',
     height: 4,
-    width: 50,
+    width: 47,
     backgroundColor: BLACK,
     top: '34%',
     zIndex: 1,

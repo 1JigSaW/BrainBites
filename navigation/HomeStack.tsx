@@ -69,8 +69,8 @@ const HomeStack = () => {
                     },
                       headerStyle: {
                           backgroundColor: MAIN_SECOND,
-                          borderBottomStartRadius: 20,
-                          borderBottomEndRadius: 20,
+                          borderBottomStartRadius: 15,
+                          borderBottomEndRadius: 15,
                           elevation: 0,
                     },
                       cardStyle: { backgroundColor: BACKGROUND },
@@ -104,8 +104,8 @@ const HomeStack = () => {
                     },
                       headerStyle: {
                           backgroundColor: MAIN_SECOND,
-                          borderBottomStartRadius: 20,
-                          borderBottomEndRadius: 20,
+                          borderBottomStartRadius: 15,
+                          borderBottomEndRadius: 15,
                     },
                       cardStyle: { backgroundColor: BACKGROUND },
                 }}
@@ -127,8 +127,8 @@ const HomeStack = () => {
                     },
                       headerStyle: {
                           backgroundColor: MAIN_SECOND,
-                          borderBottomStartRadius: 20,
-                          borderBottomEndRadius: 20,
+                          borderBottomStartRadius: 15,
+                          borderBottomEndRadius: 15,
                     },
                       cardStyle: { backgroundColor: BACKGROUND },
                 }}
@@ -149,10 +149,10 @@ const HomeStack = () => {
                                 },
                                   headerStyle: {
                                       backgroundColor: MAIN_SECOND,
-                                      borderBottomStartRadius: 20,
-                                      borderBottomEndRadius: 20,
+                                      borderBottomStartRadius: 15,
+                                      borderBottomEndRadius: 15,
                                 },
-                                  cardStyle: { backgroundColor: BACKGROUND },
+                              cardStyle: { backgroundColor: BACKGROUND}
                             }}
             />
             <Stack.Screen

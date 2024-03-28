@@ -23,7 +23,7 @@ import Toast from "react-native-toast-message";
 type Props = StackScreenProps<AuthStackParamList, 'RegistrationScreen'>;
 
 const RegistrationScreen = ({ navigation, route }: Props) => {
-    const {username, everyDayCards, completeAuth} = useContext(MainContext);
+    const {username, everyDayCards, completeAuth, setUserId} = useContext(MainContext);
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
@@ -62,6 +62,7 @@ const RegistrationScreen = ({ navigation, route }: Props) => {
                 onSuccess: async (data) => {
                     try {
                         await AsyncStorage.setItem(user, JSON.stringify(data));
+                        setUserId(data.id)
                         completeAuth();
                     } catch (error) {
                         console.error('Ошибка при сохранении данных пользователя:', error);

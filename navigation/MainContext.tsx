@@ -2,6 +2,7 @@ import React, { createContext } from 'react';
 
 interface MainContextProps {
     userId: number | null;
+    setUserId: (id: number) => void;
     completeOnboarding: () => void;
     completeAuth: () => void;
     cardCount: number;
@@ -18,6 +19,7 @@ interface MainContextProps {
 
 const MainContext = React.createContext<MainContextProps>({
     userId: null,
+    setUserId: () => {},
     completeOnboarding: async () => {},
     completeAuth: async () => {},
     cardCount: 0,

@@ -42,6 +42,7 @@ import {calculateProgressBarWidth} from "../utils";
 import PieChart from "react-native-pie-chart";
 import {VictoryPie} from "victory-native";
 import {useUserStatsFull} from "../queries/stats";
+import {GoogleSignin} from "@react-native-google-signin/google-signin";
 
 type Props = StackScreenProps<HomeStackParamList, 'ProfileScreen'>;
 
@@ -92,18 +93,37 @@ const ProfileScreen = ({ navigation, route }: Props) => {
     };
 
     const logoutHandle = async () => {
-        await AsyncStorage.removeItem(authLaunch);
-        await AsyncStorage.removeItem(user);
-        await AsyncStorage.removeItem(CARDS_COUNT);
-        await AsyncStorage.removeItem(EVERYDAY_CARDS);
-        await AsyncStorage.removeItem(USERNAME);
-        await AsyncStorage.removeItem(firstLaunchTest);
-        setIsAuthLaunch(true);
-        setIsFirstLaunch(true);
-        setLives(0);
-        setUsername('');
+        try {
+            GoogleSignin.configure({
+                webClientId: '534979316884-vgh9lg4k7tb1q7kg527ra34rftp9sof4.apps.googleusercontent.com',
+                offlineAccess: true,
+                forceCodeForRefreshToken: true,
+            });
+            const isSignedIn = await GoogleSignin.isSignedIn();
+            if (isSignedIn) {
+                await GoogleSignin.signOut(); // Выход пользователя
+                await GoogleSignin.revokeAccess(); // Отзыв доступа
+                console.log('Google Sign-In has been revoked and user signed out');
+            } else {
+                console.log('No active Google Sign-In session found');
+            }
 
-    }
+            // Сброс состояния приложения после выхода
+            await AsyncStorage.removeItem('authLaunch');
+            await AsyncStorage.removeItem('user');
+            await AsyncStorage.removeItem('CARDS_COUNT');
+            await AsyncStorage.removeItem('EVERYDAY_CARDS');
+            await AsyncStorage.removeItem('USERNAME');
+            await AsyncStorage.removeItem('firstLaunchTest');
+            setIsAuthLaunch(true);
+            setIsFirstLaunch(true);
+        } catch (error) {
+            console.error('Error signing out: ', error);
+        }
+    };
+
+
+    console.log('badgeProgress', badgeProgress)
 
     return (
         <SafeAreaView style={{ flex: 1, backgroundColor: BACKGROUND }}>
@@ -209,8 +229,10 @@ const ProfileScreen = ({ navigation, route }: Props) => {
                                 padAngle={({ datum }) => datum.y > 30 ? 2 : 0}
 
                                 data={[
-                                    { x: "Incorrect", y: userStatsFull?.user_quiz_statistics[0].incorrect_attempts },
-                                    { x: "Correct", y: userStatsFull?.user_quiz_statistics[0].correct_attempts },
+                                    { x: "Incorrect", y: userStatsFull?.user_quiz_statistics[0].incorrect_attempts !== 0
+                                            ? userStatsFull?.user_quiz_statistics[0].incorrect_attempts : 1 },
+                                    { x: "Correct", y: userStatsFull?.user_quiz_statistics[0].correct_attempts !== 0 ?
+                                            userStatsFull?.user_quiz_statistics[0].correct_attempts : 1 },
                                 ]}
                             />
                             <View>

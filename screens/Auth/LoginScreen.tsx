@@ -27,9 +27,10 @@ import Toast from "react-native-toast-message";
 type Props = StackScreenProps<AuthStackParamList, 'LoginScreen'>;
 
 const LoginScreen = ({ navigation }: Props) => {
-    const {completeAuth, setUsername, setEveryDayCards, setLives} = useContext(MainContext);
+    const {completeAuth, setUsername, setEveryDayCards, setLives, setUserId} = useContext(MainContext);
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [isSigningIn, setIsSigningIn] = useState(false);
     const { mutate: loginUser, isLoading, isError, error } = useLoginUser();
     const { mutate: googleSignInMutate } = useGoogleSignIn();
     const handleLogin = () => {
@@ -37,6 +38,7 @@ const LoginScreen = ({ navigation }: Props) => {
             onSuccess: async (data: any) => {
                 try {
                     console.log(data.user)
+                    setUserId(data.id)
                     setUsername(data.user?.username);
                     setLives(data.user?.lives);
                     await AsyncStorage.setItem(user, JSON.stringify(data.user));
@@ -48,40 +50,81 @@ const LoginScreen = ({ navigation }: Props) => {
         });
     };
 
-    const google_signIn = () => {
-        GoogleSignin.configure({
-            webClientId: '534979316884-dhc3g928q1nun7m6kdf6itacfdqad370.apps.googleusercontent.com',
-            iosClientId: '534979316884-6m9hcnm32nmn5sff14sfkmm05nna7m47.apps.googleusercontent.com',
-            offlineAccess: true,
-            forceCodeForRefreshToken: true,
-        });
-        GoogleSignin.hasPlayServices().then((hasPlayService) => {
-                if (hasPlayService) {
-                     GoogleSignin.signIn().then((userInfo) => {
-                         console.log(userInfo);
-                        const idToken = userInfo.user.id;
-                        if (idToken) {
-                            googleSignInMutate({ idToken });
-                            handleLogin();
-                        }
-                     }).catch((e) => {
-                        console.log("ERROR IS: " + JSON.stringify(e));
-                        Toast.show({
-                            type: 'error',
-                            text1: 'Error',
-                            text2: 'Something went wrong'
-                        });
-                     })
+    const handleGoogleLogin = ({ idToken }: any) => {
+        googleSignInMutate({ idToken }, {
+            onSuccess: async (data) => {
+                try {
+                    console.log("Received data: ", data);
+                    setUserId(data.user.id);
+                    await AsyncStorage.setItem('user', JSON.stringify(data.user));
+                    completeAuth();
+                } catch (error) {
+                    console.error('Ошибка при сохранении данных пользователя:', error);
                 }
-            }).catch((e) => {
-                console.log("ERROR IS: " + JSON.stringify(e));
+            },
+            onError: (error) => {
+                console.error("Login error: ", error);
                 Toast.show({
                     type: 'error',
                     text1: 'Error',
-                    text2: 'Something went wrong'
+                    text2: error.message || 'Something went wrong'
                 });
-            })
+            },
+        });
     };
+
+
+    const google_signIn = async () => {
+        if (isSigningIn) {
+            console.log("Sign-in process is already in progress.");
+            return;
+        }
+        setIsSigningIn(true);
+
+        GoogleSignin.configure({
+            webClientId: 'YOUR_WEB_CLIENT_ID',
+            offlineAccess: true,
+            forceCodeForRefreshToken: true,
+        });
+
+        try {
+            const hasPlayService = await GoogleSignin.hasPlayServices();
+            if (hasPlayService) {
+                const isSignedIn = await GoogleSignin.isSignedIn();
+                if (!isSignedIn) {
+                    const userInfo = await GoogleSignin.signIn();
+                    console.log(userInfo);
+                    const idToken = userInfo.idToken;
+                    if (idToken) {
+                        handleGoogleLogin({ idToken });
+                    }
+                } else {
+                    console.log("User already signed in. Getting current user info...");
+                    console.log("User already signed in. Getting current user info...");
+                    const currentUserInfo = await GoogleSignin.getCurrentUser();
+                    console.log(currentUserInfo);
+                    const idToken = currentUserInfo?.idToken;
+                    if (idToken) {
+                        handleGoogleLogin({ idToken });
+                    }
+                }
+            }
+        } catch (e) {
+            console.error("ERROR IS: " + JSON.stringify(e));
+            Toast.show({
+                type: 'error',
+                text1: 'Error',
+                text2: 'Something went wrong'
+            });
+        } finally {
+            setIsSigningIn(false); // Убедитесь, что флаг сбрасывается в любом случае
+        }
+    };
+
+
+
+
+
 
     return (
         <SafeAreaView style={{ flex: 1, backgroundColor: BACKGROUND }}>

@@ -161,7 +161,7 @@ export const useLoginUser = () => {
 
 export const useGoogleSignIn = () => {
     return useMutation<
-        { token: string },
+        { user: {email: string, id: number} },
         AxiosError,
         { idToken: string },
         unknown
@@ -170,7 +170,7 @@ export const useGoogleSignIn = () => {
             if ('error' in result) {
                 throw new Error(result.error);
             }
-            return { token: result.token };
+            return { user: result.user };
         }),
         {
             onError: (error) => {
@@ -178,7 +178,8 @@ export const useGoogleSignIn = () => {
             },
             onSuccess: (data) => {
                 console.log('Google sign in successful:', data);
-                // Здесь вы можете, например, сохранить токен в localStorage или в состояние приложения
+                // Здесь вы можете, например, сохранить данные пользователя
+                // localStorage.setItem('user', JSON.stringify(data.user));
             },
         },
     );

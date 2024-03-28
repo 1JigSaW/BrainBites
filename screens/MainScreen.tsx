@@ -63,7 +63,6 @@ const MainScreen = ({ navigation, route }: Props) => {
     const days = ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN'];
 
     const { userId, cardCount } = useContext(MainContext);
-    const { mutate: updateStreak } = useUpdateStreak(userId);
 
     const [centralIndex, setCentralIndex] = useState(0);
     const isFocused = useIsFocused();
@@ -98,16 +97,6 @@ const MainScreen = ({ navigation, route }: Props) => {
         }
     }, [isFocused, userId, refetch, cardCount]);
 
-    const calculateProgress = (streakCount: number) => {
-        const progressArray = new Array(days.length).fill(false);
-        for (let i = 0; i < streakCount && i < progressArray.length; i++) {
-            progressArray[i] = true;
-        }
-        return progressArray;
-    };
-
-    const progress = getCurrentWeekProgress(streakData?.last_streak_date, streakData?.currentStreak);
-
     const currentStreak = streakData?.current_streak ?? 0;
 
     return (
@@ -137,7 +126,7 @@ const MainScreen = ({ navigation, route }: Props) => {
                         </View>
                     </View>
                 </View>
-                <WeeklyProgressBar total={currentStreak} progress={progress} />
+                <WeeklyProgressBar total={currentStreak} progress={currentStreak} />
             </TouchableOpacity>
             <View>
                 <FlatList

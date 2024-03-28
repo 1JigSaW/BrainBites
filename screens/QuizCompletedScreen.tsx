@@ -80,8 +80,9 @@ const QuizCompletedScreen = ({ navigation, route }: Props) => {
    const handleContinue = () => {
     const today = new Date().toISOString().slice(0, 10);
     const lastStreakDate = streakData?.last_streak_date;
+    console.log('lastStreakDate', lastStreakDate, 'today', today);
 
-    if (streakData?.current_streak > 0 && lastStreakDate !== today) {
+    if ((streakData?.current_streak > 0) && (lastStreakDate !== today)) {
         Toast.show({
             type: 'success',
             text1: "Keep Going!",

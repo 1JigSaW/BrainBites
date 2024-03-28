@@ -121,9 +121,9 @@ export class UserApi {
         }
     }
 
-    static async googleSignIn(idToken: string): Promise<{token: string} | {error: string}> {
+    static async googleSignIn(idToken: string): Promise<{user: {email: string, id: number}} | {error: string}> {
     try {
-        const { data } = await API.post('/api/auth/google/', {
+        const { data } = await API.post('/api/google-signin/', {
             id_token: idToken,
         });
         return data;

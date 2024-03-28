@@ -85,6 +85,7 @@ function App(): JSX.Element | null {
   return (
       <MainContext.Provider value={{
           userId,
+          setUserId,
           completeOnboarding,
           completeAuth,
           cardCount,
