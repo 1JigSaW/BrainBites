@@ -184,3 +184,28 @@ export const useGoogleSignIn = () => {
         },
     );
 };
+
+
+export const usePurchaseLives = () => {
+    return useMutation<
+        { success: string; current_xp: number; current_lives: number; },
+        Error,
+        { userId: number; cost: number; }
+    >(
+        async ({ userId, cost }) => {
+            const result = await UserApi.purchaseLives(userId, cost);
+            if ('error' in result) {
+                throw new Error(result.error);
+            }
+            return result;
+        },
+        {
+            onError: (error) => {
+                console.error('Error purchasing lives:', error.message);
+            },
+            onSuccess: (data) => {
+                console.log('Lives purchased successfully:', data);
+            },
+        },
+    );
+};

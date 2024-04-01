@@ -122,18 +122,29 @@ export class UserApi {
     }
 
     static async googleSignIn(idToken: string): Promise<{user: {email: string, id: number}} | {error: string}> {
-    try {
-        const { data } = await API.post('/api/google-signin/', {
-            id_token: idToken,
-        });
-        return data;
-    } catch (error: any) {
-        throw error;
+        try {
+            const { data } = await API.post('/api/google-signin/', {
+                id_token: idToken,
+            });
+            return data;
+        } catch (error: any) {
+            throw error;
+        }
     }
-}
 
-
-
-
+    static async purchaseLives(userId: number, cost: number): Promise<{success: string, current_xp: number, current_lives: number} | {error: string}> {
+        try {
+            const { data } = await API.post(`/api/purchase-lives/`, {
+                user_id: userId,
+                cost: cost
+            });
+            return data;
+        } catch (error: any) {
+            if (error.response && error.response.data && error.response.data.error) {
+                return { error: error.response.data.error };
+            }
+            throw error;
+        }
+    }
 
 }

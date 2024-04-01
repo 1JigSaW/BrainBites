@@ -1,7 +1,7 @@
 import {StackScreenProps} from "@react-navigation/stack";
 import {HomeStackParamList} from "../navigation/HomeStack";
 import {
-    ActivityIndicator, Dimensions,
+    ActivityIndicator, Alert, Dimensions,
     Image,
     SafeAreaView, ScrollView,
     StyleSheet,
@@ -14,29 +14,19 @@ import {
     BACKGROUND,
     BLACK,
     BLUE, CORRECT_ANSWER,
-    FIRST_PLACE, INCORRECT_ANSWER,
+    INCORRECT_ANSWER,
     MAIN_SECOND,
-    RED_SECOND,
-    SECOND_PLACE, SECONDARY_SECOND,
-    THIRD_PLACE,
+    SECONDARY_SECOND,
     WHITE
 } from "../colors";
 import {SvgUri} from "react-native-svg";
-import Brain2Icon from "../components/icons/Brain2Icon";
-import HeartIcon from "../components/icons/HeartIcon";
-import PlusIcon from "../components/icons/PlusIcon";
-import WeeklyProgressBar from "../components/WeeklyProgressBar";
 import React, {useContext, useEffect, useState} from "react";
 import {useGetUserStats} from "../queries/user";
 import MainContext from "../navigation/MainContext";
 import {Nunito_Bold, Nunito_Regular, Quicksand_Bold, Quicksand_Regular} from "../fonts";
-import EditIcon from "../components/icons/EditIcon";
 import LogoutIcon from "../components/icons/LogoutIcon";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import {authLaunch, CARDS_COUNT, EVERYDAY_CARDS, firstLaunchTest, user, USERNAME} from "../constants";
-import FirstPlaceIcon from "../components/icons/FirstPlaceIcon";
-import SecondPlaceIcon from "../components/icons/SecondPlaceIcon";
-import ThirdPlaceIcon from "../components/icons/ThirdPlaceIcon";
 import {useGetUserBadgeProgress} from "../queries/badge";
 import {calculateProgressBarWidth} from "../utils";
 import PieChart from "react-native-pie-chart";
@@ -93,34 +83,48 @@ const ProfileScreen = ({ navigation, route }: Props) => {
     };
 
     const logoutHandle = async () => {
-        try {
-            GoogleSignin.configure({
-                webClientId: '534979316884-vgh9lg4k7tb1q7kg527ra34rftp9sof4.apps.googleusercontent.com',
-                offlineAccess: true,
-                forceCodeForRefreshToken: true,
-            });
-            const isSignedIn = await GoogleSignin.isSignedIn();
-            if (isSignedIn) {
-                await GoogleSignin.signOut(); // Выход пользователя
-                await GoogleSignin.revokeAccess(); // Отзыв доступа
-                console.log('Google Sign-In has been revoked and user signed out');
-            } else {
-                console.log('No active Google Sign-In session found');
-            }
+        Alert.alert(
+            "Confirm Logout", // Title
+            "Do you really want to log out?", // Message
+            [
+                {
+                    text: "Cancel",
+                    onPress: () => console.log("Logout cancelled"),
+                    style: "cancel"
+                },
+                {
+                    text: "Log Out",
+                    onPress: async () => {
+                        try {
+                            GoogleSignin.configure({
+                                webClientId: '534979316884-vgh9lg4k7tb1q7kg527ra34rftp9sof4.apps.googleusercontent.com',
+                            });
+                            const isSignedIn = await GoogleSignin.isSignedIn();
+                            if (isSignedIn) {
+                                await GoogleSignin.signOut();
+                                console.log('Google Sign-In has been revoked and user signed out');
+                            } else {
+                                console.log('No active Google Sign-In session found');
+                            }
 
-            // Сброс состояния приложения после выхода
-            await AsyncStorage.removeItem('authLaunch');
-            await AsyncStorage.removeItem('user');
-            await AsyncStorage.removeItem('CARDS_COUNT');
-            await AsyncStorage.removeItem('EVERYDAY_CARDS');
-            await AsyncStorage.removeItem('USERNAME');
-            await AsyncStorage.removeItem('firstLaunchTest');
-            setIsAuthLaunch(true);
-            setIsFirstLaunch(true);
-        } catch (error) {
-            console.error('Error signing out: ', error);
-        }
+                            // Clear AsyncStorage and application state
+                            await AsyncStorage.removeItem('authLaunch');
+                            await AsyncStorage.removeItem('user');
+                            await AsyncStorage.removeItem('CARDS_COUNT');
+                            await AsyncStorage.removeItem('EVERYDAY_CARDS');
+                            await AsyncStorage.removeItem('USERNAME');
+                            await AsyncStorage.removeItem('firstLaunchTest');
+                            setIsAuthLaunch(true);
+                            setIsFirstLaunch(true);
+                        } catch (error) {
+                            console.error('Error signing out: ', error);
+                        }
+                    }
+                }
+            ]
+        );
     };
+
 
 
     console.log('badgeProgress', badgeProgress)

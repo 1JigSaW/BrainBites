@@ -24,7 +24,7 @@ import {
     View
 } from "react-native";
 import {Nunito_Bold, Nunito_Regular, Quicksand_Bold, Quicksand_Regular} from "../fonts";
-import {useGetUsers, useGetUserStats} from "../queries/user";
+import {useGetUsers, useGetUserStats, usePurchaseLives} from "../queries/user";
 import React, {useContext, useEffect, useState} from "react";
 import MainContext from "../navigation/MainContext";
 import {useIsFocused} from "@react-navigation/native";
@@ -38,6 +38,10 @@ import {useGetUserTopicsProgress} from "../queries/topic";
 import FirstPlaceIcon from "../components/icons/FirstPlaceIcon";
 import SecondPlaceIcon from "../components/icons/SecondPlaceIcon";
 import ThirdPlaceIcon from "../components/icons/ThirdPlaceIcon";
+import TradeIcon from "../components/icons/TradeIcon";
+import DonationModal from "../components/DonationModal";
+import TradeModal from "../components/TradeModal";
+import Toast from "react-native-toast-message";
 
 type Props = StackScreenProps<HomeStackParamList, 'MainScreen'>;
 
@@ -60,11 +64,16 @@ const getCurrentWeekProgress = (streakStartDay: any, currentStreakCount: number)
 
 const MainScreen = ({ navigation, route }: Props) => {
     const [activeButton, setActiveButton] = useState<string>('xp');
-    const days = ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN'];
+    const [isModalVisibleDonation, setIsModalVisibleDonation] = useState(false);
+    const [isModalVisibleTrade, setIsModalVisibleTrade] = useState(false);
+    const [isLoadingTrade, setIsLoadingTrade] = useState(false);
+    const toggleModalDonation = () => setIsModalVisibleDonation(!isModalVisibleDonation);
+    const toggleModalTrade = () => setIsModalVisibleTrade(!isModalVisibleTrade);
+
+    const { mutate: purchaseLives } = usePurchaseLives();
 
     const { userId, cardCount } = useContext(MainContext);
 
-    const [centralIndex, setCentralIndex] = useState(0);
     const isFocused = useIsFocused();
     const { data: topicsProgress, isLoading, error, refetch: topicRefetch } = useGetUserTopicsProgress(userId);
     const sortBy = activeButton;
@@ -97,6 +106,30 @@ const MainScreen = ({ navigation, route }: Props) => {
         }
     }, [isFocused, userId, refetch, cardCount]);
 
+    const onTrade = async () => {
+        setIsLoadingTrade(true);
+        const cost = 15;
+        if (userId) {
+            purchaseLives({ userId, cost }, {
+                onSuccess: async () => {
+                    await refetch();
+                    setIsLoadingTrade(false);
+                },
+                onError: (error) => {
+                    setIsLoadingTrade(false);
+                    Toast.show({
+                        type: 'error',
+                        text1: 'Error',
+                        text2: error.message || "An error occurred",
+                    });
+                }
+            });
+        } else {
+            setIsLoadingTrade(false);
+        }
+    };
+
+
     const currentStreak = streakData?.current_streak ?? 0;
 
     return (
@@ -105,24 +138,50 @@ const MainScreen = ({ navigation, route }: Props) => {
                 <View style={styles.headerLine1}>
                     <View style={styles.centerRow}>
                         <View style={styles.circleImageView}>
-                            <SvgUri
-                                style={styles.circleImage}
-                                uri={`https://api.dicebear.com/7.x/shapes/svg?seed=${userStats?.username}`}
-                            />
+                            {isLoadingStats ? (
+                                <ActivityIndicator size="large" color={BLUE} />
+                            ) : (
+                                <SvgUri
+                                    style={styles.circleImage}
+                                    uri={`https://api.dicebear.com/7.x/shapes/svg?seed=${userStats?.username}`}
+                                />
+                            )}
                         </View>
-                        <Text style={styles.textUsername}>{userStats?.username}</Text>
+                        {isLoadingStats ? (
+                            <ActivityIndicator size="small" color={BLUE} />
+                        ) : (
+                            <Text style={styles.textUsername}>{userStats?.username}</Text>
+                        )}
                     </View>
                     <View style={styles.iconsContainer}>
                         <View style={styles.centerRow}>
                             <Brain2Icon size={100} color={BLACK} style={{marginRight: 10, marginTop: 3}}/>
-                            <Text style={styles.textVariable}>{userStats?.xp}</Text>
+                            {isLoadingStats ? (
+                                <ActivityIndicator size="small" color={BLUE} />
+                            ) : (
+                                <Text style={styles.textVariable}>{userStats?.xp}</Text>
+                            )}
+                            <TouchableOpacity style={styles.circle} onPress={toggleModalDonation}>
+                                <PlusIcon size={100} color={BLACK} />
+                            </TouchableOpacity>
+                            <DonationModal isVisible={isModalVisibleDonation} onClose={toggleModalDonation} />
                         </View>
                         <View style={styles.centerRow}>
                             <HeartIcon size={100} color={RED_SECOND} style={{marginRight: 10, marginTop: 3}} />
-                            <Text style={styles.textVariable}>{userStats?.lives}</Text>
-                            <View style={styles.circle}>
-                                <PlusIcon size={100} color={BLACK} />
-                            </View>
+                            {isLoadingStats ? (
+                                <ActivityIndicator size="small" color={BLUE} />
+                            ) : (
+                                <Text style={styles.textVariable}>{userStats?.lives}</Text>
+                            )}
+                            <TouchableOpacity style={styles.circle} onPress={toggleModalTrade}>
+                                <TradeIcon size={120} color={BLACK} style={{marginTop: 9, marginLeft: 8}}/>
+                            </TouchableOpacity>
+                            <TradeModal isVisible={isModalVisibleTrade}
+                                        onClose={toggleModalTrade}
+                                        onTrade={onTrade}
+                                        isLoading={isLoadingTrade}
+                                        userStats={userStats}
+                            />
                         </View>
                     </View>
                 </View>
@@ -133,8 +192,11 @@ const MainScreen = ({ navigation, route }: Props) => {
                     data={topicsProgress}
                     horizontal
                     showsHorizontalScrollIndicator={false}
-                    renderItem={({ item }) => (
-                      <TouchableOpacity style={styles.topicContainer} onPress={() => navigation.navigate('SubTopicScreen', {
+                    renderItem={({ item }) =>
+                        isLoading ? (
+                            <View style={{borderRadius: 20, height: 1000}}></View>
+                        ) : (
+                            <TouchableOpacity style={styles.topicContainer} onPress={() => navigation.navigate('SubTopicScreen', {
                                 topic_id: item.topic_id,
                                 topic_name: item.topic_name,
                             })}>
@@ -143,7 +205,8 @@ const MainScreen = ({ navigation, route }: Props) => {
                           <View style={styles.overlay} />
                           <Text style={styles.topicTitle}>{item.topic_name}</Text>
                       </TouchableOpacity>
-                    )}
+                    )
+                    }
                     keyExtractor={(item, index) => index.toString()}
                     snapToInterval={width * 0.5}
                     decelerationRate={"fast"}
@@ -247,7 +310,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         marginLeft: 5,
-        marginTop: 5
+        marginTop: 5,
     },
     topicContainer: {
         width: width * 0.55,

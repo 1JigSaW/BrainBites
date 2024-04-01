@@ -19,6 +19,7 @@ import {user} from "../../constants";
 import {useCreateUser, useGoogleSignIn} from "../../queries/user";
 import {GoogleSignin, GoogleSigninButton} from "@react-native-google-signin/google-signin";
 import Toast from "react-native-toast-message";
+import GoogleIcon from "../../components/icons/GoogleIcon";
 
 type Props = StackScreenProps<AuthStackParamList, 'RegistrationScreen'>;
 
@@ -29,6 +30,8 @@ const RegistrationScreen = ({ navigation, route }: Props) => {
     const [confirmPassword, setConfirmPassword] = useState('');
     const [errorMessage, setErrorMessage] = useState('');
     const [isCreatingUser, setIsCreatingUser] = useState(false);
+    const [isSigningIn, setIsSigningIn] = useState(false);
+    const [loading, setLoading] = useState(false);
 
     const { mutate: googleSignInMutate } = useGoogleSignIn();
 
@@ -80,39 +83,84 @@ const RegistrationScreen = ({ navigation, route }: Props) => {
         }
     };
 
-    const google_signIn = () => {
-        GoogleSignin.configure({
-            webClientId: '534979316884-dhc3g928q1nun7m6kdf6itacfdqad370.apps.googleusercontent.com',
-            iosClientId: '534979316884-6m9hcnm32nmn5sff14sfkmm05nna7m47.apps.googleusercontent.com',
-            offlineAccess: true,
-            forceCodeForRefreshToken: true,
-        });
-        GoogleSignin.hasPlayServices().then((hasPlayService) => {
-                if (hasPlayService) {
-                     GoogleSignin.signIn().then((userInfo) => {
-                        const idToken = userInfo.user.id;
-                        if (idToken) {
-                            googleSignInMutate({ idToken });
-                            handleRegistration();
-                        }
-                     }).catch((e) => {
-                        console.log("ERROR IS: " + JSON.stringify(e));
-                        Toast.show({
-                            type: 'error',
-                            text1: 'Error',
-                            text2: 'Something went wrong'
-                        });
-                     })
+    const handleGoogleLogin = ({ idToken }: any) => {
+        setLoading(true);
+        console.log('loading', loading);
+        googleSignInMutate({ idToken }, {
+            onSuccess: async (data) => {
+                try {
+                    console.log("Received data: ", data);
+                    setUserId(data.user.id);
+                    await AsyncStorage.setItem(user, JSON.stringify(data.user));
+                    completeAuth();
+                    setLoading(false);
+                    console.log(111)
+                } catch (error) {
+                    setLoading(false);
+                    console.error('Ошибка при сохранении данных пользователя:', error);
                 }
-            }).catch((e) => {
-                console.log("ERROR IS: " + JSON.stringify(e));
+            },
+            onError: (error) => {
+                setLoading(false);
+                console.error("Login error: ", error);
                 Toast.show({
                     type: 'error',
                     text1: 'Error',
-                    text2: 'Something went wrong'
+                    text2: error.message || 'Something went wrong'
                 });
-            })
+            },
+        });
     };
+
+    const google_signIn = async () => {
+        if (isSigningIn) {
+            console.log("Sign-in process is already in progress.");
+            return;
+        }
+        setIsSigningIn(true);
+        setLoading(true);
+
+        GoogleSignin.configure({
+            webClientId: '534979316884-vgh9lg4k7tb1q7kg527ra34rftp9sof4.apps.googleusercontent.com',
+            iosClientId: '534979316884-6m9hcnm32nmn5sff14sfkmm05nna7m47.apps.googleusercontent.com',
+        });
+
+        try {
+            const hasPlayService = await GoogleSignin.hasPlayServices();
+            if (!hasPlayService) {
+                console.error("Play services are not available.");
+                return;
+            }
+
+            const isSignedIn = await GoogleSignin.isSignedIn();
+            if (!isSignedIn) {
+                const userInfo = await GoogleSignin.signIn();
+                console.log(userInfo);
+                const idToken = userInfo.idToken;
+                if (idToken) {
+                    handleGoogleLogin({ idToken });
+                }
+            } else {
+                console.log("User already signed in. Getting current user info...");
+                const currentUserInfo = await GoogleSignin.getCurrentUser();
+                console.log(currentUserInfo);
+                const idToken = currentUserInfo?.idToken;
+                if (idToken) {
+                    handleGoogleLogin({ idToken });
+                }
+            }
+        } catch (e) {
+            console.error("Google Sign-In error: ", e);
+            Toast.show({
+                type: 'error',
+                text1: 'Error',
+                text2: 'Something went wrong with Google Sign-In'
+            });
+        } finally {
+            setIsSigningIn(false);
+        }
+    };
+
 
     return (
         <SafeAreaView style={{ flex: 1, backgroundColor: BACKGROUND }}>
@@ -148,11 +196,12 @@ const RegistrationScreen = ({ navigation, route }: Props) => {
                         </TouchableOpacity>
                     </View>
                     <View style={styles.centerRow}>
-                        <GoogleSigninButton
-                          size={GoogleSigninButton.Size.Icon}
-                          color={GoogleSigninButton.Color.Light}
-                          onPress={google_signIn}
-                        />
+                        <TouchableOpacity
+                            style={styles.googleWrap}
+                            onPress={google_signIn}
+                        >
+                            <GoogleIcon size={100}/>
+                        </TouchableOpacity>
                     </View>
                 </ScrollView>
                 <TouchableOpacity
@@ -169,6 +218,11 @@ const RegistrationScreen = ({ navigation, route }: Props) => {
                     )}
                 </TouchableOpacity>
             </View>
+            {loading && (
+                <View style={styles.overlay}>
+                    <ActivityIndicator size="large" color="#FFF" />
+                </View>
+            )}
         </SafeAreaView>
 
     );
@@ -242,18 +296,37 @@ const styles = StyleSheet.create({
     },
     switchText: {
         fontSize: 16,
-        color: BLACK, // Или другой цвет в зависимости от вашего дизайна
+        color: BLACK,
         fontFamily: Quicksand_Regular,
     },
     switchButton: {
         fontSize: 16,
-        color: SECONDARY_SECOND, // Используйте цвет, который выделяется и указывает на интерактивность
+        color: SECONDARY_SECOND,
         fontFamily: Quicksand_Bold,
     },
     centerRow: {
           flexDirection: 'row',
         justifyContent: 'center',
         alignItems: 'center',
+    },
+    googleWrap: {
+        width: 40,
+        height: 40,
+        borderRadius: 20,
+        backgroundColor: BACKGROUND,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    overlay: {
+        position: 'absolute',
+        top: 0,
+        bottom: 0,
+        left: 0,
+        right: 0,
+        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+        alignItems: 'center',
+        justifyContent: 'center',
+        zIndex: 1,
     },
 });
 

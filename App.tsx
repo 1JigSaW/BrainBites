@@ -37,6 +37,7 @@ function App(): JSX.Element | null {
             }
         });
         AsyncStorage.getItem(user).then(value => {
+            console.log('value', value)
             if (value !== null) {
                 setUserId(JSON.parse(value).id);
             }

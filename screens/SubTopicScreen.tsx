@@ -119,7 +119,7 @@ const SubTopicScreen = ({navigation, route}: Props) => {
                                 {!(subtitle.is_purchased || subtitle.is_free) && <LockIcon size={2} color={BLACK} style={{opacity: 0.5}}/>}
 
                                 <View style={[styles.mainContainer, (subtitle.is_purchased || subtitle.is_free) && {width: '100%', paddingVertical: 3}]}>
-                                    {/*<Image source={{ uri: subtitle.image }} height={30} width={30} style={[!(subtitle.is_purchased || subtitle.is_free) && {opacity: 0.2}]}/>*/}
+                                    <Image source={{ uri: subtitle.image }} height={30} width={30} style={[!(subtitle.is_purchased || subtitle.is_free) && {opacity: 0.2}]}/>
                                     <Text style={[styles.mainText, !(subtitle.is_purchased || subtitle.is_free) && {opacity: 0.2}]}>{subtitle.subtitle_name}</Text>
                                 </View>
                                 {

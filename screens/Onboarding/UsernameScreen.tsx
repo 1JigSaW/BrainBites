@@ -71,6 +71,7 @@ const UsernameScreen = ({ navigation }: Props) => {
                             placeholder="Username"
                             value={usernameLocal}
                             onChangeText={handleTextChange}
+                            maxLength={15}
                         />
                         {isUsernameTaken && (
                             <Text style={styles.errorText}>Username is already taken</Text>
