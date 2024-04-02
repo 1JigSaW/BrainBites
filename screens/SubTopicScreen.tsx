@@ -17,9 +17,10 @@ import {useIsFocused} from "@react-navigation/native";
 import LockIcon from "../components/icons/LockIcon";
 import {Quicksand_Bold, Quicksand_Regular} from "../fonts";
 import { UserSubtitleProgressResponse } from "../api/topic.api";
-import {useGetLives} from "../queries/user";
+import {useGetLives, useGetUserStats, usePurchaseLives} from "../queries/user";
 import {HomeStackParamList} from "../navigation/HomeStack";
 import Toast from "react-native-toast-message";
+import TradeModal from "../components/TradeModal";
 
 type Props = StackScreenProps<HomeStackParamList, 'SubTopicScreen'>;
 
@@ -27,9 +28,42 @@ const SubTopicScreen = ({navigation, route}: Props) => {
     const {userId} = useContext(MainContext);
     const {topic_id, topic_name} = route.params;
     const [lives, setLives] = useState<number | null>(null);
+    const [isModalVisibleTrade, setIsModalVisibleTrade] = useState(false);
+    const [isLoadingTrade, setIsLoadingTrade] = useState(false);
     const isFocused = useIsFocused();
     const {mutate: purchase, isLoading: isPurchasing} = usePurchaseSubtitle();
     const { data: livesData, refetch: refetchLives } = useGetLives(userId);
+    const { mutate: purchaseLives } = usePurchaseLives();
+    const {
+        data: userStats,
+        isLoading: isLoadingStats,
+        isError,
+    } = useGetUserStats(userId);
+
+    const toggleModalTrade = () => setIsModalVisibleTrade(!isModalVisibleTrade);
+
+    const onTrade = async () => {
+        setIsLoadingTrade(true);
+        const cost = 15;
+        if (userId) {
+            purchaseLives({ userId, cost }, {
+                onSuccess: async () => {
+                    await refetch();
+                    setIsLoadingTrade(false);
+                },
+                onError: (error) => {
+                    setIsLoadingTrade(false);
+                    Toast.show({
+                        type: 'error',
+                        text1: 'Error',
+                        text2: error.message || "An error occurred",
+                    });
+                }
+            });
+        } else {
+            setIsLoadingTrade(false);
+        }
+    };
 
      useEffect(() => {
         if (livesData && livesData.lives_remaining != null) {
@@ -56,8 +90,11 @@ const SubTopicScreen = ({navigation, route}: Props) => {
         if (lives !== null && lives <= 0) {
             Alert.alert(
                 "Out of Lives",
-                "Unfortunately, you've run out of lives. Wait for them to replenish to continue.",
-                [{ text: "OK", style: "cancel" }]
+                "Unfortunately, you've run out of lives. You can exchange Brain Coins for more lives.",
+                [
+                    { text: "OK", style: "cancel" },
+                    { text: "Exchange Lives", onPress: toggleModalTrade }
+                ]
             );
             return;
         }
@@ -104,6 +141,12 @@ const SubTopicScreen = ({navigation, route}: Props) => {
 
     return (
         <SafeAreaView style={styles.scrollView}>
+            <TradeModal isVisible={isModalVisibleTrade}
+                                        onClose={toggleModalTrade}
+                                        onTrade={onTrade}
+                                        isLoading={isLoadingTrade}
+                                        userStats={userStats}
+                            />
             <ScrollView style={styles.safeContainer}>
                 {isLoading ? (
                     <ActivityIndicator size="large" color={BLUE} />

@@ -19,7 +19,9 @@ import ProfileScreen from "../screens/ProfileScreen";
 
 export type HomeStackParamList = {
     HomeScreen: undefined;
-    MainScreen: undefined;
+    MainScreen: {
+        open?: boolean;
+    };
     SubTopicScreen: {
         topic_id: number,
         topic_name: string,

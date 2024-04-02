@@ -43,6 +43,47 @@ const QuizCompletedScreen = ({ navigation, route }: Props) => {
     const markCardsAndViewQuizzes = useMarkCardsAsViewedAndUpdateQuizzes();
     const { mutate: updateStreak } = useUpdateStreak(userId);
 
+    const messagesAbove50 = [
+        "Brilliant! Your thirst for knowledge is astounding. Keep up the good work!",
+        "Bravo! You've proven that no obstacle is too great for a mind craving knowledge.",
+        "Outstanding results! Remember, every victory brings you closer to the pinnacle of mastery.",
+        "Exceptional result! You're clearly a leader in the world of knowledge. Keep it up!",
+        "Excellent! You're a true champion of learning. Let's set new records together!",
+        "You shine like a star in the sky of knowledge. Congratulations on a brilliant victory!",
+    ];
+    const messagesEqual50 = [
+        "Good job, but you can do even better! Next time you will surely surpass yourself.",
+        "Not bad, but remember, there's always room for growth. Don't settle for what you've achieved!",
+        "You're on the right track, and I believe your next results will be even better. Forward to new knowledge!",
+        "Good try, but you're capable of more. The peak awaits you next time!",
+        "Great job for not giving up and striving for knowledge. May each quiz make you stronger!",
+        "You're halfway to success. We believe in you and await even greater achievements!",
+    ];
+    const messagesBelow50 = [
+        "Don't be upset by failure – every mistake makes us smarter. Analyze and continue to learn!",
+        "Today wasn't your day, but it's not the end. Learn from your mistakes and remember, success lies ahead.",
+        "Remember, great achievements start with small steps. Don't give up, new trials and victories lie ahead!",
+        "Every step, even backward, brings you closer to your goal. Learn, make mistakes, grow, and win!",
+        "Great discoveries start with failures. Don't give up, success awaits ahead!",
+        "Remember, even the smartest people faced difficulties. Your determination is the key to victory!",
+    ];
+
+    let selectedMessages;
+    let score = swipedCardIds.length > 0 ? (correctAnswerIds.length / swipedCardIds.length) * 100 : 0;
+
+    if (score > 70) {
+        selectedMessages = messagesAbove50;
+    } else if (score < 70 && score > 30) {
+        selectedMessages = messagesEqual50;
+    } else {
+        selectedMessages = messagesBelow50;
+    }
+
+
+    const randomIndex = Math.floor(Math.random() * selectedMessages.length);
+    const completionMessage = selectedMessages[randomIndex];
+
+
     const handleCheckAchievements = async () => {
         try {
             const badges = await checkAchievements.refetch();
@@ -106,7 +147,7 @@ const QuizCompletedScreen = ({ navigation, route }: Props) => {
     if (scorePercentage >= 50) {
         animationSource = require('../animations/quiz_good.json');
     } else {
-        animationSource = require('../animations/quiz_bad.json');
+        animationSource = require('../animations/bad5.json');
     }
 
 
@@ -122,7 +163,7 @@ const QuizCompletedScreen = ({ navigation, route }: Props) => {
                             style={{flex: 1}}
                         />
                     </View>
-                    <Text style={styles.text}>Good job!</Text>
+                    <Text style={styles.text}>{completionMessage}</Text>
                     <View style={styles.scoreContainer}>
                         <Text style={styles.scoreText}>{10 * correct_answers}</Text>
                         <Text style={styles.scoreTextWord}>score</Text>
@@ -170,7 +211,7 @@ const styles = StyleSheet.create({
         color: BLACK,
     },
     text: {
-        fontSize: 24,
+        fontSize: 18,
         textAlign: 'center',
         fontFamily: Quicksand_Regular,
         color: BLACK,

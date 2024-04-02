@@ -42,12 +42,17 @@ export const useGetUserTopicsProgress = (user_id: null | number) => {
         ['user_topics_progress', user_id],
         () => TopicsApi.getUserTopicsProgress(user_id),
         {
+            enabled: !!user_id, // Query is only enabled if user_id is truthy
             onError: (error) => {
-                console.error(error);
+                console.error('Error fetching user topics progress:', error.message);
+            },
+            onSuccess: (data) => {
+                console.log('Fetched user topics progress successfully:', data);
             }
         }
     );
 };
+
 
 export const useGetUserSubtitlesProgress = (user_id: number | null, topic_id: number) => {
     return useQuery<UserSubtitleProgressResponse[], AxiosError>(

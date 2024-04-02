@@ -1,13 +1,36 @@
-import React from 'react';
+import React, {useState} from 'react';
 import {Modal, View, TouchableOpacity, StyleSheet, ScrollView, Image, Text, Dimensions} from 'react-native';
 import {Quicksand_Bold, Quicksand_Regular} from "../fonts";
 import {BLACK, MAIN_SECOND} from "../colors";
 import Brain2Icon from "./icons/Brain2Icon";
+import WebView from "react-native-webview";
 
 const screenWidth = Dimensions.get('window').width;
 const donationOptionWidth = (screenWidth - 60) / 3;
 
 const DonationModal = ({ isVisible, onClose }: any) => {
+    const [showPaymentWebView, setShowPaymentWebView] = useState(false);
+    const [paymentUrl, setPaymentUrl] = useState('');
+
+    const handleDonationPress = (url: React.SetStateAction<string>) => {
+      setPaymentUrl(url);
+      setShowPaymentWebView(true);
+    };
+
+    if (showPaymentWebView) {
+      return (
+        <WebView
+          source={{ uri: paymentUrl }}
+          onNavigationStateChange={(navState: { url: string | string[]; }) => {
+            if (navState.url.includes('success')) {
+              setShowPaymentWebView(false);
+
+            }
+          }}
+        />
+      );
+    }
+
     return (
         <Modal
             visible={isVisible}

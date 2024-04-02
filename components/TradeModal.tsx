@@ -13,7 +13,7 @@ import {
 import Brain2Icon from "./icons/Brain2Icon";
 import {
     BACKGROUND,
-    BLACK,
+    BLACK, BLOCK_BUTTON,
     BLUE,
     CORRECT_ANSWER,
     INCORRECT_ANSWER,
@@ -52,7 +52,8 @@ const TradeModal = ({ isVisible, onClose, onTrade, isLoading, userStats }: any) 
                             </View>
                         </View>
 
-                        <TouchableOpacity onPress={onTrade} style={[styles.tradeButton, isLoading || userStats?.xp < 15 && {opacity: 0.5}]}
+                        <TouchableOpacity onPress={onTrade} style={[styles.tradeButton,
+                            isLoading || userStats?.xp < 15 && {backgroundColor: BLOCK_BUTTON}]}
                                           disabled={isLoading || userStats?.xp < 15}
                         >
                             {isLoading ? (

@@ -40,6 +40,7 @@
     "react-native-screens": "^3.25.0",
     "react-native-svg": "^13.14.0",
     "react-native-toast-message": "^2.1.7",
+    "react-native-webview": "^13.8.4",
     "victory-native": "^37.0.0"
   },
   "devDependencies": {
