@@ -7,15 +7,18 @@ import AchievementsScreen from "../screens/AchievementsScreen";
 import MyCardsScreen from "../screens/MyCardsScreen";
 import MyTopicsScreen from "../screens/MyTopicsScreen";
 import {Nunito_Semibold, Quicksand_Bold, Quicksand_Regular} from "../fonts";
-import {Platform} from "react-native";
+import {Platform, Text, View} from "react-native";
 import MainScreen from "../screens/MainScreen";
 import SubTopicScreen from "../screens/SubTopicScreen";
-import {BACKGROUND, BLACK, MAIN_SECOND} from "../colors";
+import {BACKGROUND, BLACK, MAIN_SECOND, RED_SECOND} from "../colors";
 import CardsSubtopicScreen from "../screens/CardsSubtopicScreen";
 import BackIcon from "../components/icons/BackIcon";
 import Launch1Screen from "../screens/Onboarding/Launch1Screen";
 import QuizCompletedScreen from "../screens/QuizCompletedScreen";
 import ProfileScreen from "../screens/ProfileScreen";
+import Brain2Icon from "../components/icons/Brain2Icon";
+import HeartIcon from "../components/icons/HeartIcon";
+import Brain2IconSmall from "../components/icons/Brain2IconSmall";
 
 export type HomeStackParamList = {
     HomeScreen: undefined;
@@ -76,6 +79,19 @@ const HomeStack = () => {
                           elevation: 0,
                     },
                       cardStyle: { backgroundColor: BACKGROUND },
+
+                      headerRight: () => (
+                    <View style={{ alignItems: 'flex-end', marginRight: 10 }}>
+                        <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                            <Brain2Icon size={100} color={BLACK} style={{marginRight: 10, marginTop: 0, transform: [{ scale: 0.6 }]}}/>
+                            <Text style={{ color: BLACK, fontSize: 16, fontFamily: Quicksand_Regular, marginTop: -2 }}>10</Text>
+                        </View>
+                        <View style={{flexDirection: 'row', alignItems: 'center', marginTop: -5}}>
+                            <HeartIcon size={100} color={RED_SECOND} style={{marginRight: 10, marginTop: 0, transform: [{ scale: 0.6 }]}} />
+                            <Text style={{ color: BLACK, fontSize: 16, fontFamily: Quicksand_Regular, marginTop: -2 }}>10</Text>
+                        </View>
+                    </View>
+                    ),
                 }}
             />
             <Stack.Screen name="CardsSubtopicScreen"

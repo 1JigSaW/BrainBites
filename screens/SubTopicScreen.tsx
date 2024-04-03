@@ -12,7 +12,7 @@ import {
     TouchableOpacity,
     View
 } from "react-native";
-import {BACKGROUND, BLACK, BLUE, CORRECT_ANSWER, MAIN_SECOND, RED, WHITE} from "../colors";
+import {BACKGROUND, BLACK, BLUE, CORRECT_ANSWER, MAIN_SECOND, RED, RED_SECOND, WHITE} from "../colors";
 import {useIsFocused} from "@react-navigation/native";
 import LockIcon from "../components/icons/LockIcon";
 import {Quicksand_Bold, Quicksand_Regular} from "../fonts";
@@ -21,6 +21,8 @@ import {useGetLives, useGetUserStats, usePurchaseLives} from "../queries/user";
 import {HomeStackParamList} from "../navigation/HomeStack";
 import Toast from "react-native-toast-message";
 import TradeModal from "../components/TradeModal";
+import Brain2Icon from "../components/icons/Brain2Icon";
+import HeartIcon from "../components/icons/HeartIcon";
 
 type Props = StackScreenProps<HomeStackParamList, 'SubTopicScreen'>;
 
@@ -38,9 +40,17 @@ const SubTopicScreen = ({navigation, route}: Props) => {
         data: userStats,
         isLoading: isLoadingStats,
         isError,
+        refetch: userRefetch,
     } = useGetUserStats(userId);
 
+
     const toggleModalTrade = () => setIsModalVisibleTrade(!isModalVisibleTrade);
+
+    useEffect(() => {
+        if (isFocused && userId) {
+            userRefetch();
+        }
+    }, [isFocused, userId]);
 
     const onTrade = async () => {
         setIsLoadingTrade(true);
@@ -49,6 +59,7 @@ const SubTopicScreen = ({navigation, route}: Props) => {
             purchaseLives({ userId, cost }, {
                 onSuccess: async () => {
                     await refetch();
+                    await userRefetch();
                     setIsLoadingTrade(false);
                 },
                 onError: (error) => {
@@ -64,6 +75,24 @@ const SubTopicScreen = ({navigation, route}: Props) => {
             setIsLoadingTrade(false);
         }
     };
+
+    useEffect(() => {
+      navigation.setOptions({
+        headerRight: () => (
+          <View style={{ alignItems: 'flex-end', marginRight: 10 }}>
+            <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                <Brain2Icon size={100} color={BLACK} style={{marginRight: 10, marginTop: 0, transform: [{ scale: 0.6 }]}}/>
+                <Text style={{ color: BLACK, fontSize: 16, fontFamily: Quicksand_Regular, marginTop: -2 }}>{userStats?.xp}</Text>
+            </View>
+            <View style={{flexDirection: 'row', alignItems: 'center', marginTop: -5}}>
+                <HeartIcon size={100} color={RED_SECOND} style={{marginRight: 10, marginTop: 0, transform: [{ scale: 0.6 }]}} />
+                <Text style={{ color: BLACK, fontSize: 16, fontFamily: Quicksand_Regular, marginTop: -2 }}>{userStats?.lives}</Text>
+            </View>
+        </View>
+        ),
+      });
+    }, [navigation, lives, userStats]);
+
 
      useEffect(() => {
         if (livesData && livesData.lives_remaining != null) {
@@ -87,7 +116,7 @@ const SubTopicScreen = ({navigation, route}: Props) => {
     }, [topic_name, navigation]);
 
     const handleSubtitlePress = (subtitle: UserSubtitleProgressResponse) => {
-        if (lives !== null && lives <= 0) {
+        if (userStats && userStats?.lives !== null && userStats?.lives <= 0) {
             Alert.alert(
                 "Out of Lives",
                 "Unfortunately, you've run out of lives. You can exchange Brain Coins for more lives.",

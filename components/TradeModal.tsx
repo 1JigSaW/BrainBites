@@ -24,8 +24,10 @@ import {
 import HeartIcon from "./icons/HeartIcon";
 import TradeRightIcon from "./icons/TradeRightIcon";
 import {Quicksand_Bold, Quicksand_Regular} from "../fonts";
+import {useGetUserStats} from "../queries/user";
 
 const TradeModal = ({ isVisible, onClose, onTrade, isLoading, userStats }: any) => {
+
     return (
         <Modal
             visible={isVisible}
@@ -39,6 +41,7 @@ const TradeModal = ({ isVisible, onClose, onTrade, isLoading, userStats }: any) 
                 onPressOut={onClose}
             >
                 <View style={styles.modalView}>
+
                     <View style={styles.contentContainer}>
                         <View style={styles.iconsContainer}>
                             <View style={styles.quantitiesContainer}>
@@ -104,6 +107,12 @@ const styles = StyleSheet.create({
         fontSize: 18,
         color: BLACK,
         fontFamily: Quicksand_Bold
+    },
+    quantityRealText: {
+        fontSize: 24,
+        color: BLACK,
+        fontFamily: Quicksand_Bold,
+        marginHorizontal: 5,
     },
     tradeButton: {
         margin: 10,

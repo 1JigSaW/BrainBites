@@ -38,7 +38,7 @@ const MainNavigator = () => {
                     borderWidth: 1,
                     display: currentRoute === 2 ? 'none' : 'flex',
                 },
-                tabBarActiveTintColor: 'blue',  // Цвет иконки при активации
+                tabBarActiveTintColor: 'blue',
             }}>
             <Tab.Screen
                 name="Home"
