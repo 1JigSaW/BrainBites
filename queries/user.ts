@@ -209,3 +209,27 @@ export const usePurchaseLives = () => {
         },
     );
 };
+
+export const useAddXP = () => {
+    return useMutation<
+        { success: string; current_xp: number; },
+        Error,
+        { userId: number; xpAmount: number; }
+    >(
+        async ({ userId, xpAmount }) => {
+            const result = await UserApi.addXP(userId, xpAmount);
+            if ('error' in result) {
+                throw new Error(result.error);
+            }
+            return result;
+        },
+        {
+            onError: (error) => {
+                console.error('Error adding XP:', error.message);
+            },
+            onSuccess: (data) => {
+                console.log('XP added successfully:', data);
+            },
+        },
+    );
+};

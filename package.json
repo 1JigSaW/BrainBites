@@ -1,6 +1,6 @@
 {
   "name": "BrainBites",
-  "version": "0.0.6",
+  "version": "1.0.1",
   "private": true,
   "scripts": {
     "start": "react-native start",
@@ -33,6 +33,7 @@
     "react-native-config": "^1.5.1",
     "react-native-deck-swiper": "^2.0.16",
     "react-native-gesture-handler": "^2.13.2",
+    "react-native-iap": "^12.13.1",
     "react-native-pie": "^1.1.2",
     "react-native-pie-chart": "^3.0.2",
     "react-native-reanimated": "^3.5.4",

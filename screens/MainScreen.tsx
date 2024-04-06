@@ -164,7 +164,7 @@ const MainScreen = ({ navigation, route }: Props) => {
                             <TouchableOpacity style={styles.circle} onPress={toggleModalDonation}>
                                 <PlusIcon size={100} color={BLACK} />
                             </TouchableOpacity>
-                            <DonationModal isVisible={isModalVisibleDonation} onClose={toggleModalDonation} />
+                            <DonationModal isVisible={isModalVisibleDonation} onClose={toggleModalDonation} refetch={refetch} />
                         </View>
                         <View style={styles.centerRow}>
                             <HeartIcon size={100} color={RED_SECOND} style={{marginRight: 10, marginTop: 3}} />

@@ -40,6 +40,11 @@ export interface LivesResponse {
     lives_remaining: number;
 }
 
+export interface AddXPResponse {
+    success: string;
+    current_xp: number;
+}
+
 
 export class UserApi {
     // Existing method
@@ -137,6 +142,21 @@ export class UserApi {
             const { data } = await API.post(`/api/purchase-lives/`, {
                 user_id: userId,
                 cost: cost
+            });
+            return data;
+        } catch (error: any) {
+            if (error.response && error.response.data && error.response.data.error) {
+                return { error: error.response.data.error };
+            }
+            throw error;
+        }
+    }
+
+    static async addXP(userId: number, xpAmount: number): Promise<AddXPResponse | {error: string}> {
+        try {
+            const { data } = await API.post(`/api/add-xp/`, {
+                user_id: userId,
+                xp_amount: xpAmount
             });
             return data;
         } catch (error: any) {

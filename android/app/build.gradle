@@ -72,14 +72,21 @@ android {
     ndkVersion rootProject.ext.ndkVersion
 
     compileSdkVersion rootProject.ext.compileSdkVersion
+    flavorDimensions "store"
+
+    productFlavors {
+        play {
+            dimension "store"
+        }
+    }
 
     namespace "com.brainbites"
     defaultConfig {
         applicationId "com.brainbites_jigsaw"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 6
-        versionName "0.0.6"
+        versionCode 8
+        versionName "1.0.1"
     }
     signingConfigs {
         release {
@@ -105,6 +112,7 @@ dependencies {
     // The version of react-native is set by the React Native Gradle Plugin
     implementation("com.facebook.react:react-android")
     implementation("com.google.android.gms:play-services-auth:20.2.0")
+    implementation('com.android.billingclient:billing:6.1.0')
 
 
     debugImplementation("com.facebook.flipper:flipper:${FLIPPER_VERSION}")
