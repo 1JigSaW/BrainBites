@@ -1,9 +1,12 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+          xmlns:tools="http://schemas.android.com/tools" package="com.brainbites_jigsaw">
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="com.android.vending.BILLING" />
 
     <application
+            android:debuggable="false"
+        tools:ignore="HardcodedDebugMode"
       android:name=".MainApplication"
       android:label="@string/app_name"
       android:icon="@mipmap/ic_launcher"
@@ -12,7 +15,7 @@
       android:theme="@style/AppTheme">
          <meta-data
             android:name="com.google.android.play.billingclient.version"
-            android:value="6.1.0"/>
+            android:value="6.2.0"/>
       <activity
         android:name=".MainActivity"
         android:label="@string/app_name"

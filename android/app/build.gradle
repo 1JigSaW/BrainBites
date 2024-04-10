@@ -72,11 +72,11 @@ android {
     ndkVersion rootProject.ext.ndkVersion
 
     compileSdkVersion rootProject.ext.compileSdkVersion
-    flavorDimensions "store"
-
+    flavorDimensions "appstore"
     productFlavors {
-        play {
-            dimension "store"
+        googlePlay {
+            dimension "appstore"
+            missingDimensionStrategy "store", "play"
         }
     }
 
@@ -85,8 +85,10 @@ android {
         applicationId "com.brainbites_jigsaw"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 8
-        versionName "1.0.1"
+        versionCode 11
+        versionName "1.0.4"
+        missingDimensionStrategy "store", "play"
+        multiDexEnabled true
     }
     signingConfigs {
         release {
@@ -102,7 +104,8 @@ android {
         }
         release {
             signingConfig signingConfigs.release
-            minifyEnabled enableProguardInReleaseBuilds
+            debuggable false
+            minifyEnabled true
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
         }
     }
@@ -112,7 +115,7 @@ dependencies {
     // The version of react-native is set by the React Native Gradle Plugin
     implementation("com.facebook.react:react-android")
     implementation("com.google.android.gms:play-services-auth:20.2.0")
-    implementation('com.android.billingclient:billing:6.1.0')
+    implementation('com.android.billingclient:billing:6.2.0')
 
 
     debugImplementation("com.facebook.flipper:flipper:${FLIPPER_VERSION}")
