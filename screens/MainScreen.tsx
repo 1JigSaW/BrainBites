@@ -25,7 +25,7 @@ import {
 } from "react-native";
 import {Nunito_Bold, Nunito_Regular, Quicksand_Bold, Quicksand_Regular} from "../fonts";
 import {useGetUsers, useGetUserStats, usePurchaseLives} from "../queries/user";
-import React, {useContext, useEffect, useState} from "react";
+import React, {useContext, useEffect, useLayoutEffect, useState} from "react";
 import MainContext from "../navigation/MainContext";
 import {useIsFocused} from "@react-navigation/native";
 import {SvgUri} from "react-native-svg";
@@ -67,6 +67,7 @@ const MainScreen = ({ navigation, route }: Props) => {
     const [isModalVisibleDonation, setIsModalVisibleDonation] = useState(false);
     const [isModalVisibleTrade, setIsModalVisibleTrade] = useState(false);
     const [isLoadingTrade, setIsLoadingTrade] = useState(false);
+    const [availableHeight, setAvailableHeight] = useState(0);
     const toggleModalDonation = () => setIsModalVisibleDonation(!isModalVisibleDonation);
     const toggleModalTrade = () => setIsModalVisibleTrade(!isModalVisibleTrade);
 
@@ -98,6 +99,14 @@ const MainScreen = ({ navigation, route }: Props) => {
         isError: isErrorStreak,
         refetch: refetchStreak,
     } = useGetCurrentStreak(userId);
+
+    useLayoutEffect(() => {
+        const screenHeight = Dimensions.get('window').height;
+        const headerAndLeaderboardHeight = 130 + 10;
+        const calculatedHeight = screenHeight - headerAndLeaderboardHeight;
+
+        setAvailableHeight(calculatedHeight);
+    }, []);
 
     useEffect(() => {
         if (isFocused && userId) {
@@ -187,7 +196,7 @@ const MainScreen = ({ navigation, route }: Props) => {
                 </View>
                 <WeeklyProgressBar total={currentStreak} progress={currentStreak} />
             </TouchableOpacity>
-            <View>
+            <View style={{flex: 1}}>
                 <FlatList
                     data={topicsProgress}
                     horizontal
@@ -200,7 +209,7 @@ const MainScreen = ({ navigation, route }: Props) => {
                                 topic_id: item.topic_id,
                                 topic_name: item.topic_name,
                             })}>
-                          <Image source={{ uri: item.image }} style={styles.topicImage} />
+                          <Image source={{ uri: item.image }} style={[styles.topicImage]} />
                           <View style={[styles.progressOverlay, { width: `${item.progress * 100}%`, height: width * 0.55 }]} />
                           <View style={styles.overlay} />
                           <Text style={styles.topicTitle}>{item.topic_name}</Text>
@@ -313,13 +322,13 @@ const styles = StyleSheet.create({
         marginTop: 5,
     },
     topicContainer: {
-        width: width * 0.55,
+        width: width * 0.35,
         marginRight: 10,
         marginTop: 40,
     },
     topicImage: {
         width: '100%',
-        height: width * 0.55,
+        height: width * 0.85,
         borderRadius: 10,
     },
     topicTitle: {
@@ -339,6 +348,7 @@ const styles = StyleSheet.create({
         marginTop: 30,
         borderRadius: 20,
         marginHorizontal: 10,
+        marginBottom: 10
     },
     titleLeaderboard: {
         color: BLACK,
