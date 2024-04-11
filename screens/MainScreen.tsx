@@ -42,6 +42,8 @@ import TradeIcon from "../components/icons/TradeIcon";
 import DonationModal from "../components/DonationModal";
 import TradeModal from "../components/TradeModal";
 import Toast from "react-native-toast-message";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import {NEXT_LIFE_RESTORE_TIME} from "../constants";
 
 type Props = StackScreenProps<HomeStackParamList, 'MainScreen'>;
 
@@ -68,6 +70,7 @@ const MainScreen = ({ navigation, route }: Props) => {
     const [isModalVisibleTrade, setIsModalVisibleTrade] = useState(false);
     const [isLoadingTrade, setIsLoadingTrade] = useState(false);
     const [availableHeight, setAvailableHeight] = useState(0);
+    const [remainingTime, setRemainingTime] = useState<number | null>(null);
     const toggleModalDonation = () => setIsModalVisibleDonation(!isModalVisibleDonation);
     const toggleModalTrade = () => setIsModalVisibleTrade(!isModalVisibleTrade);
 
@@ -108,8 +111,26 @@ const MainScreen = ({ navigation, route }: Props) => {
         setAvailableHeight(calculatedHeight);
     }, []);
 
+    const updateRemainingTime = async () => {
+        const storedTime = await AsyncStorage.getItem(NEXT_LIFE_RESTORE_TIME);
+        if (storedTime !== null) {
+            const nextRestoreTime = JSON.parse(storedTime);
+            setInterval(() => {
+                const currentTime = new Date().getTime();
+                const remaining = nextRestoreTime - currentTime;
+                if (remaining > 0) {
+                    setRemainingTime(Math.ceil(remaining / 1000));
+                } else {
+                    setRemainingTime(null);
+                    refetch();
+                }
+            }, 1000);
+        }
+    };
+
     useEffect(() => {
         if (isFocused && userId) {
+            updateRemainingTime();
             refetch();
             refetchStreak();
         }
@@ -177,6 +198,7 @@ const MainScreen = ({ navigation, route }: Props) => {
                         </View>
                         <View style={styles.centerRow}>
                             <HeartIcon size={100} color={RED_SECOND} style={{marginRight: 10, marginTop: 3}} />
+                            <Text>{remainingTime}</Text>
                             {isLoadingStats ? (
                                 <ActivityIndicator size="small" color={BLUE} />
                             ) : (
@@ -328,7 +350,7 @@ const styles = StyleSheet.create({
     },
     topicImage: {
         width: '100%',
-        height: width * 0.85,
+        height: '90%',
         borderRadius: 10,
     },
     topicTitle: {

@@ -10,3 +10,4 @@ export const EVERYDAY_CARDS = 'everyday_cards1112111';
 export const LIVES = 'lives';
 export const authLaunch = 'authLaunch';
 export const USERNAME = 'username';
+export const NEXT_LIFE_RESTORE_TIME = 'NEXT_LIFE_RESTORE_TIME';

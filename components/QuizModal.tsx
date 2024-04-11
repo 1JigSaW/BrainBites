@@ -11,7 +11,7 @@ import {
     ScrollView, BackHandler
 } from 'react-native';
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import {QuizState} from "../constants";
+import {NEXT_LIFE_RESTORE_TIME, QuizState} from "../constants";
 import {Quiz} from "../api/quiz.api";
 import {useUpdateQuizStreak, useUpdateUserXp} from "../queries/card";
 import MainContext from "../navigation/MainContext";
@@ -142,6 +142,8 @@ const QuizOverlay = ({ isVisible, onContinue, quizzes, onQuizChange, navigation,
                 const newLives = (prevLives != null && prevLives > 0) ? prevLives - 1 : 0;
 
                 if (newLives === 0) {
+                    const restoreTime = new Date().getTime() + 60000;
+                    AsyncStorage.setItem(NEXT_LIFE_RESTORE_TIME, JSON.stringify(restoreTime));
                     Alert.alert(
                         "Lives depleted",
                         "Unfortunately, all your lives are spent. Wait for them to be replenished.",
