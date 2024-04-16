@@ -29,7 +29,7 @@ import {
 import * as Animatable from 'react-native-animatable';
 import {Nunito_Regular, Nunito_Semibold, Quicksand_Regular} from "../fonts";
 import CircularTimer from "./functions/CircularTimer";
-import {useGetLives, useLoseLife} from "../queries/user";
+import {useGetLives, useLoseLife, useLoseLives} from "../queries/user";
 import HeartIcon from "./icons/HeartIcon";
 
 interface QuizOverlayProps {
@@ -66,6 +66,7 @@ const QuizOverlay = ({ isVisible, onContinue, quizzes, onQuizChange, navigation,
     const { mutate: loseLife } = useLoseLife();
     const { mutate: updateQuizStreak } = useUpdateQuizStreak();
     const animatableRef = useRef<Animatable.View & View>(null);
+    const { mutate: loseLives } = useLoseLives();
 
     useEffect(() => {
         let intervalId: string | number | NodeJS.Timeout | undefined;
@@ -142,11 +143,20 @@ const QuizOverlay = ({ isVisible, onContinue, quizzes, onQuizChange, navigation,
                 const newLives = (prevLives != null && prevLives > 0) ? prevLives - 1 : 0;
 
                 if (newLives === 0) {
-                    const restoreTime = new Date().getTime() + 60000;
-                    AsyncStorage.setItem(NEXT_LIFE_RESTORE_TIME, JSON.stringify(restoreTime));
+                    if (userId) {
+                        loseLives({ userId }, {
+                            onSuccess: () => {
+                                console.log('Last life lost, waiting for restoration.');
+                                // Вызов дополнительных действий, если требуется
+                            },
+                            onError: (error) => {
+                                console.error("Error when losing the last life:", error);
+                            }
+                        });
+                    }
                     Alert.alert(
                         "Lives depleted",
-                        "Unfortunately, all your lives are spent. Wait for them to be replenished.",
+                        `Unfortunately, all your lives are spent. Wait for 1 hour to replenish them.`,
                         [
                             {
                                 text: "OK",

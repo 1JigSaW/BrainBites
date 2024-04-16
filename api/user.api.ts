@@ -167,4 +167,24 @@ export class UserApi {
         }
     }
 
+    static async loseLifeCache(userId: number): Promise<any> {
+        try {
+            const url = `/api/report_life_loss/${userId}/`;
+            const { data } = await API.post(url);
+            return data;
+        } catch (error) {
+            throw error;
+        }
+    }
+
+
+    static async getLivesCache(userId: number): Promise<any> {
+        try {
+            const { data } = await API.get(`/api/check_restore_lives/${userId}/`);
+            return data;
+        } catch (error) {
+            throw error;
+        }
+    }
+
 }

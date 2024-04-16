@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet, Dimensions } from 'react-native';
-import {BLACK, BLOCK_BUTTON, INCORRECT_ANSWER, MAIN_SECOND, RED, WHITE} from "../colors";
+import {BACKGROUND, BLACK, BLOCK_BUTTON, INCORRECT_ANSWER, MAIN_SECOND, RED, WHITE} from "../colors";
 import {Quicksand_Bold, Quicksand_Regular} from "../fonts";
 import LottieView from "lottie-react-native";
 import FireIcon from "./icons/FireIcon";
@@ -17,8 +17,8 @@ const WeeklyProgressBar = ({ total, progress }: any) => {
   return (
     <View style={styles.container}>
       <View style={styles.circle}>
-        {/*<FireIcon size={100} style={{ overflow: 'hidden', position: 'absolute', left: 1, }} />*/}
-        <Text style={{ fontFamily: 'Quicksand_Bold', fontSize: 24, color: INCORRECT_ANSWER, fontWeight: 'bold' }}>{total}</Text>
+        <FireIcon size={100} style={{ overflow: 'hidden', position: 'absolute', left: -13, top: -28, zIndex: 0 }} />
+        <Text style={{ fontFamily: 'Quicksand_Bold', fontSize: 24, color: BACKGROUND, fontWeight: 'bold', zIndex: 1 }}>{total}</Text>
       </View>
       {days.map((day, index) => {
         const fill = normalizedProgress >= 0 ? index < normalizedProgress : index < 7;
@@ -57,7 +57,7 @@ const styles = StyleSheet.create({
     width: 80,
     height:  80,
     borderRadius: 50,
-    backgroundColor: WHITE,
+    backgroundColor: INCORRECT_ANSWER,
     justifyContent: 'center',
     alignItems: 'center',
     borderWidth: 11,

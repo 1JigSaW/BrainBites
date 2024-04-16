@@ -233,3 +233,58 @@ export const useAddXP = () => {
         },
     );
 };
+
+
+interface LifeApiResponse {
+    current_lives: number;
+    message: string;
+    restoring: boolean;
+    time_left?: number; // Optional since it won't always be there
+}
+
+export const useLoseLives = () => {
+    return useMutation<LifeApiResponse, Error, { userId: number }>(
+        async ({ userId }) => {
+            const result = await UserApi.loseLifeCache(userId);
+            if ('error' in result) {
+                throw new Error(result.error);
+            }
+            return result;
+        },
+        {
+            onError: (error) => {
+                console.error('Error losing life:', error.message);
+            },
+            onSuccess: (data) => {
+                console.log('Life loss recorded:', data);
+            },
+        },
+    );
+};
+
+export const useCheckRestoreLives = () => {
+    return useMutation<LifeApiResponse, Error, { userId: number }>(
+        async ({ userId }) => {
+            const result = await UserApi.getLivesCache(userId);
+            if ('error' in result) {
+                throw new Error(result.error);
+            }
+            // Так как API может вернуть либо время до восстановления, либо текущее количество жизней,
+            // добавьте логику для обработки обоих случаев.
+            if (result.current_lives !== undefined) {
+                return { ...result, restoring: false };
+            } else if (result.time_left !== undefined) {
+                return { ...result, restoring: true };
+            }
+            throw new Error('Unexpected API response structure');
+        },
+        {
+            onError: (error) => {
+                console.error('Error checking/restoring lives:', error.message);
+            },
+            onSuccess: (data) => {
+                console.log('Checked/restored lives successfully:', data);
+            },
+        },
+    );
+};
