@@ -49,9 +49,10 @@ const WeeklyProgressBar = ({ total, progress }: any) => {
 const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
-    justifyContent: 'space-around', // Обеспечивает равномерное распределение по ширине экрана
+    justifyContent: 'space-around',
     width: screenWidth,
-    padding: 10,
+    padding: 8,
+    marginTop: -18
   },
   circle: {
     width: 80,

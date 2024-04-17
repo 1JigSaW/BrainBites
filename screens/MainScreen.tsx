@@ -16,7 +16,7 @@ import {
     ActivityIndicator,
     Dimensions,
     FlatList,
-    Image,
+    Image, Pressable,
     SafeAreaView,
     StyleSheet,
     Text,
@@ -162,7 +162,7 @@ const MainScreen = ({ navigation, route }: Props) => {
 
     return (
         <SafeAreaView style={{ flex: 1, backgroundColor: BACKGROUND }}>
-            <TouchableOpacity style={styles.header} onPress={() => navigation.navigate('ProfileScreen')}>
+            <TouchableOpacity style={[styles.header]} onPress={() => navigation.navigate('ProfileScreen')}>
                 <View style={styles.headerLine1}>
                     <View style={styles.centerRow}>
                         <View style={styles.circleImageView}>
@@ -181,46 +181,62 @@ const MainScreen = ({ navigation, route }: Props) => {
                             <Text style={styles.textUsername}>{userStats?.username}</Text>
                         )}
                     </View>
-                    <View style={styles.iconsContainer}>
-                        <View style={styles.centerRow}>
+                    <View style={[styles.iconsContainer]}>
+                        <TouchableOpacity style={[styles.centerRow]} onPress={toggleModalDonation}>
                             <Brain2Icon size={100} color={BLACK} style={{marginRight: 10, marginTop: 3}}/>
                             {isLoadingStats ? (
                                 <ActivityIndicator size="small" color={BLUE} />
                             ) : (
                                 <Text style={styles.textVariable}>{userStats?.xp}</Text>
                             )}
-                            <TouchableOpacity style={styles.circle} onPress={toggleModalDonation}>
+                            <TouchableOpacity
+                                style={styles.circle}
+                                onPress={toggleModalDonation}
+                                // hitSlop={{ top: 10, left: 10, right: 10 }}
+                            >
                                 <PlusIcon size={100} color={BLACK} />
                             </TouchableOpacity>
                             <DonationModal isVisible={isModalVisibleDonation} onClose={toggleModalDonation} refetch={refetch} />
-                        </View>
-                        <View style={styles.centerRow}>
-                            <HeartIcon size={100} color={RED_SECOND} style={{marginRight: 10, marginTop: 3}} />
-                             {remainingTime ? (
-                                <RemainingTimeDisplay
-                                    remainingTime={remainingTime}
-                                    setRemainingTime={setRemainingTime}
-                                    mutate={mutate}
-                                    userId={userId}
-                                    refetch={refetch}
-                                />
-                            ) : (
-                                isLoadingStats ? (
-                                    <ActivityIndicator size="small" color={BLUE} />
+                        </TouchableOpacity>
+                        <TouchableOpacity
+                            style={[styles.centerRow, {paddingBottom: 20, zIndex: 4 }]} onPress={toggleModalTrade}>
+                        {!isLoadingLives ? (
+                            <>
+                                <HeartIcon size={100} color={RED_SECOND} style={[{marginRight: 10, marginTop: 3},
+                                    (remainingTime && userStats?.lives === 0) ? {opacity: 0.5} : {opacity: 1}]} />
+                                 {(remainingTime && userStats?.lives === 0) ? (
+                                    <RemainingTimeDisplay
+                                        remainingTime={remainingTime}
+                                        setRemainingTime={setRemainingTime}
+                                        mutate={mutate}
+                                        userId={userId}
+                                        refetch={refetch}
+                                    />
                                 ) : (
-                                    <Text style={styles.textVariable}>{userStats?.lives}</Text>
-                                )
-                            )}
-                            <TouchableOpacity style={styles.circle} onPress={toggleModalTrade}>
-                                <TradeIcon size={120} color={BLACK} style={{marginTop: 9, marginLeft: 8}}/>
-                            </TouchableOpacity>
-                            <TradeModal isVisible={isModalVisibleTrade}
-                                        onClose={toggleModalTrade}
-                                        onTrade={onTrade}
-                                        isLoading={isLoadingTrade}
-                                        userStats={userStats}
-                            />
-                        </View>
+                                    isLoadingStats ? (
+                                        <ActivityIndicator size="small" color={BLUE} />
+                                    ) : (
+                                        <Text style={styles.textVariable}>{userStats?.lives}</Text>
+                                    )
+                                )}
+                                <TouchableOpacity
+                                    style={styles.circle}
+                                    onPress={toggleModalTrade}
+                                    hitSlop={{ top: 20, bottom: 20, left: 20, right: 20 }}
+                                >
+                                    <TradeIcon size={120} color={BLACK} style={{marginTop: 9, marginLeft: 8}}/>
+                                </TouchableOpacity>
+                                <TradeModal isVisible={isModalVisibleTrade}
+                                            onClose={toggleModalTrade}
+                                            onTrade={onTrade}
+                                            isLoading={isLoadingTrade}
+                                            userStats={userStats}
+                                />
+                                </>
+                            ) : (
+                                <ActivityIndicator size="small" color={BLUE} />
+                        )}
+                        </TouchableOpacity>
                     </View>
                 </View>
                 <WeeklyProgressBar total={currentStreak} progress={currentStreak} />
@@ -308,6 +324,7 @@ const styles = StyleSheet.create({
     centerRow: {
         flexDirection: 'row',
         alignItems: 'center',
+        marginBottom: 5
     },
     circleImageView: {
         width: 60,
@@ -333,7 +350,8 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         marginLeft: 10,
         marginRight: 20,
-        marginTop: 5
+        marginTop: 5,
+        paddingBottom: 0
     },
     textVariable: {
         fontSize: 24,

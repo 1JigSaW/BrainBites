@@ -58,6 +58,7 @@ const CardsSubtopicScreen = ({ navigation, route }: Props) => {
             setQuizVisible(true); // Show the quiz
         } else {
             console.log('No quizzes available for swiped cards');
+            setQuizVisible(true);
         }
     };
 
