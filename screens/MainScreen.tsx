@@ -161,7 +161,10 @@ const MainScreen = ({ navigation, route }: Props) => {
     const currentStreak = streakData?.current_streak ?? 0;
 
     return (
+        <>
+        <SafeAreaView style={{ flex:0, backgroundColor: MAIN_SECOND }} />
         <SafeAreaView style={{ flex: 1, backgroundColor: BACKGROUND }}>
+            <View style={{ flex: 1, backgroundColor: BACKGROUND }}>
             <TouchableOpacity style={[styles.header]} onPress={() => navigation.navigate('ProfileScreen')}>
                 <View style={styles.headerLine1}>
                     <View style={styles.centerRow}>
@@ -305,7 +308,9 @@ const MainScreen = ({ navigation, route }: Props) => {
                     )}
                 </View>
             </TouchableOpacity>
+            </View>
         </SafeAreaView>
+            </>
     )
 }
 

@@ -23,23 +23,23 @@ const WeeklyProgressBar = ({ total, progress }: any) => {
       {days.map((day, index) => {
         const fill = normalizedProgress >= 0 ? index < normalizedProgress : index < 7;
         return (
-          <View key={day} style={styles.dayContainer}>
-            <Text style={styles.dayText}>{day}</Text>
-            <View style={styles.dayCircleContainer}>
-              <View style={[
-                styles.dayCircle,
-                fill ? styles.filledDay : styles.emptyDay
-              ]}>
-                {index !== 0 && (
-                  <View style={[
-                    styles.line,
-                    { left: -38 },
-                    fill ? styles.filledDay : styles.emptyDay
-                  ]}/>
-                )}
+            <View key={day} style={styles.dayContainer}>
+              <Text style={styles.dayText}>{day}</Text>
+              <View style={styles.dayCircleContainer}>
+                <View style={[
+                  styles.dayCircle,
+                  fill ? styles.filledDay : styles.emptyDay
+                ]}>
+                  {index !== days.length - 1 && ( // Change here to not render line on the last day
+                      <View style={[
+                        styles.line,
+                        { left: 4 }, // Change line position to the right
+                        fill ? styles.filledDay : styles.emptyDay
+                      ]}/>
+                  )}
+                </View>
               </View>
             </View>
-          </View>
         );
       })}
     </View>
@@ -68,6 +68,7 @@ const styles = StyleSheet.create({
   dayContainer: {
     alignItems: 'center',
     flexDirection: 'column', // Элементы располагаются вертикально
+    zIndex: 10,
   },
   dayCircleContainer: {
     position: 'relative', // Для абсолютного позиционирования линии

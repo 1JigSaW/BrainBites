@@ -17,7 +17,6 @@ import Toast from "react-native-toast-message";
 import {useAddXP} from "../queries/user";
 import MainContext from "../navigation/MainContext";
 import {adapty} from "react-native-adapty";
-import {Adapty} from "react-native-adapty/dist/adapty-handler";
 
 const productIds = [
     'low_01',

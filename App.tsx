@@ -13,6 +13,8 @@ import {adapty} from "react-native-adapty";
 
 const queryClient = new QueryClient();
 
+adapty.activate('public_live_cOLy1s7T.euJr5h93gOX73xX7lgRG');
+
 function App(): JSX.Element | null {
     const [userId, setUserId] = useState<number | null>(null);
     const [isFirstLaunch, setIsFirstLaunch] = useState<boolean | null>(null);
@@ -21,10 +23,6 @@ function App(): JSX.Element | null {
     const [everyDayCards, setEveryDayCards] = useState<number>(0);
     const [username, setUsername] = useState<string | null>(null);
     const [lives, setLives] = useState<number>(0);
-
-    useEffect(() => {
-        adapty.activate('public_live_cOLy1s7T.euJr5h93gOX73xX7lgRG');
-    }, []);
 
     useEffect(() => {
         AsyncStorage.getItem(firstLaunchTest).then(value => {

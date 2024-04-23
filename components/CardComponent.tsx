@@ -61,6 +61,7 @@ const CardComponent = ({ card, myCards, handleRemoveCard, swipedCard, cards }: a
         console.error('CardComponent was given undefined data');
         return <Text>Error: Card data is not available.</Text>;
     }
+    console.log(card.image)
 
     return (
         <View style={[styles.card, myCards && {height: '90%'}]}>
