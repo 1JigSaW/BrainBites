@@ -84,7 +84,7 @@ const SubTopicScreen = ({navigation, route}: Props) => {
                 <Brain2Icon size={100} color={BLACK} style={{marginRight: 10, marginTop: 0, transform: [{ scale: 0.6 }]}}/>
                 <Text style={{ color: BLACK, fontSize: 16, fontFamily: Quicksand_Regular, marginTop: -2 }}>{userStats?.xp}</Text>
             </View>
-            <View style={{flexDirection: 'row', alignItems: 'center', marginTop: -5}}>
+            <View style={{flexDirection: 'row', alignItems: 'center', marginTop: -10}}>
                 <HeartIcon size={100} color={RED_SECOND} style={{marginRight: 10, marginTop: 0, transform: [{ scale: 0.6 }]}} />
                 <Text style={{ color: BLACK, fontSize: 16, fontFamily: Quicksand_Regular, marginTop: -2 }}>{userStats?.lives}</Text>
             </View>

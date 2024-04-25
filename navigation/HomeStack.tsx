@@ -66,7 +66,10 @@ const HomeStack = () => {
                     headerBackTitleVisible: false,
                     headerTitleAlign: 'center',
                     headerBackImage: ({ tintColor }) => (
-                        <BackIcon color={Platform.OS === 'ios' ? 'black': tintColor} size={100} style={{marginLeft: 5, marginTop: 5}} />
+                        <BackIcon color={Platform.OS === 'ios' ? 'black': tintColor} size={100} style={{
+                            marginLeft: Platform.OS === 'ios' ? 15 : 5,
+                            marginTop: Platform.OS === 'ios' ? 0 : 5,
+                        }} />
                     ),
                     headerTitleStyle: {
                         fontFamily: Quicksand_Bold,
@@ -114,7 +117,10 @@ const HomeStack = () => {
                     headerTitle: 'Leaderboard',
                     headerTitleAlign: 'center',
                     headerBackImage: ({ tintColor }) => (
-                        <BackIcon color={Platform.OS === 'ios' ? 'black': tintColor} size={100} style={{marginLeft: 5, marginTop: 5}} />
+                        <BackIcon color={Platform.OS === 'ios' ? 'black': tintColor} size={100} style={{
+                            marginLeft: Platform.OS === 'ios' ? 15 : 5,
+                            marginTop: Platform.OS === 'ios' ? 0 : 5,
+                        }} />
                     ),
                     headerTitleStyle: {
                         fontFamily: Quicksand_Bold,
@@ -137,7 +143,10 @@ const HomeStack = () => {
                     headerTitle: 'Achievements',
                     headerTitleAlign: 'center',
                     headerBackImage: ({ tintColor }) => (
-                        <BackIcon color={Platform.OS === 'ios' ? 'black': tintColor} size={100} style={{marginLeft: 5, marginTop: 5}} />
+                        <BackIcon color={Platform.OS === 'ios' ? 'black': tintColor} size={100} style={{
+                            marginLeft: Platform.OS === 'ios' ? 15 : 5,
+                            marginTop: Platform.OS === 'ios' ? 0 : 5,
+                        }} />
                     ),
                     headerTitleStyle: {
                         fontFamily: Quicksand_Bold,
@@ -159,7 +168,10 @@ const HomeStack = () => {
                                 headerTitle: 'Account',
                                 headerTitleAlign: 'center',
                                 headerBackImage: ({ tintColor }) => (
-                                    <BackIcon color={Platform.OS === 'ios' ? 'black': tintColor} size={100} style={{marginLeft: 5, marginTop: 5}} />
+                                    <BackIcon color={Platform.OS === 'ios' ? 'black': tintColor} size={100} style={{
+                                        marginLeft: Platform.OS === 'ios' ? 15 : 5,
+                                        marginTop: Platform.OS === 'ios' ? 0 : 5,
+                                    }} />
                                 ),
                                 headerTitleStyle: {
                                     fontFamily: Quicksand_Bold,
@@ -181,7 +193,10 @@ const HomeStack = () => {
                     headerTitle: 'My Cards',
                     headerTitleAlign: 'center',
                     headerBackImage: ({ tintColor }) => (
-                        <ArrowBackIcon color={Platform.OS === 'ios' ? 'black': tintColor} size={25} style={{marginLeft: 10, marginTop: 5}} />
+                        <ArrowBackIcon color={Platform.OS === 'ios' ? 'black': tintColor} size={25} style={{
+                            marginLeft: Platform.OS === 'ios' ? 15 : 5,
+                            marginTop: Platform.OS === 'ios' ? 0 : 5,
+                        }} />
                     ),
                     headerTitleStyle: {
                         fontFamily: Nunito_Semibold,
@@ -198,7 +213,10 @@ const HomeStack = () => {
                     headerTitle: 'My Topics',
                     headerTitleAlign: 'center',
                     headerBackImage: ({ tintColor }) => (
-                        <ArrowBackIcon color={Platform.OS === 'ios' ? 'black': tintColor} size={25} style={{marginLeft: 10, marginTop: 5}} />
+                        <ArrowBackIcon color={Platform.OS === 'ios' ? 'black': tintColor} size={25} style={{
+                            marginLeft: Platform.OS === 'ios' ? 15 : 5,
+                            marginTop: Platform.OS === 'ios' ? 0 : 5,
+                        }} />
                     ),
                     headerTitleStyle: {
                         fontFamily: Nunito_Semibold,

@@ -76,7 +76,7 @@ const CardsSubtopicScreen = ({ navigation, route }: Props) => {
 
       navigation.setOptions({
       header: () => (
-        <View style={styles.customHeader}>
+        <SafeAreaView style={styles.customHeader}>
           <TouchableOpacity onPress={handleExitPress} style={styles.exitButton}>
             <BackIcon color={BLACK} size={100} />
           </TouchableOpacity>
@@ -87,7 +87,7 @@ const CardsSubtopicScreen = ({ navigation, route }: Props) => {
           {/*  {isQuizVisible ? `Quiz: ${currentQuizNumber + 1} / ${quizzes?.length}` :*/}
           {/*  `Card ${swipedCardCount + 1} / ${cards?.length}`}*/}
           {/*</Text>*/}
-        </View>
+        </SafeAreaView>
       ),
     });
     }, [isQuizVisible, currentQuizNumber, swipedCardCount, quizzes, cards, navigation]);
