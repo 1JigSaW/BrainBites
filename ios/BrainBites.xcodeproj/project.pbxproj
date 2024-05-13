@@ -58,6 +58,8 @@
 		BD5F56291553478687A23DCC /* Quicksand-Light.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Quicksand-Light.ttf"; path = "../public/assets/fonts/Quicksand-Light.ttf"; sourceTree = "<group>"; };
 		CA1062D7F1B6759FEBFA67B1 /* Pods-BrainBites-BrainBitesTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-BrainBites-BrainBitesTests.release.xcconfig"; path = "Target Support Files/Pods-BrainBites-BrainBitesTests/Pods-BrainBites-BrainBitesTests.release.xcconfig"; sourceTree = "<group>"; };
 		CEE2A4F52BD6EBB200757CF4 /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
+		CEF2A3FE2BF2AB8D0092B6E4 /* BrainBitesRelease.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = BrainBitesRelease.entitlements; path = BrainBites/BrainBitesRelease.entitlements; sourceTree = "<group>"; };
+		CEF2A3FF2BF2ABA00092B6E4 /* BrainBitesDebug.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = BrainBitesDebug.entitlements; path = BrainBites/BrainBitesDebug.entitlements; sourceTree = "<group>"; };
 		DFCBDCD436C039B4571032C7 /* Pods-BrainBites.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-BrainBites.debug.xcconfig"; path = "Target Support Files/Pods-BrainBites/Pods-BrainBites.debug.xcconfig"; sourceTree = "<group>"; };
 		E09B1489A01544F0B080C1C7 /* Nunito-Bold.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Nunito-Bold.ttf"; path = "../public/assets/fonts/Nunito-Bold.ttf"; sourceTree = "<group>"; };
 		E8805639804E4D3BB52F0829 /* Quicksand-Medium.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Quicksand-Medium.ttf"; path = "../public/assets/fonts/Quicksand-Medium.ttf"; sourceTree = "<group>"; };
@@ -107,6 +109,8 @@
 		13B07FAE1A68108700A75B9A /* BrainBites */ = {
 			isa = PBXGroup;
 			children = (
+				CEF2A3FF2BF2ABA00092B6E4 /* BrainBitesDebug.entitlements */,
+				CEF2A3FE2BF2AB8D0092B6E4 /* BrainBitesRelease.entitlements */,
 				13B07FAF1A68108700A75B9A /* AppDelegate.h */,
 				13B07FB01A68108700A75B9A /* AppDelegate.mm */,
 				13B07FB51A68108700A75B9A /* Images.xcassets */,
@@ -533,7 +537,8 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
-				CURRENT_PROJECT_VERSION = 16;
+				CODE_SIGN_ENTITLEMENTS = BrainBites/BrainBitesDebug.entitlements;
+				CURRENT_PROJECT_VERSION = 14;
 				DEVELOPMENT_TEAM = 7XL9LNUB7T;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = BrainBites/Info.plist;
@@ -543,7 +548,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 2.0.2;
+				MARKETING_VERSION = 2.0.0;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
@@ -567,6 +572,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_ENTITLEMENTS = BrainBites/BrainBitesRelease.entitlements;
 				CURRENT_PROJECT_VERSION = 16;
 				DEVELOPMENT_TEAM = 7XL9LNUB7T;
 				INFOPLIST_FILE = BrainBites/Info.plist;
@@ -662,7 +668,10 @@
 					"-DFOLLY_MOBILE=1",
 					"-DFOLLY_USE_LIBCPP=1",
 				);
-				OTHER_LDFLAGS = "$(inherited)  ";
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					" ",
+				);
 				REACT_NATIVE_PATH = "${PODS_ROOT}/../../node_modules/react-native";
 				SDKROOT = iphoneos;
 			};
@@ -732,7 +741,10 @@
 					"-DFOLLY_MOBILE=1",
 					"-DFOLLY_USE_LIBCPP=1",
 				);
-				OTHER_LDFLAGS = "$(inherited)  ";
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					" ",
+				);
 				REACT_NATIVE_PATH = "${PODS_ROOT}/../../node_modules/react-native";
 				SDKROOT = iphoneos;
 				VALIDATE_PRODUCT = YES;

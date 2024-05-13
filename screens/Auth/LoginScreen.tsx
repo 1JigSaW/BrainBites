@@ -24,6 +24,8 @@ import {
 import Config from "react-native-config";
 import Toast from "react-native-toast-message";
 import GoogleIcon from "../../components/icons/GoogleIcon";
+import { appleAuth, AppleButton } from '@invertase/react-native-apple-authentication';
+
 
 type Props = StackScreenProps<AuthStackParamList, 'LoginScreen'>;
 
@@ -138,6 +140,27 @@ const LoginScreen = ({ navigation }: Props) => {
         }
     };
 
+    async function onAppleButtonPress() {
+        try {
+            const appleAuthRequestResponse = await appleAuth.performRequest({
+                requestedOperation: appleAuth.Operation.LOGIN,
+                requestedScopes: [appleAuth.Scope.EMAIL, appleAuth.Scope.FULL_NAME],
+            });
+
+            const credentialState = await appleAuth.getCredentialStateForUser(appleAuthRequestResponse.user);
+
+            if (credentialState === appleAuth.State.AUTHORIZED) {
+                console.log('Авторизация выполнена успешно');
+                // Здесь можно обработать данные пользователя
+            } else {
+                console.log('Авторизация не выполнена');
+            }
+        } catch (error) {
+            console.error('Ошибка при входе через Apple:', error);
+        }
+    }
+
+
 
     return (
         <SafeAreaView style={{ flex: 1, backgroundColor: BACKGROUND }}>
@@ -180,6 +203,19 @@ const LoginScreen = ({ navigation }: Props) => {
                         >
                             <GoogleIcon size={100}/>
                         </TouchableOpacity>
+                    </View>
+                    <View>
+                    {appleAuth.isSupported && (
+                        <AppleButton
+                            buttonStyle={AppleButton.Style.WHITE}
+                            buttonType={AppleButton.Type.SIGN_IN}
+                            style={{
+                                width: 160,
+                                height: 45,
+                            }}
+                            onPress={() => onAppleButtonPress()}
+                        />
+                    )}
                     </View>
                 </ScrollView>
                     <TouchableOpacity
