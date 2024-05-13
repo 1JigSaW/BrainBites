@@ -1,5 +1,12 @@
-import {useMutation, useQuery, UseQueryResult} from '@tanstack/react-query';
-import {CreateUserResponse, LivesResponse, UserApi, UsernameCheckResponse, UserStatsResponse} from "../api/user.api";
+import {useMutation, UseMutationResult, useQuery, UseQueryResult} from '@tanstack/react-query';
+import {
+    CreateUserResponse,
+    DeleteUserResponse,
+    LivesResponse,
+    UserApi,
+    UsernameCheckResponse,
+    UserStatsResponse
+} from "../api/user.api";
 import {AxiosError} from "axios";
 
 export const USERNAME_UNIQUE_QUERY_KEY = 'username_check_unique';
@@ -285,6 +292,30 @@ export const useCheckRestoreLives = () => {
             onSuccess: (data) => {
                 console.log('Checked/restored lives successfully:', data);
             },
+        },
+    );
+};
+
+export interface DeleteUserOptions {
+    userId: number;
+}
+
+export const useDeleteUser = (): UseMutationResult<DeleteUserResponse, AxiosError, DeleteUserOptions> => {
+    return useMutation<DeleteUserResponse, AxiosError, DeleteUserOptions>(
+        async ({ userId }) => {
+            const response = await UserApi.deleteUser(userId);
+            if ('error' in response) {
+                throw new Error(response.error);
+            }
+            return response;
+        },
+        {
+            onError: (error) => {
+                console.error('Error deleting user:', error.message);
+            },
+            onSuccess: (data) => {
+                console.log('User deleted successfully:', data);
+            }
         },
     );
 };

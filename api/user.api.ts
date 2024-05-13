@@ -45,6 +45,10 @@ export interface AddXPResponse {
     current_xp: number;
 }
 
+export interface DeleteUserResponse {
+    success: string;
+}
+
 
 export class UserApi {
     // Existing method
@@ -183,6 +187,18 @@ export class UserApi {
             const { data } = await API.get(`/api/check_restore_lives/${userId}/`);
             return data;
         } catch (error) {
+            throw error;
+        }
+    }
+
+    static async deleteUser(userId: number): Promise<DeleteUserResponse | { error: string }> {
+        try {
+            const { data } = await API.post(`/api/delete_account/`, { user_id: userId });
+            return data;
+        } catch (error: any) {
+            if (error.response && error.response.data && error.response.data.error) {
+                return { error: error.response.data.error };
+            }
             throw error;
         }
     }

@@ -15,13 +15,13 @@ import {
     BLACK,
     BLUE, CORRECT_ANSWER,
     INCORRECT_ANSWER,
-    MAIN_SECOND,
+    MAIN_SECOND, RED, RED_SECOND,
     SECONDARY_SECOND,
     WHITE
 } from "../colors";
 import {SvgUri} from "react-native-svg";
 import React, {useContext, useEffect, useState} from "react";
-import {useGetUserStats} from "../queries/user";
+import {useDeleteUser, useGetUserStats} from "../queries/user";
 import MainContext from "../navigation/MainContext";
 import {Nunito_Bold, Nunito_Regular, Quicksand_Bold, Quicksand_Regular} from "../fonts";
 import LogoutIcon from "../components/icons/LogoutIcon";
@@ -29,7 +29,6 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import {authLaunch, CARDS_COUNT, EVERYDAY_CARDS, firstLaunchTest, user, USERNAME} from "../constants";
 import {useGetUserBadgeProgress} from "../queries/badge";
 import {calculateProgressBarWidth} from "../utils";
-import PieChart from "react-native-pie-chart";
 import {VictoryPie} from "victory-native";
 import {useUserStatsFull} from "../queries/stats";
 import {GoogleSignin} from "@react-native-google-signin/google-signin";
@@ -62,7 +61,8 @@ const ProfileScreen = ({ navigation, route }: Props) => {
         isError: isErrorStats,
         refetch: refetchStats,
     } = useUserStatsFull(userId);
-    
+    const deleteUser = useDeleteUser();
+
     const shouldFetchBadgeProgress = userId != null;
 
     const { data: badgeProgress, isLoading, error } = useGetUserBadgeProgress(userId, shouldFetchBadgeProgress, true);
@@ -125,7 +125,28 @@ const ProfileScreen = ({ navigation, route }: Props) => {
         );
     };
 
+    const handleDeleteAccount = async () => {
+        Alert.alert(
+            "Delete Account",
+            "Are you sure you want to delete your account? This action cannot be undone.",
+            [
+                { text: "Cancel", onPress: () => console.log("Deletion cancelled"), style: "cancel" },
+                { text: "Delete", onPress: async () => {
+                    try {
+                        if (userId) {
+                            await deleteUser.mutateAsync({ userId });
+                        }
+                        await AsyncStorage.clear();
+                        setIsFirstLaunch(true);
 
+                    } catch (error) {
+                        console.error('Error deleting account: ', error);
+                        Alert.alert("Error", "Failed to delete the account. Please try again later.");
+                    }
+                }}
+            ]
+        );
+    };
 
     console.log('badgeProgress', badgeProgress)
 
@@ -276,7 +297,15 @@ const ProfileScreen = ({ navigation, route }: Props) => {
                             <Text style={styles.maxCardsNumber}>{userStatsFull?.daily_read_cards[0].cards_read}</Text>
                         </View>
                     </View>
+                    <TouchableOpacity onPress={handleDeleteAccount} style={[styles.statBlock, {backgroundColor: RED_SECOND}]}>
+                        <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
+                            <Text style={[styles.statTitle, {marginBottom: 0,
+                                textAlign: 'center',
+                                color: BACKGROUND}]}>Delete Account</Text>
+                        </View>
+                    </TouchableOpacity>
                 </View>
+
             </ScrollView>
         </SafeAreaView>
 
