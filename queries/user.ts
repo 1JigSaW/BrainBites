@@ -319,3 +319,23 @@ export const useDeleteUser = (): UseMutationResult<DeleteUserResponse, AxiosErro
         },
     );
 };
+
+export interface AppleSignInResponse {
+    user: { id: number; email: string; };
+    token: string;
+}
+
+export const useAppleSignIn = () => {
+    return useMutation<any, AxiosError, any>(
+        appleData => UserApi.appleSignIn(appleData),
+        {
+            onError: (error) => {
+                console.error('Error during Apple sign in:', error.message);
+            },
+            onSuccess: (data) => {
+                console.log('Apple sign in successful:', data);
+                // Дополнительные действия после успешного входа
+            }
+        },
+    );
+};

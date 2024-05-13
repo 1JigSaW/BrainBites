@@ -203,4 +203,16 @@ export class UserApi {
         }
     }
 
+    static async appleSignIn(appleData: any) {
+        try {
+            const { data } = await API.post('/api/apple_sign_in/', appleData);
+            return data;
+        } catch (error: any) {
+            if (error.response && error.response.data && error.response.data.error) {
+                return { error: error.response.data.error };
+            }
+            throw error;
+        }
+    }
+
 }
