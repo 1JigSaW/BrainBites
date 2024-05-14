@@ -3,7 +3,7 @@ import {AuthStackParamList} from "../../navigation/AuthNavigator";
 import React, {useContext, useState} from "react";
 import {BACKGROUND, BLACK, BLOCK_BUTTON, MAIN_SECOND, RED, SECONDARY_SECOND, WHITE} from "../../colors";
 import {
-    ActivityIndicator,
+    ActivityIndicator, Platform,
     SafeAreaView,
     ScrollView,
     StyleSheet,
@@ -16,10 +16,11 @@ import {Quicksand_Bold, Quicksand_Regular} from "../../fonts";
 import MainContext from "../../navigation/MainContext";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import {user} from "../../constants";
-import {useCreateUser, useGoogleSignIn} from "../../queries/user";
+import {useAppleSignIn, useCreateUser, useGoogleSignIn} from "../../queries/user";
 import {GoogleSignin, GoogleSigninButton} from "@react-native-google-signin/google-signin";
 import Toast from "react-native-toast-message";
 import GoogleIcon from "../../components/icons/GoogleIcon";
+import {appleAuth, AppleButton} from "@invertase/react-native-apple-authentication";
 
 type Props = StackScreenProps<AuthStackParamList, 'RegistrationScreen'>;
 
@@ -32,6 +33,7 @@ const RegistrationScreen = ({ navigation, route }: Props) => {
     const [isCreatingUser, setIsCreatingUser] = useState(false);
     const [isSigningIn, setIsSigningIn] = useState(false);
     const [loading, setLoading] = useState(false);
+    const { mutate: appleSignInMutate } = useAppleSignIn();
 
     const { mutate: googleSignInMutate } = useGoogleSignIn();
 
@@ -161,6 +163,59 @@ const RegistrationScreen = ({ navigation, route }: Props) => {
         }
     };
 
+    async function onAppleButtonPress() {
+        try {
+            const appleAuthRequestResponse = await appleAuth.performRequest({
+                requestedOperation: appleAuth.Operation.LOGIN,
+                requestedScopes: [appleAuth.Scope.EMAIL, appleAuth.Scope.FULL_NAME],
+            });
+
+            const credentialState = await appleAuth.getCredentialStateForUser(appleAuthRequestResponse.user);
+
+            if (credentialState === appleAuth.State.AUTHORIZED) {
+                const { identityToken, authorizationCode, user } = appleAuthRequestResponse;
+
+                if (identityToken && authorizationCode && user) {
+                    appleSignInMutate(
+                        { identityToken, authorizationCode, user },
+                        {
+                            onSuccess: async (data) => {
+                                try {
+                                    console.log("Received data: ", data);
+                                    setUserId(data.user.id);
+                                    await AsyncStorage.setItem(user, JSON.stringify(data.user));
+                                    completeAuth();
+                                    setLoading(false);
+                                } catch (error) {
+                                    setLoading(false);
+                                    console.error('Ошибка при сохранении данных пользователя:', error);
+                                }
+                            },
+                            onError: (error) => {
+                                setLoading(false);
+                                console.error("Apple Sign-In error: ", error);
+                                Toast.show({
+                                    type: 'error',
+                                    text1: 'Error',
+                                    text2: error.message || 'Something went wrong during Apple Sign-In'
+                                });
+                            },
+                        }
+                    );
+                }
+            } else {
+                console.log('Authorization not completed');
+            }
+        } catch (error) {
+            console.error('Ошибка при входе через Apple:', error);
+            Toast.show({
+                type: 'error',
+                text1: 'Error',
+                text2: 'Something went wrong during Apple Sign-In'
+            });
+        }
+    }
+
 
     return (
         <SafeAreaView style={{ flex: 1, backgroundColor: BACKGROUND }}>
@@ -202,6 +257,22 @@ const RegistrationScreen = ({ navigation, route }: Props) => {
                         >
                             <GoogleIcon size={100}/>
                         </TouchableOpacity>
+                        {Platform.OS === 'ios' && appleAuth.isSupported && (
+                            <TouchableOpacity
+                                style={styles.authButton}
+                                onPress={onAppleButtonPress}
+                            >
+                                <AppleButton
+                                    buttonStyle={AppleButton.Style.WHITE}
+                                    buttonType={AppleButton.Type.SIGN_IN}
+                                    style={{
+                                        width: 40,
+                                        height: 40,
+                                        borderRadius: 20,
+                                    }}
+                                 onPress={onAppleButtonPress}/>
+                            </TouchableOpacity>
+                        )}
                     </View>
                 </ScrollView>
                 <TouchableOpacity
@@ -327,6 +398,15 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
         zIndex: 1,
+    },
+    authButton: {
+        width: 40,
+        height: 40,
+        borderRadius: 20,
+        backgroundColor: BACKGROUND,
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginHorizontal: 25,
     },
 });
 
