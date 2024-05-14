@@ -1,7 +1,5 @@
 import {useMutation, UseMutationResult, useQuery, UseQueryResult} from '@tanstack/react-query';
 import {
-    AppleSignInData,
-    AppleSignInResponse,
     CreateUserResponse,
     DeleteUserResponse,
     LivesResponse,
@@ -323,16 +321,27 @@ export const useDeleteUser = (): UseMutationResult<DeleteUserResponse, AxiosErro
 };
 
 export const useAppleSignIn = () => {
-    return useMutation<AppleSignInResponse, AxiosError, AppleSignInData>(
-        appleData => UserApi.appleSignIn(appleData),
+    return useMutation<
+        { user: {email: string, id: number} },
+        AxiosError,
+        { identityToken: string, authorizationCode: string, user: string },
+        unknown
+    >(
+        ({ identityToken, authorizationCode, user }) => UserApi.appleSignIn(identityToken, authorizationCode, user).then(result => {
+            if ('error' in result) {
+                throw new Error(result.error);
+            }
+            return { user: result.user };
+        }),
         {
             onError: (error) => {
-                console.error('Error during Apple sign in:', error.message);
+                console.error('Error during Apple sign in:', error);
             },
             onSuccess: (data) => {
                 console.log('Apple sign in successful:', data);
-                // Дополнительные действия после успешного входа
-            }
+                // Здесь вы можете, например, сохранить данные пользователя
+                // localStorage.setItem('user', JSON.stringify(data.user));
+            },
         },
     );
 };
