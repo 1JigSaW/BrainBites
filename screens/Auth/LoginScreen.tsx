@@ -386,7 +386,7 @@ const styles= StyleSheet.create({
         backgroundColor: BACKGROUND,
         justifyContent: 'center',
         alignItems: 'center',
-        marginHorizontal: 10,
+        marginHorizontal: 25,
     },
 });
 
