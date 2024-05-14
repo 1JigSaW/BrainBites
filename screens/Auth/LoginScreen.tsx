@@ -7,7 +7,7 @@ import {
     TouchableOpacity,
     StyleSheet,
     ActivityIndicator,
-    ScrollView, Button, Modal,
+    ScrollView, Button, Modal, Platform,
 } from 'react-native';
 import {AxiosErrorResponse, useAppleSignIn, useGoogleSignIn, useLoginUser} from '../../queries/user';
 import {StackScreenProps} from "@react-navigation/stack";
@@ -237,19 +237,22 @@ const LoginScreen = ({ navigation }: Props) => {
                         >
                             <GoogleIcon size={100}/>
                         </TouchableOpacity>
-                    </View>
-                    <View>
-                    {appleAuth.isSupported && (
-                        <AppleButton
-                            buttonStyle={AppleButton.Style.WHITE}
-                            buttonType={AppleButton.Type.SIGN_IN}
-                            style={{
-                                width: 160,
-                                height: 45,
-                            }}
-                            onPress={() => onAppleButtonPress()}
-                        />
-                    )}
+                        {Platform.OS === 'ios' && appleAuth.isSupported && (
+                            <TouchableOpacity
+                                style={styles.authButton}
+                                onPress={onAppleButtonPress}
+                            >
+                                <AppleButton
+                                    buttonStyle={AppleButton.Style.WHITE}
+                                    buttonType={AppleButton.Type.SIGN_IN}
+                                    style={{
+                                        width: 40,
+                                        height: 40,
+                                        borderRadius: 20,
+                                    }}
+                                 onPress={onAppleButtonPress}/>
+                            </TouchableOpacity>
+                        )}
                     </View>
                 </ScrollView>
                     <TouchableOpacity
@@ -375,6 +378,15 @@ const styles= StyleSheet.create({
         backgroundColor: BACKGROUND,
         justifyContent: 'center',
         alignItems: 'center',
+    },
+    authButton: {
+        width: 40,
+        height: 40,
+        borderRadius: 20,
+        backgroundColor: BACKGROUND,
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginHorizontal: 10,
     },
 });
 
