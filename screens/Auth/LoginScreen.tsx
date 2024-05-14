@@ -25,6 +25,7 @@ import Config from "react-native-config";
 import Toast from "react-native-toast-message";
 import GoogleIcon from "../../components/icons/GoogleIcon";
 import { appleAuth, AppleButton } from '@invertase/react-native-apple-authentication';
+import {AppleSignInData} from "../../api/user.api";
 
 
 type Props = StackScreenProps<AuthStackParamList, 'LoginScreen'>;
@@ -142,50 +143,52 @@ const LoginScreen = ({ navigation }: Props) => {
     };
 
     async function onAppleButtonPress() {
-        try {
-            const appleAuthRequestResponse = await appleAuth.performRequest({
-                requestedOperation: appleAuth.Operation.LOGIN,
-                requestedScopes: [appleAuth.Scope.EMAIL, appleAuth.Scope.FULL_NAME],
-            });
+    const appleSignInMutate = useAppleSignIn().mutate;
 
-            const credentialState = await appleAuth.getCredentialStateForUser(appleAuthRequestResponse.user);
+    try {
+        const appleAuthRequestResponse = await appleAuth.performRequest({
+            requestedOperation: appleAuth.Operation.LOGIN,
+            requestedScopes: [appleAuth.Scope.EMAIL, appleAuth.Scope.FULL_NAME],
+        });
 
-            if (credentialState === appleAuth.State.AUTHORIZED) {
-                console.log('Авторизация выполнена успешно');
-                const { identityToken, email, user } = appleAuthRequestResponse;
-                if (identityToken) {
-                    appleSignInMutate({ identityToken, email, user }, {
-                        onSuccess: async (data) => {
-                            setUserId(data.user.id);
-                            setUsername(data.user.username);
-                            setLives(data.user.lives);
-                            await AsyncStorage.setItem(user, JSON.stringify(data.user));
-                            completeAuth();
-                        },
-                        onError: (error) => {
-                            console.error('Ошибка при входе через Apple:', error);
-                            Toast.show({
-                                type: 'error',
-                                text1: 'Error',
-                                text2: error.message || 'Something went wrong'
-                            });
-                        }
-                    });
-                } else {
-                    console.log('Токен идентификации не получен.');
-                }
+        const credentialState = await appleAuth.getCredentialStateForUser(appleAuthRequestResponse.user);
+
+        if (credentialState === appleAuth.State.AUTHORIZED) {
+            console.log('Авторизация выполнена успешно');
+            const { identityToken, email, user } = appleAuthRequestResponse;
+            if (identityToken) {
+                appleSignInMutate({ identityToken, email, user } as AppleSignInData, {
+                    onSuccess: async (data) => {
+                        setUserId(data.user.id);
+                        setUsername(data.user.username);
+                        setLives(data.user.lives);
+                        await AsyncStorage.setItem(user, JSON.stringify(data.user));
+                        completeAuth();
+                    },
+                    onError: (error) => {
+                        console.error('Ошибка при входе через Apple:', error);
+                        Toast.show({
+                            type: 'error',
+                            text1: 'Error',
+                            text2: error.message || 'Something went wrong'
+                        });
+                    }
+                });
             } else {
-                console.log('Авторизация не выполнена');
+                console.log('Токен идентификации не получен.');
             }
-        } catch (error) {
-            console.error('Ошибка при входе через Apple:', error);
-            Toast.show({
-                type: 'error',
-                text1: 'Error',
-                text2: 'Something went wrong during Apple Sign-In'
-            });
+        } else {
+            console.log('Авторизация не выполнена');
         }
+    } catch (error) {
+        console.error('Ошибка при входе через Apple:', error);
+        Toast.show({
+            type: 'error',
+            text1: 'Error',
+            text2: 'Something went wrong during Apple Sign-In'
+        });
     }
+}
 
 
 

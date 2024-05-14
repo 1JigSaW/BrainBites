@@ -1,5 +1,7 @@
 import {useMutation, UseMutationResult, useQuery, UseQueryResult} from '@tanstack/react-query';
 import {
+    AppleSignInData,
+    AppleSignInResponse,
     CreateUserResponse,
     DeleteUserResponse,
     LivesResponse,
@@ -320,13 +322,8 @@ export const useDeleteUser = (): UseMutationResult<DeleteUserResponse, AxiosErro
     );
 };
 
-export interface AppleSignInResponse {
-    user: { id: number; email: string; };
-    token: string;
-}
-
 export const useAppleSignIn = () => {
-    return useMutation<any, AxiosError, any>(
+    return useMutation<AppleSignInResponse, AxiosError, AppleSignInData>(
         appleData => UserApi.appleSignIn(appleData),
         {
             onError: (error) => {

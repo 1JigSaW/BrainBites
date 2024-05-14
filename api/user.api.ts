@@ -49,6 +49,18 @@ export interface DeleteUserResponse {
     success: string;
 }
 
+export interface AppleSignInResponse {
+    user: { id: number; email: string; username: string; lives: number };
+    token: string;
+}
+
+// Интерфейс для данных запроса AppleSignIn
+export interface AppleSignInData {
+    identityToken: string;
+    email: string | null;
+    user: string;
+}
+
 
 export class UserApi {
     // Existing method
@@ -203,13 +215,15 @@ export class UserApi {
         }
     }
 
-    static async appleSignIn(appleData: any) {
+
+    static async appleSignIn(appleData: AppleSignInData): Promise<AppleSignInResponse> {
         try {
-            const { data } = await API.post('/api/apple_sign_in/', appleData);
+            const { data } = await API.post<AppleSignInResponse>('/api/apple_sign_in/', appleData, {
+            });
             return data;
         } catch (error: any) {
             if (error.response && error.response.data && error.response.data.error) {
-                return { error: error.response.data.error };
+                throw new Error(error.response.data.error);
             }
             throw error;
         }
