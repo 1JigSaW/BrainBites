@@ -208,11 +208,11 @@ const RegistrationScreen = ({ navigation, route }: Props) => {
             }
         } catch (error) {
             console.error('Ошибка при входе через Apple:', error);
-            Toast.show({
-                type: 'error',
-                text1: 'Error',
-                text2: 'Something went wrong during Apple Sign-In'
-            });
+            // Toast.show({
+            //     type: 'error',
+            //     text1: 'Error',
+            //     text2: 'Something went wrong during Apple Sign-In'
+            // });
         }
     }
 
