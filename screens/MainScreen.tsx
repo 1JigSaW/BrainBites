@@ -242,7 +242,9 @@ const MainScreen = ({ navigation, route }: Props) => {
                         </TouchableOpacity>
                     </View>
                 </View>
-                <WeeklyProgressBar total={currentStreak} progress={currentStreak} />
+                <View>
+                    <WeeklyProgressBar total={currentStreak} progress={currentStreak} />
+                </View>
             </TouchableOpacity>
             <View style={{flex: 1}}>
                 <FlatList
@@ -317,7 +319,7 @@ const MainScreen = ({ navigation, route }: Props) => {
 const styles = StyleSheet.create({
     header: {
         backgroundColor: MAIN_SECOND,
-        height: 130,
+        height: 150,
         borderBottomEndRadius: 20,
         borderBottomStartRadius: 20,
     },
@@ -356,7 +358,7 @@ const styles = StyleSheet.create({
         marginLeft: 10,
         marginRight: 20,
         marginTop: 5,
-        paddingBottom: 0
+        paddingBottom: 0,
     },
     textVariable: {
         fontSize: 24,

@@ -52,7 +52,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-around',
     width: screenWidth,
     padding: 8,
-    marginTop: -18
+    // marginTop: -18
   },
   circle: {
     width: 80,
